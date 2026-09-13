@@ -1,0 +1,139 @@
+/* ============================================================================
+   gen/kompendium.css — das Kompendium im Gewand der Anwendung
+   ----------------------------------------------------------------------------
+   Quelle des Inhalts sind Notion-Seiten: eigene Farben, eigene Abstände,
+   eigene Schriften. Davon wird nichts übernommen. Alles hängt an den
+   Variablen der Anwendung, damit das Kompendium im Dunkelmodus mitgeht.
+
+   Aufbau wie beim Spickzettel, damit man nichts Neues lernen muss:
+     · Kopfleiste klebt oben (Zurück, Blättern, Suche),
+     · Tabellen rollen in ihrem eigenen Kasten,
+     · zwei Spalten werden auf dem Telefon eine,
+     · Tippziele mindestens 44 px.
+   ========================================================================== */
+
+.kp-wrap{max-width:900px}
+
+/* ------------------------------------------------------------- Leiste --- */
+.kp-leiste{position:sticky; top:64px; z-index:25; background:var(--paper);
+  border-bottom:1px solid var(--rule); padding:8px 0 9px; margin-bottom:14px}
+.kp-leiste-reihe{display:flex; align-items:center; gap:7px; flex-wrap:wrap}
+.kp-leiste .btn{min-height:38px}
+.kp-zaehler{font-family:var(--data); font-size:12.5px; color:var(--muted); white-space:nowrap}
+.kp-titel-klein{font-family:var(--display); text-transform:uppercase; letter-spacing:.1em;
+  font-size:10.5px; font-weight:700; color:var(--muted)}
+.kp-suche{flex:1 1 220px; min-width:0; display:flex}
+.kp-suche input{flex:1; min-width:0; font:inherit; font-size:14px; min-height:38px;
+  padding:6px 11px; background:var(--field); color:var(--ink);
+  border:1px solid var(--rule); border-radius:6px}
+.kp-suche input:focus{outline:2px solid var(--pruefer); outline-offset:1px}
+
+/* --------------------------------------------------------- Verzeichnis --- */
+.kp-kopf h2{margin:0 0 4px}
+.kp-nr-gross{font-family:var(--data); font-style:normal; color:var(--muted); font-size:.8em}
+.kp-filter{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 2px}
+.kp-chip{font:inherit; font-size:12px; line-height:1.2; min-height:32px; padding:6px 10px;
+  background:var(--field); color:var(--ink); border:1px solid var(--rule);
+  border-radius:999px; cursor:pointer}
+.kp-chip:hover{background:var(--card)}
+.kp-chip[aria-pressed="true"]{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.kp-chip:focus-visible{outline:2px solid var(--pruefer); outline-offset:2px}
+
+.kp-gruppe{margin-top:18px}
+.kp-gruppe > h3{font-family:var(--display); font-size:12px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--muted); margin:0 0 7px}
+.kp-liste{display:flex; flex-direction:column;
+  border:1px solid var(--rule); border-radius:6px; overflow:hidden; background:var(--card)}
+.kp-zeile{display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  min-height:56px; padding:10px 13px; background:none; border:0; cursor:pointer;
+  border-bottom:1px solid var(--rule-soft); font:inherit; color:inherit}
+.kp-zeile:last-child{border-bottom:0}
+.kp-zeile:hover{background:var(--field)}
+.kp-zeile:focus-visible{outline:2px solid var(--pruefer); outline-offset:-2px}
+.kp-nr{flex:none; width:26px; font-family:var(--data); font-size:13px; font-weight:700; color:var(--pruefer)}
+.kp-text{flex:1; min-width:0}
+.kp-text b{display:block; font-size:15px; line-height:1.35}
+.kp-unter{display:block; font-size:12.5px; color:var(--muted); line-height:1.45; margin-top:2px}
+.kp-pfeil{flex:none; color:var(--muted); font-size:19px}
+.kp-quelle{font-size:12px; color:var(--muted); line-height:1.6; margin-top:18px}
+
+.kp-stand{flex:none; font-size:10.5px; font-family:var(--display); letter-spacing:.04em;
+  text-transform:uppercase; padding:3px 7px; border-radius:999px;
+  border:1px solid var(--rule); color:var(--muted); background:var(--field)}
+.kp-stand.ist-offen{border-color:var(--red); color:var(--red); background:var(--red-soft)}
+
+.kp-fakten{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px}
+.kp-fakt{flex:1 1 84px; background:var(--field); border:1px solid var(--rule); border-radius:6px;
+  padding:8px 10px; text-align:center}
+.kp-fakt b{display:block; font-family:var(--data); font-size:18px; line-height:1.2}
+.kp-fakt span{font-size:11px; color:var(--muted)}
+
+.kp-schnell{display:flex; flex-wrap:wrap; gap:6px}
+.kp-schnell .btn{font-size:12px}
+
+/* ------------------------------------------------------------- Thema --- */
+.kp-meta{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 2px}
+.kp-marke{font-size:11.5px; padding:3px 8px; border-radius:999px;
+  background:var(--field); border:1px solid var(--rule); color:var(--muted)}
+
+.kp-inhalt{font-size:15px; line-height:1.65}
+.kp-inhalt h3{font-family:var(--display); font-size:16px; margin:22px 0 8px; line-height:1.3;
+  padding-bottom:5px; border-bottom:1px solid var(--rule-soft)}
+.kp-inhalt h4{font-family:var(--display); font-size:14.5px; margin:18px 0 6px; line-height:1.3}
+.kp-inhalt h5{font-family:var(--display); font-size:13.5px; margin:14px 0 5px; color:var(--muted)}
+.kp-inhalt p{margin:0 0 9px}
+.kp-inhalt ul,.kp-inhalt ol{margin:0 0 10px; padding-left:22px}
+.kp-inhalt li{margin:0 0 5px}
+.kp-inhalt li > ul,.kp-inhalt li > ol{margin-top:5px}
+.kp-inhalt code{font-family:var(--data); font-size:.9em; background:var(--field);
+  border:1px solid var(--rule-soft); border-radius:4px; padding:1px 4px}
+.kp-inhalt a{color:var(--pruefer)}
+.kp-inhalt .k-hl{background:var(--pruefer-soft); border-radius:3px; padding:0 2px}
+.kp-inhalt .k-hr{border:0; border-top:1px solid var(--rule); margin:18px 0}
+.kp-inhalt blockquote{margin:0 0 10px; padding:2px 0 2px 12px;
+  border-left:3px solid var(--rule); color:var(--muted)}
+.kp-inhalt .k-callout{display:flex; gap:10px; background:var(--field);
+  border:1px solid var(--rule); border-left:4px solid var(--pruefer);
+  border-radius:6px; padding:11px 13px; margin:0 0 12px}
+.kp-inhalt .k-callout p:last-child{margin-bottom:0}
+.kp-inhalt .k-ic{flex:none; font-size:16px; line-height:1.4}
+.kp-inhalt .k-toggle{border:1px solid var(--rule); border-radius:6px;
+  padding:9px 12px; margin:0 0 10px; background:var(--card)}
+.kp-inhalt .k-toggle > summary{cursor:pointer; font-weight:600; min-height:24px}
+.kp-inhalt .k-code{background:var(--field); border:1px solid var(--rule); border-radius:6px;
+  padding:11px 13px; margin:0 0 12px; overflow-x:auto; font-family:var(--data); font-size:13px;
+  line-height:1.5; white-space:pre}
+.kp-inhalt .k-code code{background:none; border:0; padding:0; font-size:inherit}
+.kp-inhalt .k-todo{list-style:none; padding-left:2px}
+.kp-inhalt .k-box{font-family:var(--data)}
+
+.kp-inhalt .k-tab{overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 0 12px;
+  border:1px solid var(--rule); border-radius:6px; background:var(--card)}
+.kp-inhalt .k-tab table{border-collapse:collapse; width:100%; font-size:13.5px}
+.kp-inhalt .k-tab th,.kp-inhalt .k-tab td{border-bottom:1px solid var(--rule-soft);
+  border-right:1px solid var(--rule-soft); padding:7px 10px; text-align:left; vertical-align:top}
+.kp-inhalt .k-tab th{background:var(--field); font-weight:700; white-space:nowrap}
+.kp-inhalt .k-tab tr:last-child td{border-bottom:0}
+.kp-inhalt .k-tab th:last-child,.kp-inhalt .k-tab td:last-child{border-right:0}
+
+.kp-inhalt .k-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:0 0 12px}
+.kp-inhalt .k-fig{margin:0 0 14px}
+.kp-inhalt .k-fig img{max-width:100%; height:auto; border:1px solid var(--rule);
+  border-radius:6px; background:#fff; display:block}
+.kp-inhalt .k-fig figcaption{font-size:12px; color:var(--muted); margin-top:5px}
+.kp-inhalt .k-eq code{display:inline-block; padding:3px 7px}
+
+.kp-treffer{background:#ffe89a; color:#1b1b1b; border-radius:2px}
+.kp-fund{padding:10px 13px; border-bottom:1px solid var(--rule-soft)}
+.kp-fund:last-child{border-bottom:0}
+.kp-fund .kp-stelle{font-size:13px; color:var(--muted); line-height:1.55; margin-top:3px}
+
+.kp-fuss{display:flex; flex-wrap:wrap; gap:8px; margin-top:22px;
+  border-top:1px solid var(--rule); padding-top:14px}
+.kp-laden{font-size:13px; color:var(--muted); padding:14px 0}
+
+@media (max-width:720px){
+  .kp-inhalt .k-cols{grid-template-columns:1fr}
+  .kp-inhalt{font-size:14.5px}
+  .kp-leiste{top:56px}
+}

@@ -146,6 +146,7 @@ window.GENPWA = (function () {
         else if (ziel === "blatt" && window.GENUI) window.GENUI.assistent();
         else if (ziel === "satzbau" && window.GENSATZ) window.GENSATZ.starten();
         else if (ziel === "spick" && window.GENSPICK) window.GENSPICK.verzeichnis();
+        else if (ziel === "komp" && window.GENKOMP) window.GENKOMP.verzeichnis();
       } catch (e) { console.warn("Schnellstart:", e); }
     }, 400);
   }

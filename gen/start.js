@@ -47,6 +47,7 @@ window.GENSTART = (function () {
     { key: "gesamt",  id: "gesamtBox",                       name: "Wo stehe ich?" },
     { key: "archiv",  id: "archivBox",                       name: "Archiv der Durchgänge" },
     { key: "spick",   id: "spickBox",                        name: "Spickzettel — der ganze Stoff" },
+    { key: "komp",    id: "kompBox",                         name: "Kompendium — 52 FIAE-Themen" },
     { key: "plan",    id: "planBox",                         name: "Lernplan bis zur Prüfung" },
     { key: "tempo",   id: "zeitBox",                         name: "Tempo — Sekunden je BE" },
     { key: "pseudo",  id: "pseudoBox",                       name: "Pseudocode selbst schreiben" },

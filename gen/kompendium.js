@@ -1,0 +1,493 @@
+/* ============================================================================
+   gen/kompendium.js — das AP1-Kompendium als eigenes Kapitel der Anwendung
+   ----------------------------------------------------------------------------
+   Inhalt: 52 ausgearbeitete Themenseiten aus einer geteilten Notion-Sammlung
+   („Prüfungsvorbereitung“, Kurs FIAE). In Notion ist jede Seite ein eigener
+   Eintrag mit eigener URL — zum Lernen unterwegs heißt das: einloggen,
+   suchen, warten, blättern.
+
+   Hier stattdessen: ein Verzeichnis, nach den sieben AP1-Themengebieten
+   geordnet, und genau eine Seite auf einmal.
+
+   Warum der Text nicht in einer einzigen Datei liegt:
+   die 52 Seiten sind zusammen rund 1,3 MB HTML. Das beim Start der Anwendung
+   mitzuladen wäre auf dem Telefon spürbar. Deshalb steht in
+   gen/kompendium-daten.js nur das Verzeichnis (ein paar Kilobyte), und der
+   Text eines Themas wird erst geholt, wenn man es öffnet — als
+   gen/komp/<id>.js. Das funktioniert auch offline und beim Öffnen der
+   index.html direkt von der Festplatte (kein fetch, sondern ein Script-Tag).
+
+   Die Suche braucht alle Texte. Sie lädt deshalb beim ersten Suchlauf
+   einmalig alles nach und sagt das auch.
+   ========================================================================== */
+"use strict";
+
+window.GENKOMP = (function () {
+  const $ = id => document.getElementById(id);
+  const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const SK = "ihk2:komp";
+
+  const ALLE = () => (window.KOMP_THEMEN || []);
+  const TEXT = () => (window.KOMP_TEXT || (window.KOMP_TEXT = {}));
+
+  let stand = { thema: null, suche: "", filter: "alle" };
+  try { stand = Object.assign(stand, JSON.parse(localStorage.getItem(SK) || "{}")); } catch (e) { }
+  const merken = () => { try { localStorage.setItem(SK, JSON.stringify(stand)); } catch (e) { } };
+
+  /* Die sieben Themengebiete der AP1 (plus „0 Praktisches“ für alles,
+     was die Sammlung nicht einsortiert hat). Kurzformen fürs Verzeichnis. */
+  const GEBIETE = [
+    ["1", "Projekte planen & durchführen"],
+    ["2", "Informieren & Beraten"],
+    ["3", "Marktgängige IT-Systeme"],
+    ["4", "IT-Lösungen entwickeln"],
+    ["5", "Qualitätssicherung"],
+    ["6", "IT-Sicherheit"],
+    ["7", "Auftragsabschluss"],
+    ["0", "Praktisches & Sonstiges"]
+  ];
+  const gebietVon = t => {
+    const n = String(t.ap || "").trim().slice(0, 1);
+    return GEBIETE.some(g => g[0] === n) ? n : "0";
+  };
+  const gebietName = n => (GEBIETE.find(g => g[0] === n) || ["0", "Sonstiges"])[1];
+
+  /* ---------------------------------------------------------- Nachladen --- */
+  const geladen = {};
+  function laden(id) {
+    if (TEXT()[id]) return Promise.resolve(TEXT()[id]);
+    if (geladen[id]) return geladen[id];
+    geladen[id] = new Promise(fertig => {
+      const s = document.createElement("script");
+      s.src = "gen/komp/" + id + ".js";
+      s.onload = () => fertig(TEXT()[id] || "");
+      s.onerror = () => fertig("<p class=\"hint\">Der Text zu diesem Thema wurde nicht gefunden " +
+        "(gen/komp/" + id + ".js).</p>");
+      document.head.appendChild(s);
+    });
+    return geladen[id];
+  }
+  const alleLaden = () => Promise.all(ALLE().map(t => laden(t.id)));
+
+  /* ------------------------------------------------------------- Seite --- */
+  function seite() {
+    let s = $("scKomp");
+    if (s) return s;
+    s = el("div", "seite"); s.id = "scKomp"; s.hidden = true;
+    s.innerHTML = '<div class="abschnitt kp-wrap">' +
+      '<div class="kp-leiste" id="kpLeiste"></div>' +
+      '<div id="kpInhalt"></div></div>';
+    const start = $("scStart");
+    start.parentNode.insertBefore(s, start.nextSibling);
+    return s;
+  }
+
+  function zeigen() {
+    seite();
+    /* Jede andere Seite verschwindet — auch die, die erst später von einem
+       anderen Modul angelegt wurde. Deshalb nicht nach einer festen Liste,
+       sondern nach allem, was wie eine Seite aussieht. */
+    document.querySelectorAll("div.seite[id^='sc']").forEach(e => {
+      if (e.id !== "scKomp") e.hidden = true;
+    });
+    $("scKomp").hidden = false;
+    const f = $("fuss"); if (f) f.hidden = true;
+    const kt = $("kopfTitel"); if (kt) kt.hidden = false;
+    if (window.GENZURUECK) window.GENZURUECK.knopfPflegen();
+  }
+
+  /* --------------------------------------------------------- Suchhilfe --- */
+  const norm = s => String(s || "").toLowerCase()
+    .replace(/ä/g, "a").replace(/ö/g, "o").replace(/ü/g, "u").replace(/ß/g, "ss");
+
+  const BLOCK = /^(P|DIV|LI|UL|OL|TR|TD|TH|H1|H2|H3|H4|H5|BR|SECTION|TABLE|THEAD|TBODY|PRE|FIGURE|FIGCAPTION|SUMMARY|DETAILS|BLOCKQUOTE)$/;
+  function nurText(h) {
+    const d = document.createElement("div");
+    d.innerHTML = h || "";
+    const teile = [];
+    (function lauf(n) {
+      n.childNodes.forEach(k => {
+        if (k.nodeType === 3) teile.push(k.nodeValue);
+        else if (k.nodeType === 1) {
+          if (/^(SCRIPT|STYLE)$/.test(k.nodeName)) return;
+          if (BLOCK.test(k.nodeName)) teile.push(" ");
+          lauf(k);
+          if (BLOCK.test(k.nodeName)) teile.push(" ");
+        }
+      });
+    })(d);
+    return teile.join("").replace(/\s+/g, " ").trim();
+  }
+
+  function markieren(wurzel, wort) {
+    const w = norm(wort).trim();
+    if (w.length < 2) return 0;
+    let n = 0;
+    const lauf = document.createTreeWalker(wurzel, NodeFilter.SHOW_TEXT, {
+      acceptNode: kn => (kn.parentNode && /^(SCRIPT|STYLE|MARK)$/.test(kn.parentNode.nodeName))
+        ? NodeFilter.FILTER_REJECT
+        : (norm(kn.nodeValue).includes(w) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT)
+    });
+    const knoten = [];
+    while (lauf.nextNode()) knoten.push(lauf.currentNode);
+    knoten.forEach(kn => {
+      const txt = kn.nodeValue, nt = norm(txt);
+      const teile = document.createDocumentFragment();
+      let pos = 0, i = nt.indexOf(w);
+      while (i >= 0) {
+        if (i > pos) teile.appendChild(document.createTextNode(txt.slice(pos, i)));
+        teile.appendChild(el("mark", "kp-treffer", txt.slice(i, i + w.length))); n++;
+        pos = i + w.length; i = nt.indexOf(w, pos);
+      }
+      if (pos < txt.length) teile.appendChild(document.createTextNode(txt.slice(pos)));
+      kn.parentNode.replaceChild(teile, kn);
+    });
+    return n;
+  }
+
+  function treffer(wort) {
+    const w = norm(wort).trim();
+    if (w.length < 2) return [];
+    return ALLE().map(t => {
+      const txt = nurText((t.titel || "") + " " + (t.unter || "") + " " + (TEXT()[t.id] || ""));
+      const n = norm(txt);
+      const stellen = []; let i = n.indexOf(w), anzahl = 0;
+      while (i >= 0) {
+        anzahl++;
+        if (stellen.length < 3) stellen.push(txt.slice(Math.max(0, i - 55), i + w.length + 80).trim());
+        i = n.indexOf(w, i + w.length);
+      }
+      return { t, anzahl, stellen };
+    }).filter(x => x.anzahl > 0).sort((a, b) => b.anzahl - a.anzahl);
+  }
+
+  /* ------------------------------------------------------------ Leiste --- */
+  function leiste(modus, thema, liste) {
+    const l = $("kpLeiste");
+    l.innerHTML = "";
+    const reihe = el("div", "kp-leiste-reihe");
+
+    if (modus === "thema") {
+      const zur = el("button", "btn ghost klein", "☰ Themen");
+      zur.onclick = () => verzeichnis();
+      reihe.appendChild(zur);
+      const reihenfolge = liste || gefiltert();
+      const i = reihenfolge.findIndex(x => x.id === thema.id);
+      const vor = el("button", "btn ghost klein", "‹");
+      vor.title = "vorheriges Thema"; vor.setAttribute("aria-label", "vorheriges Thema");
+      vor.disabled = i <= 0;
+      vor.onclick = () => oeffnen(reihenfolge[i - 1].id);
+      const nach = el("button", "btn ghost klein", "›");
+      nach.title = "nächstes Thema"; nach.setAttribute("aria-label", "nächstes Thema");
+      nach.disabled = i < 0 || i >= reihenfolge.length - 1;
+      nach.onclick = () => oeffnen(reihenfolge[i + 1].id);
+      reihe.append(vor, el("span", "kp-zaehler", (i + 1) + " / " + reihenfolge.length), nach);
+    } else {
+      reihe.appendChild(el("span", "kp-titel-klein", "Kompendium · " + ALLE().length + " Themen"));
+    }
+
+    const such = el("div", "kp-suche");
+    const lab = el("label", "sr-only", "Im Kompendium suchen"); lab.htmlFor = "kpSuche";
+    const inp = el("input"); inp.type = "search"; inp.id = "kpSuche";
+    inp.placeholder = "suchen: Subnetting, RAID, DSGVO …";
+    inp.value = stand.suche || ""; inp.autocomplete = "off";
+    let warte = null;
+    inp.oninput = () => {
+      clearTimeout(warte);
+      warte = setTimeout(() => {
+        stand.suche = inp.value; merken();
+        if (inp.value.trim().length >= 2) suchseite(inp.value);
+        else if (modus === "thema") oeffnen(thema.id, true);
+        else verzeichnis(true);
+      }, 250);
+    };
+    such.append(lab, inp);
+    reihe.appendChild(such);
+    l.appendChild(reihe);
+  }
+
+  /* ------------------------------------------------------- Verzeichnis --- */
+  function gefiltert() {
+    const f = stand.filter || "alle";
+    const l = ALLE().slice();
+    if (f === "alle") {
+      const rang = n => (n === "0" ? 9 : Number(n));
+      return l.sort((a, b) => rang(gebietVon(a)) - rang(gebietVon(b)) || a.titel.localeCompare(b.titel, "de"));
+    }
+    if (f === "offen") return l.filter(t => /nicht gelernt|schwierig/i.test(t.stand || ""));
+    return l.filter(t => gebietVon(t) === f).sort((a, b) => a.titel.localeCompare(b.titel, "de"));
+  }
+
+  function zeile(t, nr) {
+    const a = el("button", "kp-zeile"); a.type = "button";
+    a.appendChild(el("span", "kp-nr", nr != null ? String(nr) : gebietVon(t)));
+    const txt = el("span", "kp-text");
+    txt.appendChild(el("b", null, t.titel));
+    const unten = [t.unter, t.thema].filter(Boolean).join(" · ");
+    if (unten) txt.appendChild(el("span", "kp-unter", unten));
+    a.appendChild(txt);
+    if (t.stand) {
+      const s = el("span", "kp-stand", t.stand);
+      if (/nicht gelernt|schwierig/i.test(t.stand)) s.classList.add("ist-offen");
+      a.appendChild(s);
+    }
+    a.appendChild(el("span", "kp-pfeil", "›"));
+    a.onclick = () => oeffnen(t.id);
+    return a;
+  }
+
+  function verzeichnis(ohneFokus) {
+    seite();
+    leiste("liste");
+    const box = $("kpInhalt");
+    box.innerHTML = "";
+
+    const kopf = el("div", "kp-kopf");
+    kopf.appendChild(el("h2", null, "AP1 Kompendium"));
+    kopf.appendChild(el("p", "hint",
+      "Ausgearbeitete Themenseiten zu allen sieben Prüfungsgebieten — Definitionen, " +
+      "Tabellen, Abbildungen, Musteraufgaben. Ein Thema je Zeile; die Suche geht über alles."));
+
+    const offen = ALLE().filter(t => /nicht gelernt|schwierig/i.test(t.stand || "")).length;
+    const zahlen = el("div", "kp-fakten");
+    [[String(ALLE().length), "Themen"], ["7", "Gebiete"],
+     [String(ALLE().length - offen), "bearbeitet"], [String(offen), "offen"]]
+      .forEach(([a, b]) => {
+        const f = el("div", "kp-fakt");
+        f.append(el("b", null, a), el("span", null, b));
+        zahlen.appendChild(f);
+      });
+    kopf.appendChild(zahlen);
+
+    const filter = el("div", "kp-filter");
+    const setzen = (wert, beschriftung) => {
+      const c = el("button", "kp-chip", beschriftung); c.type = "button";
+      c.setAttribute("aria-pressed", String((stand.filter || "alle") === wert));
+      c.onclick = () => { stand.filter = wert; merken(); verzeichnis(true); };
+      filter.appendChild(c);
+    };
+    setzen("alle", "alle");
+    GEBIETE.forEach(([n, name]) => {
+      const anzahl = ALLE().filter(t => gebietVon(t) === n).length;
+      if (anzahl) setzen(n, n + " " + name + " (" + anzahl + ")");
+    });
+    if (offen) setzen("offen", "noch offen (" + offen + ")");
+    kopf.appendChild(filter);
+    box.appendChild(kopf);
+
+    const liste = gefiltert();
+    if ((stand.filter || "alle") === "alle") {
+      GEBIETE.forEach(([n, name]) => {
+        const teil = liste.filter(t => gebietVon(t) === n);
+        if (!teil.length) return;
+        const g = el("div", "kp-gruppe");
+        g.appendChild(el("h3", null, n === "0" ? name : n + " · " + name));
+        const ul = el("div", "kp-liste");
+        teil.forEach(t => ul.appendChild(zeile(t)));
+        g.appendChild(ul);
+        box.appendChild(g);
+      });
+    } else {
+      const g = el("div", "kp-gruppe");
+      const ul = el("div", "kp-liste");
+      liste.forEach(t => ul.appendChild(zeile(t)));
+      g.appendChild(ul);
+      box.appendChild(g);
+    }
+
+    const quelle = el("p", "kp-quelle");
+    quelle.innerHTML = "Inhalt aus einer geteilten Notion-Sammlung „Prüfungsvorbereitung“ " +
+      "(Notizen einer Kurskollegin, FIAE). Übernommen als Lesekopie — die Originalseiten " +
+      "bleiben unverändert.";
+    box.appendChild(quelle);
+
+    stand.thema = null; merken();
+    zeigen();
+    if (!ohneFokus) window.scrollTo(0, 0);
+  }
+
+  /* ------------------------------------------------------------- Thema --- */
+  function oeffnen(id, stillHalten) {
+    seite();
+    const t = ALLE().find(x => x.id === id) || ALLE()[0];
+    if (!t) return;
+    const liste = gefiltert().some(x => x.id === t.id) ? gefiltert() : ALLE();
+    leiste("thema", t, liste);
+    const box = $("kpInhalt");
+    box.innerHTML = "";
+
+    const kopf = el("div", "kp-kopf");
+    kopf.appendChild(el("h2", null, t.titel));
+    const meta = el("div", "kp-meta");
+    [t.ap, t.thema, t.unter, t.stand].filter(Boolean).forEach(m =>
+      meta.appendChild(el("span", "kp-marke", m)));
+    if (meta.childNodes.length) kopf.appendChild(meta);
+    if (t.notiz) kopf.appendChild(el("p", "hint", t.notiz));
+    box.appendChild(kopf);
+
+    const inhalt = el("div", "kp-inhalt");
+    inhalt.appendChild(el("p", "kp-laden", "Thema wird geladen …"));
+    box.appendChild(inhalt);
+
+    laden(t.id).then(h => {
+      inhalt.innerHTML = h || "<p class=\"hint\">Diese Seite ist in der Sammlung noch leer.</p>";
+      inhalt.querySelectorAll("table").forEach(tab => {
+        if (tab.closest(".k-tab")) return;
+        const w = el("div", "k-tab");
+        tab.parentNode.insertBefore(w, tab); w.appendChild(tab);
+      });
+      if (stand.suche && stand.suche.trim().length >= 2) markieren(inhalt, stand.suche);
+    });
+
+    const i = liste.findIndex(x => x.id === t.id);
+    const fuss = el("div", "kp-fuss");
+    if (i > 0) {
+      const b = el("button", "btn ghost klein", "‹ " + liste[i - 1].titel);
+      b.onclick = () => oeffnen(liste[i - 1].id);
+      fuss.appendChild(b);
+    }
+    if (i >= 0 && i < liste.length - 1) {
+      const b = el("button", "btn klein", liste[i + 1].titel + " ›");
+      b.onclick = () => oeffnen(liste[i + 1].id);
+      fuss.appendChild(b);
+    }
+    const zurListe = el("button", "btn ghost klein", "☰ alle Themen");
+    zurListe.onclick = () => verzeichnis();
+    fuss.appendChild(zurListe);
+    box.appendChild(fuss);
+
+    stand.thema = t.id; merken();
+    zeigen();
+    if (!stillHalten) window.scrollTo(0, 0);
+  }
+
+  /* ------------------------------------------------------- Suchergebnis --- */
+  function suchseite(wort) {
+    seite();
+    stand.suche = wort; merken();
+    leiste("liste");
+    const box = $("kpInhalt");
+    box.innerHTML = "";
+    const kopf = el("div", "kp-kopf");
+    kopf.appendChild(el("h2", null, "„" + wort.trim() + "“"));
+    const info = el("p", "hint", "Es wird in allen " + ALLE().length + " Themen gesucht …");
+    kopf.appendChild(info);
+    box.appendChild(kopf);
+    zeigen();
+
+    alleLaden().then(() => {
+      if (norm(stand.suche) !== norm(wort)) return;   /* inzwischen weitergetippt */
+      const tr = treffer(wort);
+      info.textContent = tr.length
+        ? tr.length + (tr.length === 1 ? " Thema enthält" : " Themen enthalten") + " das Wort."
+        : "Kein Treffer. Andere Schreibweise oder kürzeres Wort versuchen.";
+      const liste = el("div", "kp-liste");
+      tr.forEach(x => {
+        const a = el("button", "kp-fund"); a.type = "button";
+        a.style.cssText = "display:block;width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit;cursor:pointer";
+        const kopfzeile = el("div");
+        kopfzeile.appendChild(el("b", null, x.t.titel));
+        kopfzeile.appendChild(el("span", "kp-unter", (x.t.ap || "") + " · " + x.anzahl + "×"));
+        a.appendChild(kopfzeile);
+        x.stellen.forEach(s => a.appendChild(el("div", "kp-stelle", "… " + s + " …")));
+        a.onclick = () => oeffnen(x.t.id);
+        liste.appendChild(a);
+      });
+      box.appendChild(liste);
+    });
+  }
+
+  /* --------------------------------------------------------- Startblock --- */
+  function block() {
+    const start = $("scStart");
+    if (!start || !ALLE().length) return;
+    let box = $("kompBox");
+    if (!box) {
+      box = el("div", "abschnitt"); box.id = "kompBox";
+      box.appendChild(el("h2", null, "Kompendium"));
+      const p = el("p", "hint");
+      p.textContent = ALLE().length + " ausgearbeitete Themenseiten zu allen sieben " +
+        "AP1-Gebieten — zum Nachschlagen und Lesen, mit Tabellen und Abbildungen.";
+      box.appendChild(p);
+      const inhalt = el("div"); inhalt.id = "kompInhalt";
+      box.appendChild(inhalt);
+      const anker = $("spickBox") || $("archivBox") || $("gesamtBox");
+      const ziel = anker ? (anker.closest("details.st-block") || anker) : null;
+      if (ziel && ziel.parentNode) ziel.parentNode.insertBefore(box, ziel.nextSibling);
+      else start.appendChild(box);
+    }
+    const inhalt = $("kompInhalt");
+    inhalt.innerHTML = "";
+
+    const reihe = el("div", "kp-schnell");
+    GEBIETE.forEach(([n, name]) => {
+      const anzahl = ALLE().filter(t => gebietVon(t) === n).length;
+      if (!anzahl) return;
+      const b = el("button", "btn ghost klein", n + " " + name + " (" + anzahl + ")");
+      b.onclick = () => { stand.filter = n; merken(); verzeichnis(); };
+      reihe.appendChild(b);
+    });
+    inhalt.appendChild(reihe);
+
+    const steuer = el("div", "steuer");
+    steuer.style.marginTop = "10px";
+    const auf = el("button", "btn primary klein", "Kompendium öffnen");
+    auf.onclick = () => { stand.filter = "alle"; merken(); verzeichnis(); };
+    steuer.appendChild(auf);
+    if (stand.thema) {
+      const t = ALLE().find(x => x.id === stand.thema);
+      if (t) {
+        const w = el("button", "btn klein", "weiter bei „" + t.titel + "“");
+        w.onclick = () => oeffnen(t.id);
+        steuer.appendChild(w);
+      }
+    }
+    inhalt.appendChild(steuer);
+  }
+
+  /* ---------------------------------------------------------- Einhängen --- */
+  function einhaengen() {
+    seite();
+    const altStart = window.renderStart;
+    if (typeof altStart === "function" && !altStart.__kp) {
+      const neu = function () {
+        const r = altStart.apply(this, arguments);
+        try { block(); } catch (e) { console.error("Kompendium:", e); }
+        return r;
+      };
+      neu.__kp = true; window.renderStart = neu;
+    }
+    const altSchirm = window.schirm;
+    if (typeof altSchirm === "function" && !altSchirm.__kp) {
+      const neu = function () {
+        const s = $("scKomp"); if (s) s.hidden = true;
+        return altSchirm.apply(this, arguments);
+      };
+      neu.__kp = true; window.schirm = neu;
+    }
+    /* Andere Kapitel (Spickzettel, Archiv, Generator …) blenden ihre eigene
+       Seite selbst ein und kennen diese hier nicht — ihre Umschaltfunktion
+       liegt in einem Modul und lässt sich von außen nicht zuverlässig
+       umwickeln. Deshalb wird schlicht zugesehen: sobald irgendeine andere
+       Seite sichtbar wird, verschwindet das Kompendium. */
+    if (!window.__kpWache && window.MutationObserver) {
+      window.__kpWache = new MutationObserver(muts => {
+        const k = $("scKomp");
+        if (!k || k.hidden) return;
+        for (const m of muts) {
+          const z = m.target;
+          if (z !== k && z.classList && z.classList.contains("seite") &&
+              /^sc/.test(z.id || "") && !z.hidden) { k.hidden = true; return; }
+        }
+      });
+      window.__kpWache.observe(document.body,
+        { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+    }
+    try { block(); } catch (e) { }
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
+  else einhaengen();
+
+  return { verzeichnis, oeffnen, suchseite, block, zeigen, laden };
+})();

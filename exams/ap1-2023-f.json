@@ -63,14 +63,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Wartbarkeit",
+              "Andere Nennungen",
               "Erweiterbarkeit",
               "Desktop-Rechner",
+              "Wartbarkeit",
               "Serververbindung",
-              "Andere Nennungen",
-              "Notebook",
               "Thin-Client",
-              "Platzbedarf"
+              "Platzbedarf",
+              "Notebook"
             ]
           },
           "felder": [
@@ -157,14 +157,14 @@
               }
             ],
             "begriffe": [
-              "Auswertung",
-              "Vergabe",
-              "Summen",
               "Kriterium",
               "Desktop",
-              "Erweiterung",
-              "Notebook",
-              "Ergonomie"
+              "Vergabe",
+              "Summen",
+              "Auswertung",
+              "Thin-Client",
+              "Berechnung",
+              "Erweiterung"
             ]
           },
           "felder": [],
@@ -264,10 +264,10 @@
             "zahlen": [],
             "begriffe": [
               "Beitrag",
+              "Büroumgebung",
+              "Modernisierung",
               "Einsparung",
               "CO2",
-              "Modernisierung",
-              "Büroumgebung",
               "Kosteneinsparung",
               "Energieverbrauch",
               "Unterstützung"
@@ -390,14 +390,14 @@
               }
             ],
             "begriffe": [
-              "SMART",
-              "Bareinkaufspreis",
-              "Tech-ware",
-              "Listeneinkaufspreis",
-              "Notebooks",
-              "Lieferantenskonto",
+              "Zieleinkaufspreis",
               "Bezugskosten",
-              "Zieleinkaufspreis"
+              "Listeneinkaufspreis",
+              "Lieferantenskonto",
+              "SMART",
+              "Tech-ware",
+              "1.071",
+              "Bareinkaufspreis"
             ]
           },
           "felder": [
@@ -488,10 +488,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Niedrige Reklamationsquote",
+              "Guter Service",
               "Großzügigeres Kulanzverhalten",
-              "Höhere Zuverlässigkeit",
-              "Guter Service"
+              "Niedrige Reklamationsquote",
+              "Höhere Zuverlässigkeit"
             ]
           },
           "felder": [],
@@ -566,14 +566,14 @@
               }
             ],
             "begriffe": [
-              "Zeitlich",
-              "Nutzungsrecht",
               "Anlagegütern",
-              "Besitzer",
-              "Eigentümer",
               "Gebäuden",
-              "Leasinggeber",
-              "Leasingnehmer"
+              "Eigentümer",
+              "Zeitlich",
+              "Besitzer",
+              "Nutzungsrecht",
+              "Leasingnehmer",
+              "Leasinggeber"
             ]
           },
           "felder": [],
@@ -658,9 +658,9 @@
               }
             ],
             "begriffe": [
+              "300.000",
               "60.000",
               "Leasing",
-              "300.000",
               "360.000",
               "6.000",
               "Monate",
@@ -728,14 +728,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Fortschritt",
-              "Leasinggeber Eigentümer",
+              "Keine Sicherheiten",
+              "Steuerliche Vorteile",
               "Schnellere Anpassung",
               "Eigenkapital",
-              "Keine Sicherheiten",
+              "Leasinggeber Eigentümer",
               "Kreditspielraum",
-              "Steuerliche Vorteile",
-              "Planung"
+              "Fortschritt",
+              "Liquidität"
             ]
           },
           "felder": [],
@@ -800,9 +800,9 @@
             "zahlen": [],
             "begriffe": [
               "Nach Vertragsablauf",
-              "Gegenstand",
               "Buchwert",
               "Restwert",
+              "Gegenstand",
               "Leasingnehmer"
             ]
           },
@@ -862,14 +862,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Erstellung",
-              "Benutzeroberfläche",
               "Anwendung Textverarbeitung",
-              "UEFI",
               "Funktion",
-              "Hardware",
               "Textdokumenten",
-              "Bereitstellung"
+              "Benutzeroberfläche",
+              "Hardware",
+              "UEFI",
+              "Erstellung",
+              "Speicherung"
             ]
           },
           "felder": [
@@ -929,12 +929,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Erarbeitung",
-              "Standards",
-              "Thema",
-              "Sicherheitsgesetz",
               "Bundes",
+              "Erarbeitung",
               "Bürger",
+              "Sicherheitsgesetz",
+              "Thema",
+              "Standards",
               "Sicherheit",
               "Unternehmen"
             ]
@@ -1061,14 +1061,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Rechten",
               "Entfernung",
-              "Benutzerkonten",
+              "Rechten",
               "Softwarekomponenten",
+              "Benutzerkonten",
               "Betrieb",
-              "Vererbung",
               "Reduzierung",
-              "Deaktivierung"
+              "Ports",
+              "Vererbung"
             ]
           },
           "felder": [],
@@ -1140,8 +1140,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Virenschutz",
               "Benutzerverwaltung",
+              "Virenschutz",
               "Firewall",
               "Datensicherung"
             ]
@@ -1214,14 +1214,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Konfigurationsmöglichkeiten",
-              "Digitale Richtlinie",
-              "Group Policies",
               "Einstellungen",
+              "Digitale Richtlinie",
+              "Konfigurationsmöglichkeiten",
+              "Gruppenrichtlinien",
+              "Group Policies",
               "Vorgabe",
-              "Sperrung",
               "Passworteinstellungen",
-              "Gruppenrichtlinien"
+              "Sperrung"
             ]
           },
           "felder": [],
@@ -1293,11 +1293,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Benutzern",
               "Zeiten",
               "Fehlern",
-              "Benutzern",
-              "Identifikation",
               "Aktivitäten",
+              "Identifikation",
               "Zuordnung"
             ]
           },
@@ -1371,8 +1371,8 @@
             "zahlen": [],
             "begriffe": [
               "Grundsatz",
-              "Datensparsamkeit",
               "Beispielen",
+              "Datensparsamkeit",
               "Daten"
             ]
           },
@@ -1439,14 +1439,14 @@
               }
             ],
             "begriffe": [
-              "Servicemitarbeiter",
-              "Einbindung",
-              "Entlastung",
-              "Missverständnisse",
+              "Soziale Aspekte",
               "Kunden Berührungsängste",
-              "Entscheidungsfindung",
-              "Wirtschaftliche Aspekte",
-              "Anfragen"
+              "Betriebskosten",
+              "Servicemitarbeiter",
+              "Anschaffungskosten",
+              "Anfragen",
+              "Entlastung",
+              "Einbindung"
             ]
           },
           "felder": [
@@ -1513,12 +1513,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Pflichtenheftes",
-              "Vorhaben",
               "Leistungen",
+              "Vorhaben",
+              "Pflichtenheftes",
+              "Auftraggeber",
               "Auftragnehmer",
               "Pflichtenheft",
-              "Auftraggeber",
               "Lastenheft",
               "Auftraggebers"
             ]
@@ -1572,11 +1572,11 @@
             "zahlen": [],
             "begriffe": [
               "Ausgangssituation",
-              "Liste",
+              "Qualitätsziele",
               "Inhalt Lastenheft",
               "Zeitziele",
-              "Qualitätsziele",
               "Budget",
+              "Liste",
               "Rahmenbedingungen",
               "Beschreibung"
             ]
@@ -1634,14 +1634,14 @@
               }
             ],
             "begriffe": [
-              "Oberklasse Versicherungsobjekt",
-              "Klasse",
-              "Schadenshöhe",
+              "Klasse Versicherungsobjekt",
               "Laufleistung",
-              "Methoden",
+              "Lösungsvorschlag",
+              "Lagebewertung",
+              "Neupreis",
+              "Versicherungsobjekt",
               "Immobilie",
-              "KFZ",
-              "Versicherungsobjekt"
+              "Oberklasse Versicherungsobjekt"
             ]
           },
           "felder": [],
@@ -1699,8 +1699,8 @@
             "zahlen": [],
             "begriffe": [
               "AVG",
-              "FROM",
-              "SELECT"
+              "SELECT",
+              "FROM"
             ]
           },
           "felder": [],
@@ -1757,9 +1757,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Vertragsbeginn",
               "Month",
               "Garage",
+              "Vertragsbeginn",
               "VID",
               "FALSE",
               "AND",

@@ -70,12 +70,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Projektspezifische Organisationsform",
-              "Zeitliche Begrenzung",
-              "Begrenzte Ressourcen",
               "Komplexität",
               "Einmaligkeit",
-              "Zielvorgabe"
+              "Zeitliche Begrenzung",
+              "Zielvorgabe",
+              "Begrenzte Ressourcen",
+              "Projektspezifische Organisationsform"
             ]
           },
           "felder": [],
@@ -337,9 +337,9 @@
               }
             ],
             "begriffe": [
-              "Puffer",
               "Keine Auswirkung",
               "Stunden Verzögerung",
+              "Puffer",
               "Stunden"
             ]
           },
@@ -440,14 +440,14 @@
               }
             ],
             "begriffe": [
+              "Betriebsstunden",
               "Wirkungsgrad",
               "Stromnetz",
-              "Betriebsstunden",
               "Energiekosten",
+              "Prozent",
+              "Komponenten",
               "Netzteil",
-              "Betrieb",
-              "Netzteils",
-              "Komponenten"
+              "Betrieb"
             ]
           },
           "felder": [],
@@ -543,9 +543,9 @@
               }
             ],
             "begriffe": [
-              "Monaten",
               "Differenz",
               "Energiebetriebskosten",
+              "Monaten",
               "Anschaffungspreis",
               "Monat",
               "Anschaffung",
@@ -608,10 +608,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Label",
               "Standby-Betrieb",
-              "Monitoren",
               "Steckdosen",
+              "Monitoren",
+              "Label",
               "Energieeffizienz Label",
               "Energiekosten",
               "Vermeidung",
@@ -714,10 +714,10 @@
               }
             ],
             "begriffe": [
+              "Eine Steckdose",
+              "4.140",
               "1.200",
               "3.680",
-              "4.140",
-              "Eine Steckdose",
               "2.000"
             ]
           },
@@ -761,11 +761,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Falsche Zeilen",
               "Write-Host",
-              "Volume",
               "Erstelltes Skript",
+              "Falsche Zeilen",
               "Speicherplatz",
+              "Volume",
               "Prozent"
             ]
           },
@@ -818,14 +818,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Funktionale Anforderungen",
               "Rahmenparameter",
-              "Security",
-              "Kurzvorstellung",
               "Projektziels",
-              "Umsetzung",
-              "Definition",
-              "Zeitrahmen"
+              "Security",
+              "Funktionale Anforderungen",
+              "Kurzvorstellung",
+              "Infrastruktur",
+              "Zeitrahmen",
+              "Umsetzung"
             ]
           },
           "felder": [],
@@ -894,8 +894,8 @@
               }
             ],
             "begriffe": [
-              "5.200",
               "Gesamtkosten",
+              "5.200",
               "EUR"
             ]
           },
@@ -971,8 +971,8 @@
             ],
             "begriffe": [
               "Aufgerundet",
-              "Gesamtdauer",
-              "Arbeiter"
+              "Arbeiter",
+              "Gesamtdauer"
             ]
           },
           "felder": [],
@@ -1030,14 +1030,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Bedarf",
+              "Kontaktvermeidung",
               "Spesen",
               "Bereich Datenschutz",
-              "Risiko",
-              "Bedarf",
-              "Verbindungsproblemen",
-              "Kontaktvermeidung",
-              "Geringere Kosten",
-              "Schonung"
+              "Zusätzliche Kosten",
+              "Reisezeit",
+              "Einfachere Einbindung",
+              "Verbindungsproblemen"
             ]
           },
           "felder": [],
@@ -1108,12 +1108,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Video-Tutorien",
               "Einweisung",
-              "Wissen",
-              "Webinare",
-              "Arbeitszeit",
               "Multiplikatoren-Schulung",
+              "Webinare",
+              "Video-Tutorien",
+              "Arbeitszeit",
+              "Wissen",
               "Interaktion",
               "Schulung"
             ]
@@ -1209,14 +1209,14 @@
               }
             ],
             "begriffe": [
+              "Mirroring",
+              "Arztpraxis",
+              "Blöcke",
+              "Datentransferrate",
+              "Verkraftet",
               "Zerlegung",
-              "Speicherkapazität",
-              "Gesamt",
-              "Spiegelung",
               "Datensicherheit",
-              "Festplatte",
-              "Data Striping",
-              "Blöcke"
+              "Speicherkapazität"
             ]
           },
           "felder": [],
@@ -1276,14 +1276,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bearbeitungsstand",
-              "Dokumente",
-              "Zugriff Fremder",
-              "Benutzerdaten",
-              "Schutzmaßnahme",
               "Zentrale Bearbeitung",
-              "Hashwertüberprüfung",
-              "Softwarein"
+              "Begründungen",
+              "Patien",
+              "Zugriff Fremder",
+              "Softwarein",
+              "Benutzerdaten",
+              "Dokumente",
+              "Sichere Passwörter"
             ]
           },
           "felder": [],
@@ -1334,14 +1334,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Installationen",
-              "Windows Updates",
               "Autoupdate-Mechanismen",
-              "Differenzieren",
-              "Benutzerrollen",
-              "Systemänderungen",
               "Rollentrennung",
-              "Virensignaturen"
+              "Benutzerrollen",
+              "Systemdateien",
+              "Installationen",
+              "Virensignaturen",
+              "Administratorrechten",
+              "Differenzieren"
             ]
           },
           "felder": [],
@@ -1441,14 +1441,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Abrechnungen",
-              "Grundwert",
-              "Andere Begründungen",
               "Verfälschte Daten",
-              "Betroffenen",
+              "Textverarbeitung",
+              "Schutzbedarfsfeststellung",
+              "Patientendatenverarbeitung",
+              "Diagnosen",
+              "Abrechnungen",
               "Videokonferenz",
-              "Fehlerhafte Einträge",
-              "Schutzbedarfsfeststellung"
+              "Grundwert"
             ]
           },
           "felder": [
@@ -1663,14 +1663,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Unsinnige Zeichenketten",
-              "Passwortes",
               "Zeichenvorrats",
               "Softwareunterstütztes Ausspionieren",
-              "Begriffe",
-              "Risikominimierung",
+              "Zugänge",
+              "Passwortes",
+              "Unterschiedliche Passwörter",
               "Ausreichende Länge",
-              "Unterschiedliche Passwörter"
+              "Begriffe",
+              "Unsinnige Zeichenketten"
             ]
           },
           "felder": [],
@@ -1735,9 +1735,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Rekonstruktion",
               "Wöchentlicher Sicherungszyklus",
               "Trennung",
-              "Rekonstruktion",
               "Datensicherung",
               "Keine",
               "Daten"
@@ -1804,8 +1804,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Externe Sicherung",
               "Sicherungskonzept",
+              "Externe Sicherung",
               "Medium",
               "Medien",
               "Sicherung",
