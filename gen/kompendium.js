@@ -381,6 +381,7 @@ window.GENKOMP = (function () {
     box.appendChild(quelle);
 
     stand.thema = null; merken();
+    document.body.classList.remove("liest-runter");
     zeigen();
     if (!ohneFokus) window.scrollTo(0, 0);
   }
@@ -496,6 +497,7 @@ window.GENKOMP = (function () {
         const w = el("div", "k-tab");
         tab.parentNode.insertBefore(w, tab); w.appendChild(tab);
       });
+      tabellenKnoepfe(inhalt);
       if (stand.suche && stand.suche.trim().length >= 2) markieren(inhalt, stand.suche);
       /* Die Abbildungen sind Tabellen und Schaubilder aus den Notizen —
          auf 390 px Breite unlesbar. Antippen zeigt sie groß, mit den
@@ -534,22 +536,29 @@ window.GENKOMP = (function () {
     box.appendChild(fuss);
 
     stand.thema = t.id; merken();
+    document.body.classList.remove("liest-runter");
     zeigen();
     if (!stillHalten) window.scrollTo(0, 0);
   }
 
   /* -------------------------------------------------------- Großansicht --- */
-  function grossansicht(quelle, text) {
+  function grossansicht(quelle, text, html) {
     const alt = $("kpLupe"); if (alt) alt.remove();
-    const box = el("div", "kp-gross"); box.id = "kpLupe";
-    const bild = el("img"); bild.src = quelle; bild.alt = text || "Abbildung";
+    const box = el("div", "kp-gross" + (html ? " ist-tabelle" : "")); box.id = "kpLupe";
+    let kern;
+    if (html) {
+      kern = el("div", "kp-gross-tab");
+      kern.innerHTML = html;
+    } else {
+      kern = el("img"); kern.src = quelle; kern.alt = text || "Abbildung";
+    }
     const zu = el("button", "btn klein kp-gross-zu", "✕ schließen"); zu.type = "button";
     const schliessen = () => { box.remove(); document.removeEventListener("keydown", taste); };
     const taste = e => { if (e.key === "Escape") schliessen(); };
     zu.onclick = schliessen;
-    box.onclick = e => { if (e.target === box || e.target === bild) schliessen(); };
+    box.onclick = e => { if (e.target === box || (!html && e.target === kern)) schliessen(); };
     document.addEventListener("keydown", taste);
-    box.append(bild, zu);
+    box.append(kern, zu);
     document.body.appendChild(box);
   }
 
@@ -657,9 +666,80 @@ window.GENKOMP = (function () {
     inhalt.appendChild(steuer);
   }
 
+  /* ---------------------------------------------------- Tabellen groß ---
+     Sechsspaltige Tabellen sind auf 390 px nicht zu lesen — bisher half nur,
+     das Telefon zu drehen. Jede Tabelle bekommt deshalb einen Knopf: groß
+     und allein auf dem Schirm, dort darf sie so breit sein, wie sie will.
+
+     Gilt auch für den Spickzettel (dort heißen die Rollkästen `.sp-tab`
+     oder, wenn sie schon aus der Vorlage kommen, `.tablewrap`). Der baut
+     seinen Inhalt bei
+     jedem Kapitelwechsel neu auf und weiß nichts von dieser Datei, deshalb
+     schaut ein Beobachter zu und hängt die Knöpfe jedes Mal neu an.       */
+  function tabellenKnoepfe(wurzel) {
+    if (!wurzel) return;
+    wurzel.querySelectorAll(".k-tab, .sp-tab, .tablewrap").forEach(kasten => {
+      const vorher = kasten.previousElementSibling;
+      if (vorher && vorher.classList.contains("k-tabkopf")) return;
+      if (!kasten.querySelector("table")) return;
+      const zeile = el("div", "k-tabkopf");
+      const knopf = el("button", "btn ghost klein", "⤢ Tabelle groß");
+      knopf.type = "button";
+      knopf.onclick = () => grossansicht(null, "Tabelle", kasten.innerHTML);
+      zeile.appendChild(knopf);
+      kasten.parentNode.insertBefore(zeile, kasten);
+    });
+  }
+
+  function tabellenBeobachten() {
+    if (window.__kpTabWache || !window.MutationObserver) return;
+    window.__kpTabWache = new MutationObserver(() => {
+      const sp = $("spInhalt"); if (sp) tabellenKnoepfe(sp);
+    });
+    const start = () => {
+      const sp = $("spInhalt");
+      if (!sp) return false;
+      window.__kpTabWache.observe(sp, { childList: true, subtree: true });
+      tabellenKnoepfe(sp);
+      return true;
+    };
+    if (!start()) setTimeout(start, 1200);
+  }
+
+  /* --------------------------------------------------------- Lesemodus ---
+     Beim Lesen am Telefon — besonders quer — nimmt der Kopf der Anwendung
+     zusammen mit der Kapitelleiste die halbe Höhe weg. Also: runterscrollen
+     blendet den Kopf aus, hochscrollen holt ihn zurück. Die Kapitelleiste
+     rückt dann nach ganz oben, damit kein Streifen Nichts entsteht.
+
+     Das gilt für beide Lesekapitel — Kompendium und Spickzettel. Der
+     Spickzettel bringt keinen eigenen Code dafür mit; hier hängt es an der
+     Seite, nicht am Modul, deshalb steht es an dieser Stelle.            */
+  function lesemodus() {
+    if (window.__kpLesemodus) return;
+    window.__kpLesemodus = true;
+    const SEITEN = ["scKomp", "scSpick"];
+    let letzte = 0;
+    const liest = () => SEITEN.some(id => { const e = $(id); return e && !e.hidden; });
+    const aus = () => document.body.classList.remove("liest-runter");
+    window.addEventListener("scroll", () => {
+      const y = Math.max(0, window.pageYOffset || document.documentElement.scrollTop || 0);
+      if (!liest()) { aus(); letzte = y; return; }
+      const weg = y - letzte;
+      if (Math.abs(weg) < 6) return;
+      if (weg > 0 && y > 140) document.body.classList.add("liest-runter");
+      else if (weg < 0) aus();
+      letzte = y;
+    }, { passive: true });
+    /* Beim Seitenwechsel ist der Kopf wieder da — sonst sucht man ihn. */
+    window.addEventListener("hashchange", aus);
+  }
+
   /* ---------------------------------------------------------- Einhängen --- */
   function einhaengen() {
     seite();
+    lesemodus();
+    tabellenBeobachten();
     const altStart = window.renderStart;
     if (typeof altStart === "function" && !altStart.__kp) {
       const neu = function () {

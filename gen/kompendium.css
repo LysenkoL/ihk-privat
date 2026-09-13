@@ -193,3 +193,42 @@
 .kp-gross img{max-width:100%; max-height:100%; width:auto; height:auto;
   background:#fff; border-radius:6px; cursor:zoom-out}
 .kp-gross-zu{position:fixed; right:12px; top:12px; min-height:44px}
+
+/* ------------------------------------------------------------ Lesemodus ---
+   Runterscrollen blendet den Kopf der Anwendung aus (Klasse `liest-runter`
+   an <body>, gesetzt in gen/kompendium.js), die Kapitelleiste rutscht nach
+   oben nach. Gilt für Kompendium und Spickzettel — quer auf dem Telefon
+   gewinnt das rund 60 px, also eine ganze Textzeile mehr als vorher zwei. */
+.kopf{transition:transform .18s ease}
+body.liest-runter .kopf{transform:translateY(-100%)}
+.kp-leiste,.sp-leiste{transition:top .18s ease}
+body.liest-runter .kp-leiste,
+body.liest-runter .sp-leiste{top:0}
+
+/* Quer gehalten ist der Schirm niedrig, aber breit: dort zählt Höhe, nicht
+   Breite. Deshalb hängt die Suche auch bei viel Breite hinter der Lupe,
+   sobald die Höhe knapp wird. */
+@media (max-height: 520px){
+  .kp-lupe{display:inline-block}
+  .kp-leiste .kp-suche{display:none}
+  .kp-leiste.suche-offen .kp-suche{display:flex; flex:1 1 100%; margin-top:6px}
+  .kp-leiste{padding:5px 0 6px; margin-bottom:9px}
+  .kp-leiste .btn{min-height:34px}
+  /* Spickzettel bringt keine Lupe mit — dort wird die Leiste nur flacher. */
+  .sp-leiste{padding:5px 0 6px; margin-bottom:9px}
+  .sp-leiste .btn{min-height:34px}
+  .sp-suche input{min-height:34px}
+  .kp-standleiste{padding:7px 10px; margin:10px 0 4px}
+}
+
+/* Tabelle groß ansehen */
+.k-tabkopf{display:flex; justify-content:flex-end; margin:0 0 4px}
+.k-tabkopf .btn{font-size:11.5px; min-height:32px}
+.kp-gross.ist-tabelle{align-items:flex-start; padding:56px 8px 12px}
+.kp-gross-tab{background:var(--card); color:var(--ink); border-radius:8px;
+  padding:6px; max-width:100%; max-height:100%; overflow:auto;
+  -webkit-overflow-scrolling:touch}
+.kp-gross-tab table{border-collapse:collapse; font-size:13.5px; width:auto; min-width:100%}
+.kp-gross-tab th,.kp-gross-tab td{border:1px solid var(--rule-soft);
+  padding:7px 10px; text-align:left; vertical-align:top}
+.kp-gross-tab th{background:var(--field); font-weight:700; white-space:nowrap}
