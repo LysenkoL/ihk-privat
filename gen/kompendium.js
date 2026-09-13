@@ -27,12 +27,47 @@ window.GENKOMP = (function () {
   const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
   const SK = "ihk2:komp";
 
-  const ALLE = () => (window.KOMP_THEMEN || []);
+  /* Achtung: `ALLE` heißt in index.html die Liste aller Teilaufgaben.
+     Der Themenspeicher hier heißt deshalb THEMEN — sonst verdeckt die
+     lokale Deklaration die globale, und die Verknüpfung mit den Aufgaben
+     findet nichts mehr. */
+  const THEMEN = () => (window.KOMP_THEMEN || []);
   const TEXT = () => (window.KOMP_TEXT || (window.KOMP_TEXT = {}));
 
   let stand = { thema: null, suche: "", filter: "alle" };
   try { stand = Object.assign(stand, JSON.parse(localStorage.getItem(SK) || "{}")); } catch (e) { }
   const merken = () => { try { localStorage.setItem(SK, JSON.stringify(stand)); } catch (e) { } };
+
+  /* ------------------------------------------------------- eigener Stand ---
+     Der Stand in der Notion-Sammlung ist der Stand der Kollegin — er sagt,
+     was SIE bearbeitet hat, nicht was Lena gelesen hat. Beides getrennt zu
+     halten ist der ganze Witz: die Spalte der Kollegin bleibt als Hinweis
+     stehen, gefiltert und gezählt wird nach dem eigenen Stand.
+
+     Gespeichert wird unter demselben Schlüssel wie der Rest (ihk2:komp),
+     also lokal im Browser des Geräts. Auf dem Telefon ist das genau richtig;
+     mitgenommen wird es über „Fortschritt sichern“ (gen/fortschritt.js).   */
+  const MEIN = [
+    ["neu", "neu", "○"],
+    ["gelesen", "gelesen", "✓"],
+    ["verstanden", "verstanden", "★"],
+    ["wiederholen", "nochmal", "↻"]
+  ];
+  const meinName = w => (MEIN.find(m => m[0] === w) || MEIN[0])[1];
+  const meinZeichen = w => (MEIN.find(m => m[0] === w) || MEIN[0])[2];
+  /* Eigener Stand in einem eigenen Schlüssel: „wo war ich zuletzt“ ist
+     Bedienung und darf verlorengehen, der Lernstand nicht. Getrennt
+     gespeichert lässt er sich auch sauber sichern und zurückspielen —
+     gen/fortschritt.js nimmt ihn beim Export mit.                        */
+  const MK = SK + ":mein";
+  let mein = {};
+  try { mein = JSON.parse(localStorage.getItem(MK) || "{}") || {}; } catch (e) { }
+  const meinStand = id => mein[id] || "neu";
+  function setzeStand(id, wert) {
+    if (wert === "neu") delete mein[id]; else mein[id] = wert;
+    try { localStorage.setItem(MK, JSON.stringify(mein)); } catch (e) { }
+  }
+  const zaehle = w => THEMEN().filter(t => meinStand(t.id) === w).length;
 
   /* Die sieben Themengebiete der AP1 (plus „0 Praktisches“ für alles,
      was die Sammlung nicht einsortiert hat). Kurzformen fürs Verzeichnis. */
@@ -67,7 +102,7 @@ window.GENKOMP = (function () {
     });
     return geladen[id];
   }
-  const alleLaden = () => Promise.all(ALLE().map(t => laden(t.id)));
+  const alleLaden = () => Promise.all(THEMEN().map(t => laden(t.id)));
 
   /* ------------------------------------------------------------- Seite --- */
   function seite() {
@@ -148,7 +183,7 @@ window.GENKOMP = (function () {
   function treffer(wort) {
     const w = norm(wort).trim();
     if (w.length < 2) return [];
-    return ALLE().map(t => {
+    return THEMEN().map(t => {
       const txt = nurText((t.titel || "") + " " + (t.unter || "") + " " + (TEXT()[t.id] || ""));
       const n = norm(txt);
       const stellen = []; let i = n.indexOf(w), anzahl = 0;
@@ -183,8 +218,20 @@ window.GENKOMP = (function () {
       nach.onclick = () => oeffnen(reihenfolge[i + 1].id);
       reihe.append(vor, el("span", "kp-zaehler", (i + 1) + " / " + reihenfolge.length), nach);
     } else {
-      reihe.appendChild(el("span", "kp-titel-klein", "Kompendium · " + ALLE().length + " Themen"));
+      reihe.appendChild(el("span", "kp-titel-klein", "Kompendium · " + THEMEN().length + " Themen"));
     }
+
+    /* Auf dem Telefon frisst das Suchfeld eine ganze Zeile der Leiste, und
+       gesucht wird beim Lesen selten. Deshalb steckt es dort hinter einer
+       Lupe; am Schreibtisch (ab 640 px) steht es wie bisher offen da.   */
+    const lupe = el("button", "btn ghost klein kp-lupe", "🔍");
+    lupe.type = "button";
+    lupe.title = "suchen"; lupe.setAttribute("aria-label", "im Kompendium suchen");
+    lupe.onclick = () => {
+      l.classList.toggle("suche-offen");
+      if (l.classList.contains("suche-offen")) { const i = $("kpSuche"); if (i) i.focus(); }
+    };
+    reihe.appendChild(lupe);
 
     const such = el("div", "kp-suche");
     const lab = el("label", "sr-only", "Im Kompendium suchen"); lab.htmlFor = "kpSuche";
@@ -204,31 +251,44 @@ window.GENKOMP = (function () {
     such.append(lab, inp);
     reihe.appendChild(such);
     l.appendChild(reihe);
+    if (stand.suche && stand.suche.trim()) l.classList.add("suche-offen");
   }
 
   /* ------------------------------------------------------- Verzeichnis --- */
   function gefiltert() {
     const f = stand.filter || "alle";
-    const l = ALLE().slice();
+    const l = THEMEN().slice();
     if (f === "alle") {
       const rang = n => (n === "0" ? 9 : Number(n));
       return l.sort((a, b) => rang(gebietVon(a)) - rang(gebietVon(b)) || a.titel.localeCompare(b.titel, "de"));
     }
-    if (f === "offen") return l.filter(t => /nicht gelernt|schwierig/i.test(t.stand || ""));
+    if (f.slice(0, 5) === "mein:") {
+      const w = f.slice(5);
+      return l.filter(t => meinStand(t.id) === w)
+              .sort((a, b) => a.titel.localeCompare(b.titel, "de"));
+    }
     return l.filter(t => gebietVon(t) === f).sort((a, b) => a.titel.localeCompare(b.titel, "de"));
   }
 
-  function zeile(t, nr) {
+  function zeile(t) {
+    const w = meinStand(t.id);
     const a = el("button", "kp-zeile"); a.type = "button";
-    a.appendChild(el("span", "kp-nr", nr != null ? String(nr) : gebietVon(t)));
+    a.dataset.mein = w;
+    const punkt = el("span", "kp-punkt", meinZeichen(w));
+    punkt.title = "eigener Stand: " + meinName(w);
+    a.appendChild(punkt);
     const txt = el("span", "kp-text");
     txt.appendChild(el("b", null, t.titel));
-    const unten = [t.unter, t.thema].filter(Boolean).join(" · ");
+    const unten = [gebietVon(t) === "0" ? "" : "AP " + gebietVon(t), t.unter || t.thema]
+      .filter(Boolean).join(" · ");
     if (unten) txt.appendChild(el("span", "kp-unter", unten));
     a.appendChild(txt);
-    if (t.stand) {
-      const s = el("span", "kp-stand", t.stand);
-      if (/nicht gelernt|schwierig/i.test(t.stand)) s.classList.add("ist-offen");
+    if (w !== "neu") {
+      const s = el("span", "kp-stand ist-" + w, meinName(w));
+      a.appendChild(s);
+    } else if (/nicht gelernt/i.test(t.stand || "")) {
+      const s = el("span", "kp-stand ist-duenn", "dünn");
+      s.title = "Die Kollegin hat diese Seite selbst als „Nicht gelernt“ markiert — sie ist fast leer.";
       a.appendChild(s);
     }
     a.appendChild(el("span", "kp-pfeil", "›"));
@@ -245,13 +305,29 @@ window.GENKOMP = (function () {
     const kopf = el("div", "kp-kopf");
     kopf.appendChild(el("h2", null, "AP1 Kompendium"));
     kopf.appendChild(el("p", "hint",
-      "Ausgearbeitete Themenseiten zu allen sieben Prüfungsgebieten — Definitionen, " +
-      "Tabellen, Abbildungen, Musteraufgaben. Ein Thema je Zeile; die Suche geht über alles."));
+      "Ausgearbeitete Themenseiten zu allen sieben Prüfungsgebieten. Der Stand hier " +
+      "ist dein eigener: beim Lesen unten am Thema auf „gelesen“, „verstanden“ oder " +
+      "„nochmal“ tippen. Die Suche geht über alle Themen."));
 
-    const offen = ALLE().filter(t => /nicht gelernt|schwierig/i.test(t.stand || "")).length;
+    const gesamt = THEMEN().length;
+    const nGelesen = zaehle("gelesen"), nVerstanden = zaehle("verstanden"),
+          nNochmal = zaehle("wiederholen"), nNeu = zaehle("neu");
+    const angefasst = gesamt - nNeu;
+
+    const balken = el("div", "kp-balken");
+    balken.title = angefasst + " von " + gesamt + " Themen angefasst";
+    const b1 = el("div", "kp-balken-teil ist-verstanden");
+    b1.style.width = (nVerstanden / gesamt * 100) + "%";
+    const b2 = el("div", "kp-balken-teil ist-gelesen");
+    b2.style.width = (nGelesen / gesamt * 100) + "%";
+    const b3 = el("div", "kp-balken-teil ist-wiederholen");
+    b3.style.width = (nNochmal / gesamt * 100) + "%";
+    balken.append(b1, b2, b3);
+    kopf.appendChild(balken);
+
     const zahlen = el("div", "kp-fakten");
-    [[String(ALLE().length), "Themen"], ["7", "Gebiete"],
-     [String(ALLE().length - offen), "bearbeitet"], [String(offen), "offen"]]
+    [[String(nNeu), "neu"], [String(nGelesen), "gelesen"],
+     [String(nVerstanden), "verstanden"], [String(nNochmal), "nochmal"]]
       .forEach(([a, b]) => {
         const f = el("div", "kp-fakt");
         f.append(el("b", null, a), el("span", null, b));
@@ -266,12 +342,15 @@ window.GENKOMP = (function () {
       c.onclick = () => { stand.filter = wert; merken(); verzeichnis(true); };
       filter.appendChild(c);
     };
-    setzen("alle", "alle");
+    setzen("alle", "alle (" + gesamt + ")");
+    if (nNeu) setzen("mein:neu", "○ neu (" + nNeu + ")");
+    if (nNochmal) setzen("mein:wiederholen", "↻ nochmal (" + nNochmal + ")");
+    if (nGelesen) setzen("mein:gelesen", "✓ gelesen (" + nGelesen + ")");
+    if (nVerstanden) setzen("mein:verstanden", "★ verstanden (" + nVerstanden + ")");
     GEBIETE.forEach(([n, name]) => {
-      const anzahl = ALLE().filter(t => gebietVon(t) === n).length;
+      const anzahl = THEMEN().filter(t => gebietVon(t) === n).length;
       if (anzahl) setzen(n, n + " " + name + " (" + anzahl + ")");
     });
-    if (offen) setzen("offen", "noch offen (" + offen + ")");
     kopf.appendChild(filter);
     box.appendChild(kopf);
 
@@ -306,12 +385,87 @@ window.GENKOMP = (function () {
     if (!ohneFokus) window.scrollTo(0, 0);
   }
 
+  /* --------------------------------------------- Aufgaben zum Thema --- */
+  /* Die Verknüpfung läuft über die Themenschlüssel der Anwendung
+     (netzwerk, itsicherheit, kalkulation …), die in jedem Kompendium-Thema
+     unter `themen` stehen. Die Wörter unter `worte` filtern NICHT — in den
+     zehn echten Prüfungen kommen Lehrbuchbegriffe wie „Scrum“ oder
+     „Blackbox“ schlicht nicht vor. Sie sortieren nur: Aufgaben, in denen
+     ein Wort des Themas auftaucht, stehen vorn.                          */
+  const HOECHSTENS = 20;   /* mehr passt in keine Lerneinheit am Telefon */
+  const MINDESTENS = 8;    /* darunter lohnt der Sprung in die Übung nicht */
+
+  function aufgabenZu(t) {
+    try {
+      if (typeof ALLE === "undefined" || !Array.isArray(ALLE) || !ALLE.length) return [];
+      const themen = new Set(t.themen || []);
+      if (!themen.size) return [];
+      const durchlassen = (typeof aktiv === "function") ? aktiv : function () { return true; };
+      const worte = (t.worte || []).map(w => String(w).toLowerCase());
+      const rang = it => {
+        const txt = ((it.prompt || "") + " " +
+                     ((it.solution && it.solution.text) || "")).toLowerCase();
+        let n = 0; worte.forEach(w => { if (txt.indexOf(w) >= 0) n++; });
+        return n;
+      };
+      const passend = ALLE.filter(durchlassen)
+        .filter(it => (it.topics || []).some(x => themen.has(x)))
+        .map(it => ({ it: it, r: rang(it) }))
+        .sort((a, b) => b.r - a.r);
+      /* Die Aufgaben mit Worttreffer sind die eigentlichen. Der Rest des
+         Themengebiets kommt nur dazu, wenn es sonst zu wenige wären —
+         sieben Aufgaben zu „Kosten-Nutzen“ sind mehr wert als zwanzig,
+         von denen die Hälfte über Konstruktoren geht.                    */
+      const genau = passend.filter(x => x.r > 0);
+      const liste = genau.length >= MINDESTENS ? genau : passend.slice(0, MINDESTENS);
+      return liste.slice(0, HOECHSTENS).map(x => x.it);
+    } catch (e) { return []; }
+  }
+
+  function uebungStarten(t) {
+    const items = aufgabenZu(t);
+    if (!items.length) return;
+    try {
+      VIEW = { modus: "uebung", exam: null, items: items, titel: "Kompendium · " + t.titel };
+      SHOW_SOL = false;
+      zeigeBogen();
+      if (typeof toast === "function")
+        toast(items.length + " Aufgaben zum Thema — die passendsten zuerst.");
+    } catch (e) {
+      if (typeof toast === "function") toast("Die Aufgaben lassen sich gerade nicht öffnen.");
+    }
+  }
+
   /* ------------------------------------------------------------- Thema --- */
+  /** Vier Knöpfe für den eigenen Stand. Sie stehen zweimal auf der Seite:
+   *  oben, wo man das Thema wiedererkennt, und unten, wo man mit dem Lesen
+   *  fertig ist — auf dem Telefon will niemand dafür zurückscrollen.     */
+  function standLeiste(t, untenDrunter) {
+    const box = el("div", "kp-standleiste" + (untenDrunter ? " ist-unten" : ""));
+    box.appendChild(el("span", "kp-standlabel", "Mein Stand:"));
+    const knoepfe = el("div", "kp-standknoepfe");
+    MEIN.forEach(([wert, name, zeichen]) => {
+      const b = el("button", "kp-chip ist-" + wert, zeichen + " " + name);
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(meinStand(t.id) === wert));
+      b.onclick = () => {
+        setzeStand(t.id, wert);
+        document.querySelectorAll(".kp-standleiste").forEach(l => {
+          l.querySelectorAll(".kp-chip").forEach((c, k) =>
+            c.setAttribute("aria-pressed", String(MEIN[k][0] === meinStand(t.id))));
+        });
+      };
+      knoepfe.appendChild(b);
+    });
+    box.appendChild(knoepfe);
+    return box;
+  }
+
   function oeffnen(id, stillHalten) {
     seite();
-    const t = ALLE().find(x => x.id === id) || ALLE()[0];
+    const t = THEMEN().find(x => x.id === id) || THEMEN()[0];
     if (!t) return;
-    const liste = gefiltert().some(x => x.id === t.id) ? gefiltert() : ALLE();
+    const liste = gefiltert().some(x => x.id === t.id) ? gefiltert() : THEMEN();
     leiste("thema", t, liste);
     const box = $("kpInhalt");
     box.innerHTML = "";
@@ -319,10 +473,16 @@ window.GENKOMP = (function () {
     const kopf = el("div", "kp-kopf");
     kopf.appendChild(el("h2", null, t.titel));
     const meta = el("div", "kp-meta");
-    [t.ap, t.thema, t.unter, t.stand].filter(Boolean).forEach(m =>
+    [t.ap, t.thema, t.unter].filter(Boolean).forEach(m =>
       meta.appendChild(el("span", "kp-marke", m)));
+    if (t.stand) {
+      const k = el("span", "kp-marke ist-fremd", "Kollegin: " + t.stand);
+      k.title = "Stand in der Notion-Sammlung der Kollegin — nicht dein eigener.";
+      meta.appendChild(k);
+    }
     if (meta.childNodes.length) kopf.appendChild(meta);
     if (t.notiz) kopf.appendChild(el("p", "hint", t.notiz));
+    kopf.appendChild(standLeiste(t));
     box.appendChild(kopf);
 
     const inhalt = el("div", "kp-inhalt");
@@ -337,9 +497,17 @@ window.GENKOMP = (function () {
         tab.parentNode.insertBefore(w, tab); w.appendChild(tab);
       });
       if (stand.suche && stand.suche.trim().length >= 2) markieren(inhalt, stand.suche);
+      /* Die Abbildungen sind Tabellen und Schaubilder aus den Notizen —
+         auf 390 px Breite unlesbar. Antippen zeigt sie groß, mit den
+         Zoom-Gesten des Browsers; noch einmal tippen schließt.          */
+      inhalt.querySelectorAll("img").forEach(bild => {
+        bild.classList.add("ist-tippbar");
+        bild.onclick = () => grossansicht(bild.getAttribute("src"), bild.alt);
+      });
     });
 
     const i = liste.findIndex(x => x.id === t.id);
+    box.appendChild(standLeiste(t, true));
     const fuss = el("div", "kp-fuss");
     if (i > 0) {
       const b = el("button", "btn ghost klein", "‹ " + liste[i - 1].titel);
@@ -354,11 +522,35 @@ window.GENKOMP = (function () {
     const zurListe = el("button", "btn ghost klein", "☰ alle Themen");
     zurListe.onclick = () => verzeichnis();
     fuss.appendChild(zurListe);
+
+    /* Gelesen ist nicht geübt: von hier direkt in den Übungsmodus mit den
+       Aufgaben, die dieses Thema betreffen. */
+    const wieviele = aufgabenZu(t).length;
+    if (wieviele) {
+      const u = el("button", "btn primary klein", "Aufgaben dazu üben (" + wieviele + ")");
+      u.onclick = () => uebungStarten(t);
+      fuss.insertBefore(u, fuss.firstChild);
+    }
     box.appendChild(fuss);
 
     stand.thema = t.id; merken();
     zeigen();
     if (!stillHalten) window.scrollTo(0, 0);
+  }
+
+  /* -------------------------------------------------------- Großansicht --- */
+  function grossansicht(quelle, text) {
+    const alt = $("kpLupe"); if (alt) alt.remove();
+    const box = el("div", "kp-gross"); box.id = "kpLupe";
+    const bild = el("img"); bild.src = quelle; bild.alt = text || "Abbildung";
+    const zu = el("button", "btn klein kp-gross-zu", "✕ schließen"); zu.type = "button";
+    const schliessen = () => { box.remove(); document.removeEventListener("keydown", taste); };
+    const taste = e => { if (e.key === "Escape") schliessen(); };
+    zu.onclick = schliessen;
+    box.onclick = e => { if (e.target === box || e.target === bild) schliessen(); };
+    document.addEventListener("keydown", taste);
+    box.append(bild, zu);
+    document.body.appendChild(box);
   }
 
   /* ------------------------------------------------------- Suchergebnis --- */
@@ -370,7 +562,7 @@ window.GENKOMP = (function () {
     box.innerHTML = "";
     const kopf = el("div", "kp-kopf");
     kopf.appendChild(el("h2", null, "„" + wort.trim() + "“"));
-    const info = el("p", "hint", "Es wird in allen " + ALLE().length + " Themen gesucht …");
+    const info = el("p", "hint", "Es wird in allen " + THEMEN().length + " Themen gesucht …");
     kopf.appendChild(info);
     box.appendChild(kopf);
     zeigen();
@@ -400,14 +592,12 @@ window.GENKOMP = (function () {
   /* --------------------------------------------------------- Startblock --- */
   function block() {
     const start = $("scStart");
-    if (!start || !ALLE().length) return;
+    if (!start || !THEMEN().length) return;
     let box = $("kompBox");
     if (!box) {
       box = el("div", "abschnitt"); box.id = "kompBox";
       box.appendChild(el("h2", null, "Kompendium"));
-      const p = el("p", "hint");
-      p.textContent = ALLE().length + " ausgearbeitete Themenseiten zu allen sieben " +
-        "AP1-Gebieten — zum Nachschlagen und Lesen, mit Tabellen und Abbildungen.";
+      const p = el("p", "hint"); p.id = "kompHinweis";
       box.appendChild(p);
       const inhalt = el("div"); inhalt.id = "kompInhalt";
       box.appendChild(inhalt);
@@ -416,12 +606,22 @@ window.GENKOMP = (function () {
       if (ziel && ziel.parentNode) ziel.parentNode.insertBefore(box, ziel.nextSibling);
       else start.appendChild(box);
     }
+    const hinweis = $("kompHinweis");
+    if (hinweis) {
+      const g = THEMEN().length, neu = zaehle("neu");
+      hinweis.textContent = g + " Themenseiten zu allen sieben AP1-Gebieten. " +
+        (neu === g
+          ? "Noch nichts davon gelesen."
+          : (g - neu) + " angefasst, davon " + zaehle("verstanden") + " verstanden" +
+            (zaehle("wiederholen") ? ", " + zaehle("wiederholen") + " zum Wiederholen" : "") + ".");
+    }
+
     const inhalt = $("kompInhalt");
     inhalt.innerHTML = "";
 
     const reihe = el("div", "kp-schnell");
     GEBIETE.forEach(([n, name]) => {
-      const anzahl = ALLE().filter(t => gebietVon(t) === n).length;
+      const anzahl = THEMEN().filter(t => gebietVon(t) === n).length;
       if (!anzahl) return;
       const b = el("button", "btn ghost klein", n + " " + name + " (" + anzahl + ")");
       b.onclick = () => { stand.filter = n; merken(); verzeichnis(); };
@@ -435,12 +635,24 @@ window.GENKOMP = (function () {
     auf.onclick = () => { stand.filter = "alle"; merken(); verzeichnis(); };
     steuer.appendChild(auf);
     if (stand.thema) {
-      const t = ALLE().find(x => x.id === stand.thema);
+      const t = THEMEN().find(x => x.id === stand.thema);
       if (t) {
         const w = el("button", "btn klein", "weiter bei „" + t.titel + "“");
         w.onclick = () => oeffnen(t.id);
         steuer.appendChild(w);
       }
+    }
+    const nochmal = THEMEN().filter(t => meinStand(t.id) === "wiederholen");
+    if (nochmal.length) {
+      const w = el("button", "btn klein", "↻ nochmal (" + nochmal.length + ")");
+      w.onclick = () => { stand.filter = "mein:wiederholen"; merken(); verzeichnis(); };
+      steuer.appendChild(w);
+    }
+    const naechstesNeue = THEMEN().find(t => meinStand(t.id) === "neu");
+    if (naechstesNeue) {
+      const w = el("button", "btn ghost klein", "nächstes neues Thema");
+      w.onclick = () => oeffnen(naechstesNeue.id);
+      steuer.appendChild(w);
     }
     inhalt.appendChild(steuer);
   }

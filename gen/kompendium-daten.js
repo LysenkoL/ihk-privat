@@ -2,8 +2,15 @@
    gen/kompendium-daten.js — Verzeichnis des AP1-Kompendiums
    ----------------------------------------------------------------------------
    Nur die Liste der Themen mit ihren Merkmalen (Gebiet, Thema, Unterthema,
-   Stand, Kurznotiz). Der eigentliche Text steht je Thema in gen/komp/<id>.js
-   und wird erst beim Öffnen nachgeladen — siehe gen/kompendium.js.
+   Stand der Kollegin, Kurznotiz). Der eigentliche Text steht je Thema in
+   gen/komp/<id>.js und wird erst beim Öffnen nachgeladen — siehe
+   gen/kompendium.js.
+
+   `themen` sind die Themenschlüssel dieser Anwendung (window.IHK_TOPICS).
+   Darüber findet das Kompendium die passenden Prüfungsaufgaben. `worte`
+   filtern nicht, sie sortieren nur: eine Aufgabe, in der eines dieser Wörter
+   vorkommt, steht im Übungsmodus vorn. Zwei Themen (Glossar, Lernplan) haben
+   bewusst keine Zuordnung — zu ihnen gibt es keine Aufgaben.
 
    Quelle: geteilte Notion-Sammlung „Prüfungsvorbereitung“ (Kurskollegin,
    FIAE). Lesekopie vom 13.09.2026; die Originalseiten wurden nicht verändert.
@@ -19,7 +26,16 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "OSI",
   "notiz": "OSI-Überblick ergänzt: Schichtenmodell, Kapselung, Adressen, Geräte, TCP/IP-Vergleich, Fehlersuche und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk"
+  ],
+  "worte": [
+   "OSI",
+   "Schicht",
+   "Vermittlungsschicht",
+   "Sicherungsschicht"
+  ]
  },
  {
   "id": "definition-und-klassifikation-von-it-systemen",
@@ -29,7 +45,17 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "EVA-Prinzip,IT-System Kriterien,Schutzziele IT,phys. vs. virt. Systeme,On-Premise,Cloud-Bereitstellung",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Definition und Klassifikation von IT-Systemen mit Hardware, Software, Daten, Netzwerk, EVA/EVAS, Klassifikation nach Größe, Einsatzzweck, Benutzerzahl, Betriebsmodell, physisch/virtuell/Cloud, Bewertungskriterien, Schutzzielen, Protokollen, Musteraufgaben und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "hardware",
+   "software"
+  ],
+  "worte": [
+   "IT-System",
+   "Client",
+   "Server",
+   "Betriebssystem"
+  ]
  },
  {
   "id": "hardwarekomponenten",
@@ -39,7 +65,19 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "Hardware",
   "notiz": "",
-  "stand": "Nicht gelernt"
+  "stand": "Nicht gelernt",
+  "themen": [
+   "hardware"
+  ],
+  "worte": [
+   "RAM",
+   "Prozessor",
+   "CPU",
+   "SSD",
+   "Festplatte",
+   "Mainboard",
+   "Netzteil"
+  ]
  },
  {
   "id": "protokolle",
@@ -49,7 +87,19 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Protokolle im OSI-Modell mit Prüfung der Fachbuchliste, Korrekturen zu IEEE 802.4/802.5, PPPoE und TCP-Bezeichnung, Ergänzungen moderner Protokolle wie ARP, ICMP, IPv6, VLAN, TLS, HTTP/HTTPS, SMTP/IMAP/POP3, SSH, SNMP, NTP, LDAP, RDP, REST sowie Ports, Musteraufgaben und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk"
+  ],
+  "worte": [
+   "Protokoll",
+   "TCP",
+   "UDP",
+   "HTTP",
+   "DNS",
+   "DHCP",
+   "Port"
+  ]
  },
  {
   "id": "berechnungen",
@@ -59,7 +109,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Berechnungen mit Bit/Byte, Speichergrößen, SI-/IEC-Einheiten, Speicherbedarf, Datenübertragung, Subnetting, Prozentrechnung, Dreisatz, Wirtschaftlichkeit, Abschreibungszeitrechnungen, Arbeitszeitberechnungen für Migrationen, Nutzwertanalyse, elektrischer Leistung, Verfügbarkeit, Lösungswegen und Bemerkungen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kalkulation"
+  ],
+  "worte": [
+   "berechnen",
+   "Berechnen",
+   "Kosten",
+   "Wirtschaftlichkeit",
+   "Amortisation"
+  ]
  },
  {
   "id": "usv-unterbrechungsfreie-stromversorgung",
@@ -69,7 +129,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Siehe Heft",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "hardware",
+   "arbeitsplatz"
+  ],
+  "worte": [
+   "USV",
+   "Stromversorgung",
+   "Leistung",
+   "Watt",
+   "Akku"
+  ]
  },
  {
   "id": "firewall",
@@ -79,7 +150,17 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "Firewall",
   "notiz": "Aufgaben Firewall",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "itsicherheit",
+   "netzwerk"
+  ],
+  "worte": [
+   "Firewall",
+   "Paketfilter",
+   "DMZ",
+   "Port"
+  ]
  },
  {
   "id": "gewa-hrleistung-wartungsvertra-ge",
@@ -89,7 +170,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Gewährleistungspflichten, Mängelrechte, Garantie-Abgrenzung, Wartungsverträge, SLA/SLO/KPI, Support-Level 1st/2nd/3rd, Ticketsystem, Priorisierung, Wartungsfenster, Protokollvorschlag und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "datenschutz",
+   "kommunikation"
+  ],
+  "worte": [
+   "Gewährleistung",
+   "Wartungsvertrag",
+   "SLA",
+   "Mangel",
+   "Garantie"
+  ]
  },
  {
   "id": "abnahme-u-bergabe",
@@ -99,7 +191,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Abnahme und Übergabe mit Funktionstest, Abnahmetest, Abnahmekriterien, Abnahmeprotokoll, Mängelliste, Übergabedokumentation, Einweisung der Anwender, Übergabe an Betrieb/Support, Checklisten und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kommunikation",
+   "projekt"
+  ],
+  "worte": [
+   "Abnahme",
+   "Übergabe",
+   "Protokoll",
+   "Einweisung",
+   "Schulung"
+  ]
  },
  {
   "id": "verschlu-sselung",
@@ -109,7 +212,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: symmetrische Verschlüsselung mit AES/DES/3DES, asymmetrische Verschlüsselung mit RSA, hybride Verfahren, Zertifikate, PKI, TLS/SSL, Hashfunktionen, Passwort-Hashing, digitale Signaturen und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "itsicherheit"
+  ],
+  "worte": [
+   "Verschlüsselung",
+   "symmetrisch",
+   "asymmetrisch",
+   "Zertifikat",
+   "TLS",
+   "Signatur"
+  ]
  },
  {
   "id": "datensicherungskonzepte",
@@ -119,7 +233,19 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Vollbackup, differenzielles und inkrementelles Backup, 3-2-1-Regel, RTO, RPO, RAID-Level, Restore-Tests, Backup-Protokolle, Ransomware-Schutz und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "itsicherheit",
+   "daten"
+  ],
+  "worte": [
+   "Datensicherung",
+   "Backup",
+   "inkrementell",
+   "differenziell",
+   "RAID",
+   "3-2-1"
+  ]
  },
  {
   "id": "dsgvo-grundlagen",
@@ -129,7 +255,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: DSGVO-Grundlagen, Art. 5, Datenschutzprinzipien, personenbezogene Daten, Rechtsgrundlagen, Einwilligung, Betroffenenrechte, Datenschutzbeauftragter, TOMs, Privacy by Design/Default und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "datenschutz"
+  ],
+  "worte": [
+   "DSGVO",
+   "personenbezogen",
+   "Auftragsverarbeitung",
+   "Betroffenenrechte",
+   "Löschung"
+  ]
  },
  {
   "id": "schutzmassnahmen-firewall",
@@ -139,7 +275,16 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "Firewall",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Schutzmaßnahmen und Firewall mit Paketfilter, Stateful Inspection, Proxy-Firewall, DMZ, IDS/IPS, Antivirus, Patch-Management, Protokollen, Firewall-Regeln, Protokollierung und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "itsicherheit"
+  ],
+  "worte": [
+   "Firewall",
+   "Schutzmaßnahme",
+   "Virenschutz",
+   "Angriff"
+  ]
  },
  {
   "id": "bedrohungsszenarien",
@@ -149,7 +294,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Bedrohungsszenarien mit Malware, Viren, Trojanern, Ransomware, Würmern, Phishing, Social Engineering, DoS/DDoS, Man-in-the-Middle, SQL-Injection, Incident Response, Protokollvorschlag und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "itsicherheit"
+  ],
+  "worte": [
+   "Phishing",
+   "Schadsoftware",
+   "Ransomware",
+   "Angriff",
+   "Social Engineering",
+   "DDoS"
+  ]
  },
  {
   "id": "schutzziele-cia-prinzip",
@@ -159,7 +315,16 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "Schutzziele IT",
   "notiz": "Vertraulichkeit (Confidentiality), Integrität (Integrity), Verfügbarkeit (Availability); + Authentizität, Nichtabstreitbarkeit",
-  "stand": "Nicht gelernt"
+  "stand": "Nicht gelernt",
+  "themen": [
+   "itsicherheit"
+  ],
+  "worte": [
+   "Vertraulichkeit",
+   "Integrität",
+   "Verfügbarkeit",
+   "Schutzziel"
+  ]
  },
  {
   "id": "qualita-tskriterien-nach-iso-25010",
@@ -169,7 +334,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: ISO/IEC 25010, funktionale Eignung, Zuverlässigkeit, Benutzbarkeit, Leistungseffizienz, Wartbarkeit, Portabilität, Sicherheit, Kompatibilität, Qualitätssicherung und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software"
+  ],
+  "worte": [
+   "Qualität",
+   "ISO 25010",
+   "Wartbarkeit",
+   "Benutzbarkeit",
+   "Zuverlässigkeit"
+  ]
  },
  {
   "id": "testarten",
@@ -179,7 +354,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Unit-Test, Integrationstest, Systemtest, Abnahmetest, Regressionstest, Lasttest, Stresstest, Testprotokolle, V-Modell, TDD und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software",
+   "programmierung"
+  ],
+  "worte": [
+   "Test",
+   "Unittest",
+   "Integrationstest",
+   "Abnahmetest",
+   "Regressionstest"
+  ]
  },
  {
   "id": "softwaretestmethoden",
@@ -189,7 +375,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Blackbox-Test, Whitebox-Test, Greybox-Test, Testmethoden vs. Testarten, Grenzwertanalyse, Testprotokolle, Qualitätssicherung und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software",
+   "programmierung"
+  ],
+  "worte": [
+   "Blackbox",
+   "Whitebox",
+   "Testfall",
+   "Testmethode",
+   "Grenzwert"
+  ]
  },
  {
   "id": "sql-grundlagen",
@@ -199,7 +396,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: SQL-Grundlagen, SELECT/FROM/WHERE/JOIN/GROUP BY/ORDER BY, DDL/DML/DCL/TCL, Aggregatfunktionen, Transaktionen, Sicherheit, Indizes und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "daten",
+   "programmierung"
+  ],
+  "worte": [
+   "SQL",
+   "SELECT",
+   "JOIN",
+   "WHERE",
+   "Datenbank"
+  ]
  },
  {
   "id": "datenbankgrundlagen-er-modell",
@@ -209,7 +417,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Datenbankgrundlagen, ER-Modell, Entitäten, Attribute, Beziehungen, Kardinalitäten, PK/FK, Normalisierung, Anomalien und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "daten"
+  ],
+  "worte": [
+   "ER-Modell",
+   "Entität",
+   "Kardinalität",
+   "Normalisierung",
+   "Primärschlüssel",
+   "Redundanz"
+  ]
  },
  {
   "id": "grundlagen-oop",
@@ -219,7 +438,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: OOP-Grundlagen, Klassen, Objekte, Attribute, Methoden, Kapselung, Vererbung, Polymorphismus, Abstraktion, UML-Klassendiagramm und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "programmierung"
+  ],
+  "worte": [
+   "Klasse",
+   "Objekt",
+   "Vererbung",
+   "Kapselung",
+   "Methode",
+   "UML"
+  ]
  },
  {
   "id": "algorithmen-ablaufdiagramme",
@@ -229,7 +459,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Algorithmen, PAP, Struktogramm, Pseudocode, Sequenz, Selektion, Iteration, Schreibtischtest, UML-Aktivitätsdiagramm und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "programmierung"
+  ],
+  "worte": [
+   "Struktogramm",
+   "Pseudocode",
+   "Programmablaufplan",
+   "Algorithmus",
+   "Schleife"
+  ]
  },
  {
   "id": "netzwerktopologien",
@@ -239,7 +479,17 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "Stern (häufigste), Ring, Bus, Baum, Vollvermascht; Vor-/Nachteile je Topologie",
-  "stand": "Nicht gelernt"
+  "stand": "Nicht gelernt",
+  "themen": [
+   "netzwerk"
+  ],
+  "worte": [
+   "Topologie",
+   "Stern",
+   "Bus",
+   "Ring",
+   "Masche"
+  ]
  },
  {
   "id": "wlan-vpn",
@@ -249,7 +499,19 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "IEEE 802.11 (a/b/g/n/ac/ax=Wi-Fi 6), WPA2/WPA3; VPN-Tunnel, IPSec, SSL-VPN, Site-to-Site vs. Remote",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk",
+   "itsicherheit"
+  ],
+  "worte": [
+   "WLAN",
+   "VPN",
+   "WPA",
+   "Funk",
+   "Tunnel",
+   "SSID"
+  ]
  },
  {
   "id": "netzwerkkomponenten",
@@ -259,7 +521,18 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "Router (L3), Switch (L2), Hub (L1), Bridge (L2), Repeater (L1), Access Point, Modem, Proxy",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk",
+   "hardware"
+  ],
+  "worte": [
+   "Switch",
+   "Router",
+   "Access Point",
+   "Patchfeld",
+   "Kabel"
+  ]
  },
  {
   "id": "netzwerkprotokolle",
@@ -269,7 +542,18 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "HTTP/HTTPS (80/443), FTP (21), SMTP (25), POP3 (110), IMAP (143), DNS (53), DHCP (67/68), SSH (22)",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk"
+  ],
+  "worte": [
+   "Protokoll",
+   "DHCP",
+   "DNS",
+   "ARP",
+   "ICMP",
+   "SMTP"
+  ]
  },
  {
   "id": "ip-adressen-subnetting",
@@ -279,7 +563,19 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "IPv4 (Klassen A/B/C), IPv6; Subnetzmaske, CIDR (/24), private Adressbereiche, NAT",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk"
+  ],
+  "worte": [
+   "IP-Adresse",
+   "Subnetz",
+   "Subnetzmaske",
+   "CIDR",
+   "IPv6",
+   "NAT",
+   "APIPA"
+  ]
  },
  {
   "id": "tcp-ip-modell",
@@ -289,7 +585,17 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien",
   "unter": "",
   "notiz": "4 Schichten: Netzzugang, Internet, Transport, Anwendung; Vergleich mit OSI; TCP vs. UDP",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "netzwerk"
+  ],
+  "worte": [
+   "TCP/IP",
+   "TCP",
+   "UDP",
+   "Schicht",
+   "Transport"
+  ]
  },
  {
   "id": "eva-prinzip",
@@ -299,7 +605,17 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "EVA-Prinzip",
   "notiz": "Eingabe – Verarbeitung – Ausgabe; Beispiele: Tastatur → CPU → Bildschirm",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "hardware",
+   "software"
+  ],
+  "worte": [
+   "EVA",
+   "Eingabe",
+   "Verarbeitung",
+   "Ausgabe"
+  ]
  },
  {
   "id": "nutzwertanalyse-angebotsvergleich",
@@ -309,7 +625,18 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "IT-System Kriterien",
   "notiz": "Überarbeitet im Stil der Prüfungsvorbereitung: Nutzwertanalyse, Angebotsvergleich, Muss-Kriterien, Beispielrechnung, AP1-Aufgaben und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kalkulation",
+   "projekt"
+  ],
+  "worte": [
+   "Nutzwertanalyse",
+   "Angebot",
+   "Gewichtung",
+   "Kriterium",
+   "Anbieter"
+  ]
  },
  {
   "id": "lizenzmodelle",
@@ -319,7 +646,18 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "IT-System Kriterien",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Kauflizenz, Abo/Miete, Open Source, GPL, MIT, Freeware, Shareware, OEM, CAL, Kostenvergleich und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software",
+   "datenschutz"
+  ],
+  "worte": [
+   "Lizenz",
+   "Open Source",
+   "Miete",
+   "Abonnement",
+   "Nutzungsrecht"
+  ]
  },
  {
   "id": "on-premise-vs-cloud",
@@ -329,7 +667,17 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "On-Premise,Cloud-Bereitstellung",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Vergleich On-Premise vs. Cloud nach Kosten, Datenschutz, Skalierbarkeit, Kontrolle, Verfügbarkeit, IaaS/PaaS/SaaS und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software",
+   "kalkulation"
+  ],
+  "worte": [
+   "Cloud",
+   "On-Premise",
+   "Rechenzentrum",
+   "Anbieter"
+  ]
  },
  {
   "id": "cloud-modelle-iaas-paas-saas",
@@ -339,7 +687,16 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "Cloud-Bereitstellung",
   "notiz": "Ausgearbeitet als AP1-Kompendium: IaaS, PaaS, SaaS, Public/Private/Hybrid/Multi Cloud, Verantwortung, Protokolle, Datenschutz, Vor-/Nachteile und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software"
+  ],
+  "worte": [
+   "IaaS",
+   "PaaS",
+   "SaaS",
+   "Cloud"
+  ]
  },
  {
   "id": "virtualisierung",
@@ -349,7 +706,18 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "phys. vs. virt. Systeme",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Hypervisor Typ 1/2, VMs, Container/Docker, Ressourcen, Überprovisionierung, Netzwerk, Cloud-Bezug und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software",
+   "hardware"
+  ],
+  "worte": [
+   "Virtualisierung",
+   "virtuelle Maschine",
+   "Hypervisor",
+   "Container",
+   "VM"
+  ]
  },
  {
   "id": "betriebssysteme",
@@ -359,7 +727,18 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "IT-System Kriterien",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Windows, Linux, macOS, Kernel, Prozesse, Scheduler, Dateisysteme, Shell, Rechte, Bootvorgang, Paketmanager, Protokolle und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "software"
+  ],
+  "worte": [
+   "Betriebssystem",
+   "Windows",
+   "Linux",
+   "Dateisystem",
+   "Benutzerkonto",
+   "Rechte"
+  ]
  },
  {
   "id": "hardwarekomponenten-2",
@@ -369,7 +748,19 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "Hardware",
   "notiz": "Ausgearbeitet als AP1-Kompendium: CPU, RAM, Mainboard, Netzteil, HDD/SSD/NVMe, GPU, Peripherie, Schnittstellen, Green IT, Diagnose und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "hardware"
+  ],
+  "worte": [
+   "RAM",
+   "Prozessor",
+   "CPU",
+   "SSD",
+   "Festplatte",
+   "Mainboard",
+   "Netzteil"
+  ]
  },
  {
   "id": "technische-dokumentation",
@@ -379,7 +770,16 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Benutzerhandbuch, Installationsanleitung, Systemdokumentation, Präsentationstechniken",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kommunikation"
+  ],
+  "worte": [
+   "Dokumentation",
+   "Handbuch",
+   "Betriebsanleitung",
+   "Protokoll"
+  ]
  },
  {
   "id": "kommunikationsmodelle",
@@ -389,7 +789,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Sender-Empfänger-Modell, 4-Ohren-Modell (Schulz v. Thun), aktives Zuhören",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kommunikation"
+  ],
+  "worte": [
+   "Kommunikation",
+   "Sender",
+   "Empfänger",
+   "Vier-Ohren",
+   "Gespräch",
+   "Beratung"
+  ]
  },
  {
   "id": "bedarfsermittlung-anforderungsanalyse",
@@ -399,7 +810,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Ist-/Soll-Analyse; funktionale & nicht-funktionale Anforderungen; Interviewtechniken",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kommunikation",
+   "projekt"
+  ],
+  "worte": [
+   "Anforderung",
+   "Bedarf",
+   "Ist-Analyse",
+   "Soll",
+   "Kundenwunsch"
+  ]
  },
  {
   "id": "make-or-buy-entscheidung",
@@ -409,7 +831,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Eigenentwicklung vs. Fremdbeschaffung; Kriterien: Kosten, Zeit, Know-how, Abhängigkeit",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kalkulation",
+   "projekt"
+  ],
+  "worte": [
+   "Make-or-Buy",
+   "Eigenentwicklung",
+   "Fremdvergabe",
+   "Outsourcing"
+  ]
  },
  {
   "id": "kosten-nutzen-analyse",
@@ -419,7 +851,17 @@ window.KOMP_THEMEN = [
   "thema": ".",
   "unter": "",
   "notiz": "ROI, Amortisationszeit, Wirtschaftlichkeitsberechnung, Gesamtbetriebskosten (TCO); ausgearbeitet als AP1-Kompendium mit Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kalkulation"
+  ],
+  "worte": [
+   "Kosten",
+   "Nutzen",
+   "Amortisation",
+   "Wirtschaftlichkeit",
+   "Einsparung"
+  ]
  },
  {
   "id": "projektmanagementmethoden",
@@ -429,7 +871,18 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Wasserfallmodell, Scrum, Kanban, V-Modell; agil vs. klassisch; ausgearbeitet als AP1-Kompendium mit Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "projekt"
+  ],
+  "worte": [
+   "Scrum",
+   "agil",
+   "Wasserfall",
+   "Kanban",
+   "Sprint",
+   "Projektmanagement"
+  ]
  },
  {
   "id": "lasten-und-pflichtenheft",
@@ -439,7 +892,17 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "",
   "notiz": "Lastenheft = Auftraggeber (Was?); Pflichtenheft = Auftragnehmer (Wie?); fachlich überprüft und als AP1-Kompendium mit Quellen ausgearbeitet.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "projekt",
+   "kommunikation"
+  ],
+  "worte": [
+   "Lastenheft",
+   "Pflichtenheft",
+   "Auftraggeber",
+   "Anforderung"
+  ]
  },
  {
   "id": "projektphasen",
@@ -449,7 +912,17 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "",
   "notiz": "Initiierung, Planung, Durchführung, Steuerung, Abschluss; Meilensteine; ausgearbeitet als AP1-Kompendium mit Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "projekt"
+  ],
+  "worte": [
+   "Projektphase",
+   "Meilenstein",
+   "Projektstrukturplan",
+   "Planung",
+   "Abschluss"
+  ]
  },
  {
   "id": "gantt-diagramm-netzplan",
@@ -459,7 +932,18 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "",
   "notiz": "Zeitplanung, kritischer Pfad, Pufferzeit, Meilensteine, Abhängigkeiten; ausgearbeitet als AP1-Kompendium mit Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "projekt"
+  ],
+  "worte": [
+   "Netzplan",
+   "Gantt",
+   "Pufferzeit",
+   "kritischer Pfad",
+   "Vorgang",
+   "Dauer"
+  ]
  },
  {
   "id": "glossar",
@@ -469,7 +953,9 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "",
-  "stand": "Nicht gelernt"
+  "stand": "Nicht gelernt",
+  "themen": [],
+  "worte": []
  },
  {
   "id": "spannung-stromsta-rke-widerstand",
@@ -479,7 +965,19 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "Hardware",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Spannung, Stromstärke, Widerstand, Ohm'sches Gesetz, Leistung, Netzteile, USV, EMV, PoE, Sicherheit und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "hardware",
+   "kalkulation"
+  ],
+  "worte": [
+   "Spannung",
+   "Stromstärke",
+   "Watt",
+   "Leistung",
+   "Widerstand",
+   "Ampere"
+  ]
  },
  {
   "id": "14-tage-lernplan-ap1",
@@ -489,7 +987,9 @@ window.KOMP_THEMEN = [
   "thema": "Netzwerk- & Internettechnologien,IT-Systeme",
   "unter": "",
   "notiz": "Strukturierter 14-Tage-Lernplan mit Tageszielen, Prüfungsfragen, Prioritäten und Notizvorlage.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [],
+  "worte": []
  },
  {
   "id": "03-arbeitsaufgaben-im-rahmen-von-gescha-fts-und-",
@@ -499,7 +999,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Umfassendes AP1-Kompendium zu Kundenkommunikation, systematischem Fehlermanagement, Incident- und Störungsmanagement, Ticketsystemen, Support-Leveln und verantwortungsvoller KI-Unterstützung.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "projekt",
+   "kommunikation"
+  ],
+  "worte": [
+   "Geschäftsprozess",
+   "Auftrag",
+   "Arbeitsauftrag",
+   "Ablauf"
+  ]
  },
  {
   "id": "02-machbarkeit-und-wirtschaftlichkeit-von-projek",
@@ -509,7 +1019,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Umfassendes AP1-Kompendium zu Machbarkeitsanalyse, Budgetprüfung, Vor- und Nachkalkulation, Wirtschaftlichkeit, Stakeholderbewertung und Risikoanalyse.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "kalkulation",
+   "projekt"
+  ],
+  "worte": [
+   "Wirtschaftlichkeit",
+   "Machbarkeit",
+   "Kosten",
+   "Nutzwertanalyse"
+  ]
  },
  {
   "id": "01-merkmale-und-methoden-des-projektmanagements",
@@ -519,7 +1039,17 @@ window.KOMP_THEMEN = [
   "thema": "",
   "unter": "",
   "notiz": "Umfassendes AP1-Kompendium auf 100-%-Niveau: Projektmerkmale, SMART, Wasserfall, Scrum, Projektstrukturplan, Gantt, Netzplan, kritischer Pfad, Puffer, Terminsteuerung, Meilensteine, Teamentwicklung, Feedback und Lessons Learned.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "projekt"
+  ],
+  "worte": [
+   "Projektmanagement",
+   "Scrum",
+   "Wasserfall",
+   "Meilenstein",
+   "Projektziel"
+  ]
  },
  {
   "id": "schutzbedarfsfeststellung-nach-bsi",
@@ -529,6 +1059,15 @@ window.KOMP_THEMEN = [
   "thema": "IT-Systeme",
   "unter": "Schutzziele IT",
   "notiz": "Ausgearbeitet als AP1-Kompendium: Schutzbedarfsfeststellung nach BSI-Standard 200-2 mit Schutzzielen, Schutzbedarfskategorien, Schadensszenarien, Vererbung, Maximumprinzip, Kumulations- und Verteilungseffekt, Fallbeispiel, Dokumentationsvorlage, Musteraufgaben und Quellen.",
-  "stand": "Bearbeitet"
+  "stand": "Bearbeitet",
+  "themen": [
+   "itsicherheit"
+  ],
+  "worte": [
+   "BSI",
+   "Schutzbedarf",
+   "Grundschutz",
+   "Risiko"
+  ]
  }
 ];

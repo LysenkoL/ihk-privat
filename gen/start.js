@@ -250,6 +250,20 @@ window.GENSTART = (function () {
     setz("gesamt", z.prognose != null ? "Prognose " + z.prognose + " %" : "noch keine Daten");
     setz("blatt", z.vorlagen + " Aufgabentypen" + (z.fehlerOffen ? " · " + z.fehlerOffen + " Fehler offen" : ""));
     setz("satz", z.satzKarten ? z.satzKarten + " Karten" : "");
+    /* Kompendium: der eigene Lernstand, nicht die Zahl der Seiten — die ändert
+       sich nie, der Stand jeden Tag. */
+    (function () {
+      const alleThemen = (window.KOMP_THEMEN || []).length;
+      if (!alleThemen) return;
+      let mein = {};
+      try { mein = JSON.parse(localStorage.getItem("ihk2:komp:mein") || "{}") || {}; } catch (e) { }
+      const zaehl = w => Object.keys(mein).filter(k => mein[k] === w).length;
+      const angefasst = Object.keys(mein).length;
+      const nochmal = zaehl("wiederholen");
+      setz("komp", angefasst
+        ? angefasst + " von " + alleThemen + " bearbeitet" + (nochmal ? " · " + nochmal + "× nochmal" : "")
+        : alleThemen + " Themen");
+    })();
     setz("themen", z.schwach ? "schwächstes: " + z.schwach.label : "");
   }
 

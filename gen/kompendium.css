@@ -137,3 +137,59 @@
   .kp-inhalt{font-size:14.5px}
   .kp-leiste{top:56px}
 }
+
+/* ------------------------------------------------------- eigener Stand ---
+   Vier Zustände, vier Farben, überall dieselben:
+     ○ neu · ◐ gelesen · ● verstanden · ↻ nochmal
+   Der Punkt links in der Liste trägt die Farbe, damit man beim Scrollen
+   auf dem Telefon am Rand sieht, wie weit man ist — ohne zu lesen.      */
+.kp-punkt{flex:none; width:22px; text-align:center; font-size:15px; line-height:1;
+  color:var(--muted)}
+.kp-zeile[data-mein="gelesen"] .kp-punkt{color:var(--pruefer)}
+.kp-zeile[data-mein="verstanden"] .kp-punkt{color:#1a7f4b}
+.kp-zeile[data-mein="wiederholen"] .kp-punkt{color:var(--red)}
+
+.kp-stand.ist-gelesen{border-color:var(--pruefer); color:var(--pruefer); background:var(--pruefer-soft)}
+.kp-stand.ist-verstanden{border-color:#1a7f4b; color:#1a7f4b; background:rgba(26,127,75,.10)}
+.kp-stand.ist-wiederholen{border-color:var(--red); color:var(--red); background:var(--red-soft)}
+.kp-stand.ist-duenn{opacity:.75}
+
+.kp-balken{display:flex; height:8px; border-radius:999px; overflow:hidden;
+  background:var(--field); border:1px solid var(--rule); margin:12px 0 2px}
+.kp-balken-teil{height:100%}
+.kp-balken-teil.ist-verstanden{background:#1a7f4b}
+.kp-balken-teil.ist-gelesen{background:var(--pruefer)}
+.kp-balken-teil.ist-wiederholen{background:var(--red)}
+
+.kp-standleiste{display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  margin:14px 0 4px; padding:10px 12px; background:var(--field);
+  border:1px solid var(--rule); border-radius:8px}
+.kp-standleiste.ist-unten{margin-top:22px}
+.kp-standlabel{font-family:var(--display); font-size:11px; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--muted)}
+.kp-standknoepfe{display:flex; flex-wrap:wrap; gap:6px}
+.kp-standknoepfe .kp-chip{min-height:40px}
+.kp-chip.ist-gelesen[aria-pressed="true"]{background:var(--pruefer); border-color:var(--pruefer)}
+.kp-chip.ist-verstanden[aria-pressed="true"]{background:#1a7f4b; border-color:#1a7f4b; color:#fff}
+.kp-chip.ist-wiederholen[aria-pressed="true"]{background:var(--red); border-color:var(--red); color:#fff}
+.kp-chip.ist-neu[aria-pressed="true"]{background:var(--muted); border-color:var(--muted); color:#fff}
+
+.kp-marke.ist-fremd{border-style:dashed}
+
+/* ------------------------------------------------ Telefon: Leiste & Bild ---
+   Beim Lesen zählt jede Zeile Höhe. Unter 640 px klappt das Suchfeld hinter
+   die Lupe; darüber steht es wie gehabt in der Leiste.                     */
+.kp-lupe{display:none}
+@media (max-width:639px){
+  .kp-lupe{display:inline-block}
+  .kp-leiste .kp-suche{display:none}
+  .kp-leiste.suche-offen .kp-suche{display:flex; flex:1 1 100%; margin-top:7px}
+}
+
+.kp-inhalt img.ist-tippbar{cursor:zoom-in}
+.kp-gross{position:fixed; inset:0; z-index:1000; background:rgba(12,12,14,.92);
+  display:flex; align-items:center; justify-content:center; padding:12px;
+  overflow:auto}
+.kp-gross img{max-width:100%; max-height:100%; width:auto; height:auto;
+  background:#fff; border-radius:6px; cursor:zoom-out}
+.kp-gross-zu{position:fixed; right:12px; top:12px; min-height:44px}

@@ -26,7 +26,9 @@ window.GENFORTSCHRITT = (function () {
     "ihk2:zeit",             // gemessenes Tempo je Aufgabentyp
     "ihk2:plan",             // Lernplan: Minuten pro Tag, abgehakte Tage
     "ihk2:pseudo",           // Pseudocode-Trainer
-    "ihk2:archiv"            // Archiv der Durchgänge samt Antworten
+    "ihk2:archiv",           // Archiv der Durchgänge samt Antworten
+    "ihk2:komp:mein",        // eigener Lernstand je Kompendium-Thema
+    "ihk2:spick"             // zuletzt gelesenes Kapitel im Spickzettel
   ];
 
   function einsammeln() {
@@ -88,6 +90,8 @@ window.GENFORTSCHRITT = (function () {
     if (gen["ihk2:gen:satz"]) t.push("Satzbau-Fortschritt");
     const m = Object.keys(gen["ihk2:marker"] || {}).length;
     if (m) t.push(m + " markierte Absätze");
+    const k = Object.keys(gen["ihk2:komp:mein"] || {}).length;
+    if (k) t.push(k + " Kompendium-Themen mit Stand");
     return t.join(" · ");
   }
 

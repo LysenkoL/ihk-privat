@@ -394,3 +394,47 @@
   table.gzuo td { border: 0 !important; padding: 0 !important; width: auto !important; }
   table.gzuo td:first-child { font-size: 13.5px; line-height: 1.5; margin-bottom: 6px; }
 }
+
+/* ============================================================================
+   Tippziele auf dem Telefon
+   ----------------------------------------------------------------------------
+   Gelernt wird inzwischen fast nur noch am Telefon. Die kleinen Knöpfe
+   (`.btn.klein`, 34 px) sind mit der Maus tadellos und mit dem Daumen eine
+   Zumutung — besonders die Paare „Prüfung / Lösung“, die direkt nebeneinander
+   stehen. Empfohlen sind 44 px.
+
+   Absichtlich NICHT angefasst: der Aufgabenbogen selbst (`.fuss-in`,
+   `body.kompakt`, die Generator-Leisten). Dort ist die Enge gewollt — beim
+   Rechnen zählt jede Zeile Bildschirm. Vergrößert wird nur, wo gelesen und
+   navigiert wird: Startseite, Spickzettel, Kompendium, Archiv.
+   ========================================================================== */
+@media (max-width: 700px) and (pointer: coarse) {
+  #scStart .btn.klein,
+  #scSpick .btn.klein,
+  #scKomp  .btn.klein,
+  #scArchiv .btn.klein {
+    min-height: 44px; padding: 10px 14px; font-size: 12.5px;
+  }
+  #scStart .chip, #scStart .kp-chip,
+  #scKomp .kp-chip { min-height: 44px; padding: 10px 14px; font-size: 12.5px; }
+
+  /* Zwei Knöpfe nebeneinander in einer Prüfungskarte: nebeneinander bleiben,
+     aber jeder mindestens halb so breit wie die Karte — kein Zielen mehr. */
+  #scStart .karte .steuer .btn.klein { flex: 1 1 40%; justify-content: center; }
+
+  /* Die Zeilen der Verzeichnisse sind Tippziele, keine Textzeilen. */
+  #scKomp .kp-zeile, #scSpick .sp-zeile { min-height: 60px; }
+
+  /* „alles aufklappen“ war ein 19 px hoher Textlink. */
+  #scStart .st-link { min-height: 44px; padding: 0 6px }
+
+  /* Lernplan: Minutenwahl und die sieben Häkchen der Woche — die kleinsten
+     Ziele der ganzen Startseite (28 px) und die, die täglich getippt werden. */
+  #scStart .pl-min, #scStart .pl-mehr { min-height: 44px; padding: 8px 14px }
+  #scStart .pl-hak { min-height: 40px; min-width: 40px }
+
+  /* Alles, was in einer Knopfreihe steht — auch ohne Klasse „klein“. */
+  #scStart .steuer .btn,
+  #scStart .gen-kopf .btn, #scStart .sim-kopf .btn,
+  #scStart .gen-knopfzeile .btn, #scStart .st-heute .btn { min-height: 44px }
+}

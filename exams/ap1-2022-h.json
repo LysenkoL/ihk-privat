@@ -191,14 +191,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Prozessoptimierung",
               "Modellierung",
-              "Ausblick",
+              "Problembereiches",
+              "Phasen",
               "Inhaltlicher Aspekt",
-              "Projektschritte",
-              "Zielerreichung",
               "Istzustands",
-              "Problembereiches"
+              "Zielerreichung",
+              "Prozessoptimierung",
+              "Fixierung"
             ]
           },
           "felder": [
@@ -288,13 +288,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bereitschaft",
-              "Akzeptanz",
               "Anteilseigner",
-              "Realisierbarkeit",
+              "Bereitschaft",
               "Bestellungen",
-              "Finanzierung",
+              "Akzeptanz",
+              "Realisierbarkeit",
               "Lieferanten",
+              "Finanzierung",
               "Durchführung"
             ]
           },
@@ -360,12 +360,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Risikoeinschätzung",
               "Kenntnisse",
-              "Spezialisierung",
-              "Zusatzbelastung",
-              "Zutrittskontrolle",
+              "Beraters",
+              "Risikoeinschätzung",
               "Methodenkompetenz",
+              "Spezialisierung",
+              "Zutrittskontrolle",
               "Personals",
               "Strukturen"
             ]
@@ -507,8 +507,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Dienstvertrag",
               "Werkvertrag",
+              "Dienstvertrag",
               "Arbeitsleistung"
             ]
           },
@@ -573,14 +573,14 @@
               }
             ],
             "begriffe": [
-              "Stunde",
-              "Arbeitstag",
-              "Minute",
-              "Aufnahmen",
-              "Karton",
               "Scanner",
-              "6.000",
-              "72.000"
+              "Karton",
+              "Minute",
+              "Stunde",
+              "Aufnahmen",
+              "Arbeitstag",
+              "72.000",
+              "6.000"
             ]
           },
           "felder": [],
@@ -660,14 +660,14 @@
               }
             ],
             "begriffe": [
-              "76.800",
-              "Bildpunkte",
-              "614.400",
-              "Pixel",
-              "75.000",
-              "Farbtiefe",
               "4.800",
-              "38.400"
+              "38.400",
+              "Bildpunkte",
+              "Pixel",
+              "614.400",
+              "76.800",
+              "Farbtiefe",
+              "75.000"
             ]
           },
           "felder": [],
@@ -763,13 +763,13 @@
             ],
             "begriffe": [
               "6.835",
-              "100.000",
-              "7.000",
               "Ersatzrechnung",
-              "5.274",
+              "7.000",
+              "100.000",
               "5.150",
-              "Datenvolumen",
-              "72.000"
+              "5.274",
+              "72.000",
+              "Datenvolumen"
             ]
           },
           "felder": [],
@@ -836,13 +836,13 @@
               }
             ],
             "begriffe": [
-              "Nettospeicherkapazität",
-              "TB",
               "Kapazität",
+              "TB",
+              "Nettospeicherkapazität",
               "Level",
-              "Rechenweg",
               "RAID",
               "Platten",
+              "Rechenweg",
               "Nutzung"
             ]
           },
@@ -1013,11 +1013,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Speicherkapazitäten",
-              "Relativ",
-              "Plattengrößen",
               "Controller",
               "Volle Ausnutzung",
+              "Plattengrößen",
+              "Speicherkapazitäten",
+              "Relativ",
               "Erweiterung",
               "RAID",
               "Platten"
@@ -1084,14 +1084,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bietet Maximum",
-              "SAN",
-              "Besonders",
-              "Verwaltung",
-              "Unterbrechungsfreie Online-Erweiterung",
-              "Administrators",
               "Betriebssysteme",
-              "Erlaubt"
+              "Administrators",
+              "Verwaltung",
+              "Bietet Maximum",
+              "Unabhängig",
+              "SAN",
+              "Ressourcenauslastung",
+              "Standort"
             ]
           },
           "felder": [],
@@ -1154,14 +1154,14 @@
               }
             ],
             "begriffe": [
-              "Herstellung",
-              "QR",
-              "Sichtkontakt",
-              "Verschmutzung",
               "Sichtbehinderung",
+              "Sichtkontakt",
+              "RFID",
+              "Chips",
               "Auslesen",
-              "Datenmenge",
-              "RFID"
+              "QR",
+              "Verschmutzung",
+              "Herstellung"
             ]
           },
           "felder": [
@@ -1258,13 +1258,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Sicherheitsmaßnahmen",
-              "Adresszahl",
-              "Verbesserte Integration",
-              "Weltweite Erreichbarkeit",
-              "Verschlankung",
               "Nahezu",
+              "Adresszahl",
+              "Sicherheitsmaßnahmen",
+              "Verschlankung",
+              "Weltweite Erreichbarkeit",
               "Protokoll-Headers",
+              "Verbesserte Integration",
               "Komponenten"
             ]
           },
@@ -1493,11 +1493,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Industrie-PC",
-              "Sensor",
-              "Steuerung",
-              "Router",
               "Netzwerkanschluss",
+              "Sensor",
+              "Industrie-PC",
+              "Router",
+              "Steuerung",
               "Standard-Gateway",
               "Gateway",
               "Switch"
@@ -1650,14 +1650,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Kriterien",
-              "Notebook-Clever",
-              "Qualität",
-              "Punktzahl",
-              "Noteplus",
               "KG",
+              "AG",
+              "Noteplus",
+              "Lieferzeit",
+              "Qualität",
               "Frankfurt",
-              "Lieferzeit"
+              "Kriterien",
+              "Genie"
             ]
           },
           "felder": [
@@ -1751,10 +1751,10 @@
             "zahlen": [],
             "begriffe": [
               "Length",
-              "Quantity",
               "Width",
-              "WHERE",
+              "Quantity",
               "Thickness",
+              "WHERE",
               "SELECT",
               "FROM"
             ]
@@ -1827,12 +1827,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Anzahl Wellpappen",
               "HAVING",
+              "Anzahl Wellpappen",
               "AS",
-              "COUNT",
               "Thickness",
               "BY",
+              "COUNT",
               "GROUP",
               "SELECT"
             ]
@@ -1905,14 +1905,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "SUM",
               "Gesamtanzahl",
+              "SUM",
               "AND",
-              "AS",
+              "Width",
               "Length",
               "Quantity",
-              "Width",
-              "WHERE"
+              "AS",
+              "Thickness"
             ]
           },
           "felder": [],
@@ -2062,14 +2062,14 @@
               }
             ],
             "begriffe": [
-              "WID",
-              "Bezeichnung",
-              "Walzanlage",
-              "Dicke",
               "Spezifikation",
-              "Produktionsdaten",
+              "Zeitstempel",
+              "Kennzeichnung Primärschlüssel",
+              "Dicke",
+              "WID",
+              "Walzanlage",
               "Aufgabenstellung",
-              "Zeitstempel"
+              "Bezeichnung"
             ]
           },
           "felder": [],
