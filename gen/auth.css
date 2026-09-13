@@ -1,0 +1,128 @@
+/* ============================================================================
+   gen/auth.css — Zugangsschutz für den IHK AP1 Prüfungssimulator
+   ========================================================================== */
+html.gesperrt body > *:not(#authLock) {
+  display: none !important;
+}
+
+#authLock {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: var(--paper, #FCFCFA);
+  color: var(--ink, #14171C);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: var(--body, -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+.al-box {
+  background: var(--card, #FFFFFF);
+  border: 1px solid var(--rule, #D5D8DE);
+  border-radius: 14px;
+  padding: 36px 28px 28px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.al-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.al-titel {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--ink, #14171C);
+}
+
+.al-sub {
+  font-size: 13.5px;
+  color: var(--muted, #5E6570);
+  margin: 0 0 22px 0;
+  line-height: 1.4;
+}
+
+.al-pin-dots {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.al-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--rule, #D5D8DE);
+  background: transparent;
+  transition: all .15s ease;
+}
+
+.al-dot.voll {
+  background: var(--pruefer, #12457E);
+  border-color: var(--pruefer, #12457E);
+  transform: scale(1.15);
+}
+
+.al-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+.al-key {
+  height: 52px;
+  border-radius: 10px;
+  border: 1px solid var(--rule-soft, #E8EAEE);
+  background: var(--field, #F4F6F9);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink, #14171C);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: background .12s, transform .1s;
+}
+
+.al-key:active {
+  background: var(--rule, #D5D8DE);
+  transform: scale(0.96);
+}
+
+.al-key.al-del {
+  font-size: 16px;
+  font-weight: normal;
+  color: var(--muted, #5E6570);
+}
+
+.al-fehler {
+  color: var(--red, #A8291F);
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 16px;
+  min-height: 20px;
+}
+
+.al-shake {
+  animation: alShake .4s ease;
+}
+
+@keyframes alShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}

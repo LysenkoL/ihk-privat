@@ -62,10 +62,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "05.09",
               "Rechnungsstellung",
-              "11.09",
               "10.09",
+              "05.09",
+              "11.09",
               "Bestellung",
               "Lieferung"
             ]
@@ -100,13 +100,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Abgleich Artikelbezeichnung",
-              "Abgleich",
-              "Einzelpreis",
-              "Umsatzsteuersatzes",
-              "Achtung",
               "Rechnungspositionen",
               "Steuersatz",
+              "Position",
+              "Einheit",
+              "Achtung",
+              "Abgleich",
+              "Einzelpreises",
               "Vergleichen"
             ]
           },
@@ -206,14 +206,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Treuerabatt",
-              "Produkte",
-              "Neukundenrabatt",
-              "Vergünstigungen",
-              "Vertragsabschlüsse",
-              "Nachlass",
               "Personengruppen",
-              "Zeitrabatte"
+              "Rabatt",
+              "Neukundenrabatt",
+              "Schüler",
+              "Zeitrabatte",
+              "Vertragsabschlüsse",
+              "Langjährige Kunden",
+              "Produkte"
             ]
           },
           "felder": [],
@@ -255,14 +255,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "IBAN",
-              "Überweisung",
-              "Zahlungsempfänger",
               "Rechnungsbetrag",
-              "SEPA",
-              "BIC",
               "Verwendungszweck",
-              "Begünstigter"
+              "SEPA",
+              "Überweisung",
+              "BIC",
+              "Zahlungsempfänger",
+              "Begünstigter",
+              "IBAN"
             ]
           },
           "felder": [],
@@ -304,11 +304,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Zahlungseingangs",
               "Fehlerfreie Übernahme",
               "Überweisungsdaten",
-              "Eingabe",
+              "Zahlungseingangs",
               "Keine",
+              "Eingabe",
               "Zuordnung"
             ]
           },
@@ -343,13 +343,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Wegrationalisieren",
+              "Befürchtung",
               "Angst",
+              "Fehlende Bereitschaft",
               "Routinen",
               "Zeitressourcen",
-              "Fehlende Bereitschaft",
+              "Wegrationalisieren",
               "Leistungsdruck",
-              "Befürchtung",
               "Arbeitsplatzes"
             ]
           },
@@ -383,14 +383,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Fortbildungsmanagement",
-              "Herausforderungen",
-              "Verbesserungen",
-              "Abfrage",
-              "Wegfall",
-              "Bedienungsanleitungen",
+              "Frühzeitige Kommunikation",
+              "Permanente",
+              "Fragen",
               "Aufwertungsmöglichkeit",
-              "Transparenz"
+              "Mitarbeiterqualifizierung",
+              "Klare Handlungsanweisung",
+              "Problemen",
+              "Bedienungsanleitungen"
             ]
           },
           "felder": [],
@@ -441,14 +441,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Schulungskosten",
-              "Medienbrüchen",
-              "Kosteneinsparungen",
-              "Vermeiden",
               "Einfacher Zugriff",
+              "Datenmissbrauch",
+              "Veränderungen",
               "Integration",
+              "Schulungskosten",
               "Nachhaltigkeit",
-              "Anfangsinvestitionen"
+              "Sicherheitsrisiken",
+              "Effizienzsteigerung"
             ]
           },
           "felder": [],
@@ -577,14 +577,14 @@
               }
             ],
             "begriffe": [
+              "Bezahlen",
+              "Automatische Prüfung",
+              "Endknoten",
+              "Ablehnung",
               "Parallelisierung",
               "Archivieren",
-              "Ablehnung",
-              "Automatische Prüfung",
               "Manuelle Prüfung",
-              "Endknoten",
-              "Bezahlen",
-              "Lösungshinweises"
+              "Diagrammprüfung"
             ]
           },
           "felder": [],
@@ -626,13 +626,13 @@
             "zahlen": [],
             "begriffe": [
               "Effizienz",
-              "Prüfungen",
-              "Fehlerreduktion",
-              "Automatisierung",
               "Muster",
-              "Zeitersparnis",
+              "Verhalten",
+              "Automatisierung",
               "Rechnungsprüfung",
-              "Weitere Gründe"
+              "Zeitersparnis",
+              "Fehlerreduktion",
+              "Kostenreduktion"
             ]
           },
           "felder": [],
@@ -706,8 +706,8 @@
             ],
             "begriffe": [
               "40.687",
-              "Scans",
               "40.688",
+              "Scans",
               "1.000",
               "Stunden",
               "1.024"
@@ -791,8 +791,8 @@
             ],
             "begriffe": [
               "18.250",
-              "50.000",
               "14.851",
+              "50.000",
               "40.688",
               "1.024"
             ]
@@ -912,14 +912,14 @@
               }
             ],
             "begriffe": [
-              "Einwilligung",
               "Zugriffskontrollen",
               "SGB",
+              "Einwilligung",
+              "Grundlage",
               "BDSG",
               "Sicherheit",
-              "Grundlage",
-              "Anwendungen",
-              "Verarbeitung"
+              "Verarbeitung",
+              "Anwendungen"
             ]
           },
           "felder": [],
@@ -967,13 +967,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Lesegerät",
-              "Chipkarte",
-              "Medikationsplan",
-              "Keine Hilfsmittel",
               "Fremden",
-              "Mitführung",
+              "Medikationsplan",
               "Phishing",
+              "Keine Hilfsmittel",
+              "Lesegerät",
+              "Mitführung",
+              "Chipkarte",
               "Sicherheitsrisiko"
             ]
           },
@@ -1015,8 +1015,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Softwarefehler",
               "Angriffen",
+              "Softwarefehler",
               "System",
               "Fehler",
               "Anforderungen"
@@ -1152,10 +1152,10 @@
               }
             ],
             "begriffe": [
-              "Kartenterminal",
               "Terminal",
-              "Stromversorgung",
               "Stromstärke",
+              "Stromversorgung",
+              "Kartenterminal",
               "Netzteils",
               "USB",
               "Verwendung"
@@ -1199,11 +1199,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "172.16",
-              "10.254",
               "10.1",
-              "Standard-Gateway",
+              "10.254",
+              "172.16",
               "255.0",
+              "Standard-Gateway",
               "255.255",
               "Subnetzmaske",
               "IP"
@@ -1255,8 +1255,8 @@
             "zahlen": [],
             "begriffe": [
               "Verkauf",
-              "Anschlüsse Verkauf",
               "Patchfeld",
+              "Anschlüsse Verkauf",
               "Anschlüsse",
               "Patchkabel",
               "Switch",
@@ -1315,14 +1315,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Anschließend",
-              "Absender",
-              "Herkunft",
               "Authentizität",
+              "Apotheke",
               "Basis",
+              "Diese Signatur",
+              "Anschließend",
               "Funktioniert",
-              "Signatur",
-              "Apotheke"
+              "Herkunft",
+              "Stimmt"
             ]
           },
           "felder": [],
@@ -1441,9 +1441,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Verknüpfen",
               "Redundanz",
-              "Datenorganisation",
-              "Verknüpfen"
+              "Datenorganisation"
             ]
           },
           "felder": [],
@@ -1495,14 +1495,14 @@
               }
             ],
             "begriffe": [
-              "Primärschlüsselangabe",
+              "Attribut Dosierung",
               "Zwei Entitäten",
               "Zwei Kardinalitäten",
-              "Attribut Dosierung",
               "Sinnvolle Zuordnung",
               "Auflösung Zwischentabelle",
-              "Entität",
-              "Diagrammprüfung"
+              "Primärschlüsselangabe",
+              "Diagrammprüfung",
+              "Entität"
             ]
           },
           "felder": [],
@@ -1543,13 +1543,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Medikaments",
-              "Durchläuft",
+              "Überprüft",
               "Medikament",
               "Warnung",
-              "Limit",
               "Datenstruktur",
-              "Überprüft",
+              "Medikaments",
+              "Durchläuft",
+              "Limit",
               "Namen"
             ]
           },
@@ -1633,10 +1633,10 @@
             "zahlen": [],
             "begriffe": [
               "Beginn",
-              "Multiplikation",
               "Schleife",
-              "Produkt",
+              "Multiplikation",
               "Andere Formulierungen",
+              "Produkt",
               "Menge",
               "Preis"
             ]
