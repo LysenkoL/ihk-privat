@@ -1,0 +1,87 @@
+/* ============================================================================
+   gen/tabellen.css — Tabellen aus dem Aufgabentext
+   ----------------------------------------------------------------------------
+   Drei Ansichten desselben Inhalts, je nachdem, wie viel Platz da ist:
+
+     breit   echte Tabelle, alle Spalten nebeneinander
+     schmal  dieselbe Tabelle, rollt seitwärts im eigenen Kasten
+     Telefon Karten — eine Karte je Zeile, Spalten untereinander.
+             Bei sechs Spalten auf 390 px ist das die einzige Form, in der
+             man noch erkennt, welcher Wert zu welchem Modell gehört.
+
+   Gedruckt wird immer die Tabelle, nie die Karten; leere Zellen erscheinen
+   als Kästchen zum Ausfüllen mit dem Stift.
+   ========================================================================== */
+
+.tb-block{margin:10px 0 14px}
+.tb-rollen{overflow-x:auto; -webkit-overflow-scrolling:touch;
+  border:1px solid var(--rule); border-radius:6px; background:var(--card)}
+table.tb{border-collapse:collapse; width:100%; font-size:13.5px; min-width:520px}
+table.tb th{font-family:var(--display); text-transform:uppercase; letter-spacing:.06em;
+  font-size:10.5px; font-weight:700; color:var(--muted); text-align:left;
+  padding:8px 10px; border-bottom:1px solid var(--rule); white-space:nowrap;
+  background:var(--field); position:sticky; top:0}
+table.tb th.tb-leerkopf{min-width:34px}
+table.tb td{padding:6px 10px; border-bottom:1px solid var(--rule-soft);
+  vertical-align:middle; line-height:1.45}
+table.tb tr:last-child td{border-bottom:0}
+table.tb td.tb-kopfspalte{font-weight:600; white-space:nowrap}
+table.tb td.tb-zahl, table.tb .tb-zahl{font-family:var(--data);
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+table.tb td.tb-luecke{background:var(--field); padding:4px 6px}
+
+.tb-feld{width:100%; min-width:74px; box-sizing:border-box; font:inherit; font-size:13.5px;
+  min-height:38px; padding:5px 8px; background:var(--paper); color:var(--ink);
+  border:1px solid var(--pruefer); border-radius:4px}
+.tb-feld.tb-zahl{font-family:var(--data); text-align:right}
+.tb-feld:focus{outline:2px solid var(--pruefer); outline-offset:1px}
+
+.tb-hinweis{font-size:12px; color:var(--muted); line-height:1.55; margin-top:6px}
+
+/* ------------------------------------------------------------- Karten --- */
+.tb-karten{display:none}
+.tb-karte{border:1px solid var(--rule); border-radius:6px; background:var(--card);
+  padding:10px 12px; margin-bottom:8px}
+.tb-karte-kopf{font-weight:600; font-size:14.5px; margin-bottom:7px;
+  padding-bottom:6px; border-bottom:1px solid var(--rule-soft)}
+.tb-karte-zeile{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+.tb-karte-zeile:last-child{margin-bottom:0}
+.tb-karte-label{flex:1 1 46%; min-width:0; font-size:12.5px; color:var(--muted); line-height:1.4}
+.tb-karte-wert{flex:1 1 46%; font-family:var(--data); font-size:13.5px}
+.tb-karte-zeile .tb-feld{flex:1 1 46%; min-width:0}
+
+@media (max-width:700px){
+  .tb-rollen{display:none}
+  .tb-karten{display:block}
+  /* Tabellen mit wenigen Spalten bleiben Tabellen — dort gibt es keine
+     Karten, und der Rollkasten ist die bessere Lösung.                 */
+  .tb-block:not(:has(.tb-karten)) .tb-rollen{display:block}
+}
+
+/* ------------------------------------------------------------ Drucken --- */
+@media print{
+  .tb-karten, .tb-hinweis{display:none !important}
+  .tb-rollen{display:block !important; overflow:visible; border:1px solid #999}
+  /* Auf Papier gibt es kein seitwärts Rollen: die Spalten müssen sich die
+     Blattbreite teilen. Feste Tabellenbreite plus umbrechende Kopfzeilen —
+     sonst fällt die letzte Spalte über den Rand und fehlt im Ausdruck.  */
+  table.tb{min-width:0 !important; width:100%; table-layout:fixed;
+    font-size:9pt; page-break-inside:auto}
+  /* Umbrechen ja, Wörter zerhacken nein: word-break:break-word macht aus
+     „Gewichtung“ ein „Gewichtun-g“. overflow-wrap bricht nur dort, wo es
+     ohne Trennung nicht mehr passt.                                     */
+  table.tb th{background:#EEE; color:#000; position:static;
+    white-space:normal; overflow-wrap:break-word; word-break:normal;
+    hyphens:auto; padding:4px 5px; font-size:7.5pt}
+  table.tb td{padding:4px 5px; overflow-wrap:break-word; word-break:normal; hyphens:auto}
+  table.tb td.tb-kopfspalte{white-space:normal}
+  table.tb tr{page-break-inside:avoid}
+  table.tb td.tb-luecke{background:#FFF}
+  .tb-feld{border:1px solid #999; background:#FFF; color:#000; min-height:26px;
+    -webkit-appearance:none; appearance:none}
+}
+
+/* Laufende Nummer als kleine Kennziffer vor dem Zeilennamen */
+.tb-karte-nr{display:inline-block; font-family:var(--data); font-size:11.5px; font-weight:700;
+  color:var(--pruefer); background:var(--pruefer-soft); border-radius:4px;
+  padding:1px 6px; margin-right:7px}

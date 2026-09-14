@@ -291,6 +291,16 @@ window.GENEXAM = (function () {
       if (!it) return;
       const typ = it.answerType === "diagram" ? typVon(it) : null;
       if (!typ || !FORM[typ]) return;
+      /* Steht die Tabelle schon im Aufgabentext und ist dort ausfüllbar
+         (gen/tabellen.js), dann hier keine zweite danebenstellen — sonst
+         füllt man dieselben Werte zweimal aus und weiß nicht, welche
+         gewertet wird.                                                  */
+      if (window.GENTAB && (window.GENTAB.finde(it.prompt || "") || []).length) {
+        karte.dataset.diaFertig = "1";
+        const doppelt = karte.querySelector(".ex-dia");
+        if (doppelt) doppelt.remove();
+        return;
+      }
       const haupt = karte.querySelector(".tk-haupt");
       const ta = haupt ? haupt.querySelector("textarea") : null;
       if (!haupt) return;

@@ -65,10 +65,10 @@
               }
             ],
             "begriffe": [
-              "Geschwindigkeit Scan",
               "Geschwindigkeit Druck",
               "Wartungskosten",
               "Matrix",
+              "Geschwindigkeit Scan",
               "Spalte",
               "Ergebnis",
               "Preis"
@@ -209,14 +209,14 @@
               }
             ],
             "begriffe": [
-              "Multifunktionsgerät",
               "2.844",
-              "3.456",
               "1.656",
+              "3.456",
+              "Multifunktionsgerät",
               "Abzug",
-              "2.000",
               "Falls",
-              "Folgefehler"
+              "2.000",
+              "Rechnungen"
             ]
           },
           "felder": [],
@@ -373,13 +373,13 @@
             "zahlen": [],
             "begriffe": [
               "Regelmäßiges Aktualisieren",
-              "Security Compliance",
+              "Aktivierung",
               "Toolkit",
-              "Englisch",
-              "Installation",
               "Memory Integrity",
+              "Features",
               "Sicherheitsvorschriften",
-              "Aktivierung"
+              "Deutsch",
+              "Security Compliance"
             ]
           },
           "felder": [],
@@ -413,10 +413,10 @@
             "zahlen": [],
             "begriffe": [
               "Aktionen",
-              "Unternehmenssicht",
               "Rechte",
-              "Malware",
+              "Unternehmenssicht",
               "Anwender",
+              "Malware",
               "Rechner",
               "Netzwerk"
             ]
@@ -640,8 +640,8 @@
               "Schlüssels",
               "Rechenaufwand",
               "Entschlüsselung",
-              "Verschlüsselung",
               "Übertragung",
+              "Verschlüsselung",
               "Nachteil",
               "Vorteil"
             ]
@@ -684,10 +684,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Zusammenarbeit",
+              "Proprietäre Software",
               "Service",
               "Open-Source",
-              "Proprietäre Software",
+              "Zusammenarbeit",
               "Source-Code",
               "Interessierten",
               "Herstellers",
@@ -734,8 +734,8 @@
             "zahlen": [],
             "begriffe": [
               "Datenmanipulationen",
-              "Nutzer",
               "Download",
+              "Nutzer",
               "Hashwert",
               "Datenübertragung",
               "Integrität",
@@ -788,14 +788,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Dadurch",
               "IMAP",
+              "Verbleib",
               "Mailpostfachs",
               "Mail-Kopie",
-              "Verbleib",
-              "Dadurch",
-              "Clients",
               "Bearbeitung",
-              "Abruf"
+              "Abruf",
+              "Clients"
             ]
           },
           "felder": [],
@@ -972,11 +972,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Parametern",
               "Website",
               "Benutzerinteraktionen",
-              "Laufzeit",
+              "Parametern",
               "Grundlage",
+              "Laufzeit",
               "Inhalte"
             ]
           },
@@ -1019,12 +1019,12 @@
             "zahlen": [],
             "begriffe": [
               "CSS",
+              "HTML",
               "Python",
-              "Programmiersprachen",
+              "Edition",
               "PHP",
               "Java Enterprise",
-              "Edition",
-              "HTML"
+              "Programmiersprachen"
             ]
           },
           "felder": [],
@@ -1066,13 +1066,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Sitzungen",
-              "Seitenaufruf",
-              "Prozentsatz",
               "Bounce-Rate",
               "Durchschnittliche Seitenaufrufe",
-              "Besucher",
+              "Prozentsatz",
+              "Sitzungen",
               "Suchmaschinen",
+              "Besucher",
+              "Seitenaufruf",
               "Rückgabewerte"
             ]
           },
@@ -1182,14 +1182,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Gericht",
-              "Anrufern",
-              "Rechtsmittels",
-              "Erstgespräch",
-              "Urteils",
+              "Erfolgschancen",
+              "Anwaltsgehilfen",
+              "Zusammenfassung",
+              "Referenz-Rechtsfällen",
               "Erläuterung",
+              "Rechtsmittels",
               "Terminvereinbarung",
-              "Inhaltliche Erfassung"
+              "Gesetzestexten"
             ]
           },
           "felder": [],
@@ -1230,11 +1230,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Freiraum",
               "Effektivität",
+              "Freiraum",
               "Fehlerhäufigkeit",
-              "Tätigkeiten",
-              "Arbeitsleistung"
+              "Arbeitsleistung",
+              "Tätigkeiten"
             ]
           },
           "felder": [],
@@ -1355,14 +1355,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Erstberatung",
+              "Kanzlei",
               "Image",
               "Potenzielle Mandanten",
-              "Beanspruchung",
-              "Erstberatung",
-              "Mögliche Vorteile",
-              "Kanzlei",
+              "Mögliche Nachteile",
               "Kontakt",
-              "Mögliche Nachteile"
+              "Mögliche Vorteile",
+              "Beanspruchung"
             ]
           },
           "felder": [],
@@ -1396,11 +1396,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Host Name",
               "230.33",
+              "32.42",
               "Connection",
               "SSH",
-              "Host Name",
-              "32.42",
               "IP"
             ]
           },
@@ -1541,13 +1541,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Löschen",
+              "Erhöhter Zeitaufwand",
               "Ändern",
               "Änderungen",
-              "Einfügen",
               "Inkonsistenzen",
+              "Löschen",
               "Ungewollte Nebeneffekte",
-              "Erhöhter Zeitaufwand",
+              "Einfügen",
               "Durchführung"
             ]
           },

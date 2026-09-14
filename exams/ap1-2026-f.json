@@ -62,8 +62,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Sicherheitsbedingungen",
               "Zugang",
+              "Sicherheitsbedingungen",
               "Herstellers",
               "Geräten",
               "Passwort"
@@ -107,13 +107,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Heizung",
               "Beschlag",
               "Infrarot",
-              "Heizung",
-              "Option",
               "Nachtaufnahmen",
-              "Vereisung",
+              "Option",
               "IR",
+              "Vereisung",
               "Außentemperaturen"
             ]
           },
@@ -361,8 +361,8 @@
               "MST",
               "Anschlüssen",
               "Multi-Stream Transport",
-              "Monitore",
               "Thunderbolt-Port",
+              "Monitore",
               "Unterstützung"
             ]
           },
@@ -411,14 +411,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Verkettung",
               "Panels",
-              "Zeichnungen",
-              "Lösungsbogen",
               "Variante",
+              "Lösungsbogen",
+              "Verkettung",
               "Variante Thunderbolt",
-              "Monitore",
-              "Thunderbolt-Port"
+              "Zeichnungen",
+              "Thunderbolt-Port",
+              "Monitor"
             ]
           },
           "felder": [],
@@ -460,11 +460,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Broadcast-Adresse",
+              "Anzahl Hosts",
+              "16.0",
               "16.127",
               "255.128",
-              "16.0",
-              "Anzahl Hosts",
+              "Broadcast-Adresse",
               "Netzadresse",
               "255.255",
               "Subnetzmaske"
@@ -525,14 +525,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Netzwerkdose",
-              "Behebung",
-              "Netzwerkkabels",
+              "Korrekte Netzwerkadresse",
+              "Überprüfen Netzwerkadresse",
+              "Namensauflösung",
               "Network-Analyzer",
               "Netzwerkbuchse",
-              "Korrekte Netzwerkadresse",
-              "Netzwerkadresse",
-              "Diode"
+              "Netzwerkkabels",
+              "Befehl",
+              "Netzwerkdose"
             ]
           },
           "felder": [],
@@ -565,13 +565,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Adressraum",
-              "Schlankerer Headeraufbau",
-              "SLAAC",
-              "Autoconfiguration",
-              "Netzwerkkonfiguration",
-              "Konfiguration",
+              "Dezimalform",
               "Adressnotationen",
+              "Stateless Address",
+              "SLAAC",
+              "Adressraum",
+              "Netzwerkkonfiguration",
+              "Autoconfiguration",
               "Adresslänge"
             ]
           },
@@ -613,14 +613,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Dual-Stack",
+              "Netzwerken",
+              "Paketen",
+              "Protokollen",
               "Jedes Gerät",
               "Tunneling",
-              "Netzwerken",
-              "Protokollen",
-              "Paketen",
-              "Kapselung",
-              "Methode"
+              "Dual-Stack",
+              "Pakete",
+              "Kapselung"
             ]
           },
           "felder": [],
@@ -667,14 +667,14 @@
               }
             ],
             "begriffe": [
-              "Prozessschritt",
               "FAZ",
+              "Prozessschritt",
               "SEZ",
-              "SAZ",
               "GP",
+              "SAZ",
               "Korrektur",
-              "Netzknoten",
-              "Netzplan"
+              "Falls",
+              "Netzknoten"
             ]
           },
           "felder": [],
@@ -716,13 +716,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Keine Aufnahmen",
-              "Zulässige Speicherzeiten",
-              "Speichern",
               "Videoaufnahmen",
               "Videoüberwachung",
               "Erhöhte Schutzmaßnahmen",
+              "Speichern",
+              "Keine Aufnahmen",
               "Schildes",
+              "Zulässige Speicherzeiten",
               "Bereich"
             ]
           },
@@ -765,14 +765,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Kameraaufnahmen",
+              "Zuweisung",
+              "Beweiszwecken",
               "Ankunft",
+              "Uhrzeit",
+              "Ablieferung",
+              "Datenbank",
               "Vorschlag",
-              "Neben",
-              "Erfassung",
-              "Mithilfe",
-              "Video-Systems",
-              "Zuweisung"
+              "Video-System"
             ]
           },
           "felder": [],
@@ -805,14 +805,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bessere Auslastung",
-              "Zügige Abwicklung",
-              "Schnellere Verfügbarkeit",
-              "Schnellere Auslieferung",
               "Kundenbestellungen",
+              "Bessere Auslastung",
+              "Schnellere Auslieferung",
+              "Schnellere Verfügbarkeit",
               "Entladens",
+              "Entladen",
               "Standzeiten",
-              "Entladen"
+              "Zügige Abwicklung"
             ]
           },
           "felder": [],
@@ -853,11 +853,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Zahlungsverpflichtung",
               "Ausgleich",
               "Schadensersatz",
-              "Zahlungsverpflichtung",
-              "Schaden",
               "Kaufvertrag",
+              "Schaden",
               "Lieferverzug",
               "Leistung",
               "Lieferung"
@@ -893,10 +893,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Mitarbeitergewinnung",
-              "Umsatzrückgang",
-              "Probleme",
               "Neukunden",
+              "Probleme",
+              "Umsatzrückgang",
+              "Mitarbeitergewinnung",
               "Absprung",
               "Gewinnung",
               "Kunden"
@@ -933,8 +933,8 @@
             "zahlen": [],
             "begriffe": [
               "Internet",
-              "Adressen",
               "Netzwerk",
+              "Adressen",
               "IP"
             ]
           },
@@ -987,13 +987,13 @@
               }
             ],
             "begriffe": [
-              "Instabilität",
-              "Verbindungsabbrüchen",
               "Ruckeln",
+              "Instabilität",
               "Antwortzeit",
-              "Bildübertragung",
               "Einfrieren",
-              "Timeouts"
+              "Timeouts",
+              "Verbindungsabbrüchen",
+              "Bildübertragung"
             ]
           },
           "felder": [],
@@ -1034,13 +1034,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Technologien",
-              "Ausdruck",
+              "Schlüsselbegriffe",
               "Beispiele",
               "Entscheidend",
               "Geschäftsprozesse",
-              "Schlüsselbegriffe",
+              "Technologien",
               "Umstrukturierung",
+              "Ausdruck",
               "Benennung"
             ]
           },
@@ -1120,11 +1120,11 @@
             "zahlen": [],
             "begriffe": [
               "Große",
+              "Gute Auflösung",
+              "Höhenverstellbare Tische",
               "Ergonomischer Stuhl",
               "Bildschirme",
-              "Mehrere Bildschirme",
-              "Höhenverstellbare Tische",
-              "Gute Auflösung"
+              "Mehrere Bildschirme"
             ]
           },
           "felder": [],
@@ -1166,10 +1166,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Polymorphismus",
-              "Leichtere Erweiterbarkeit",
-              "Bessere Wiederverwendbarkeit",
               "Bessere Wartbarkeit",
+              "Bessere Wiederverwendbarkeit",
+              "Leichtere Erweiterbarkeit",
+              "Polymorphismus",
               "Kapselung",
               "Vererbung"
             ]
@@ -1232,11 +1232,11 @@
               }
             ],
             "begriffe": [
-              "Sichtbarkeit",
-              "Punkt Attribut",
               "Punkt Klassenname",
+              "Sichtbarkeit",
               "Rückgabewert",
-              "Package"
+              "Package",
+              "Punkt Attribut"
             ]
           },
           "felder": [],
@@ -1331,8 +1331,8 @@
               }
             ],
             "begriffe": [
-              "Gesamtpreis",
               "Preis Paket",
+              "Gesamtpreis",
               "Pakete",
               "Summe",
               "EUR"
@@ -1421,13 +1421,13 @@
               }
             ],
             "begriffe": [
-              "Gewicht",
-              "Artikel",
-              "Attributen Verladezeit",
-              "Restliche Attribute",
-              "Entität Artikel",
-              "Kennzeichen",
               "Kennzeichnung",
+              "Kennzeichen",
+              "Gewicht",
+              "Restliche Attribute",
+              "Attributen Verladezeit",
+              "AID",
+              "Entität Artikel",
               "LID"
             ]
           },

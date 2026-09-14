@@ -191,14 +191,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Projektschritte",
-              "Fixierung",
-              "Sollkonzepts",
-              "Problembereiches",
               "Prozessänderung",
               "Modellierung",
               "Inhaltlicher Aspekt",
-              "Projektinitiierung"
+              "Problembereiches",
+              "Ausblick",
+              "Istzustands",
+              "Phasen",
+              "Prozessoptimierung"
             ]
           },
           "felder": [
@@ -288,11 +288,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bereitschaft",
               "Realisierbarkeit",
-              "Akzeptanz",
-              "Bestellungen",
               "Anteilseigner",
+              "Bestellungen",
+              "Bereitschaft",
+              "Akzeptanz",
               "Finanzierung",
               "Lieferanten",
               "Durchführung"
@@ -360,14 +360,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Kenntnisse",
-              "Methodenkompetenz",
+              "Personals",
               "Risikoeinschätzung",
-              "Strukturen",
+              "Methodenkompetenz",
+              "Zutrittskontrolle",
               "Beraters",
-              "Zusatzbelastung",
               "Spezialisierung",
-              "Zutrittskontrolle"
+              "Zusatzbelastung",
+              "Strukturen"
             ]
           },
           "felder": [],
@@ -573,14 +573,14 @@
               }
             ],
             "begriffe": [
-              "Minute",
-              "Arbeitstag",
-              "Karton",
-              "Scanner",
               "Aufnahmen",
+              "Minute",
+              "Karton",
               "Stunde",
-              "6.000",
-              "72.000"
+              "Arbeitstag",
+              "Scanner",
+              "72.000",
+              "6.000"
             ]
           },
           "felder": [],
@@ -660,14 +660,14 @@
               }
             ],
             "begriffe": [
-              "Bildpunkte",
-              "38.400",
+              "76.800",
               "614.400",
               "75.000",
-              "Farbtiefe",
-              "76.800",
+              "38.400",
+              "Pixel",
+              "Bildpunkte",
               "4.800",
-              "Pixel"
+              "Farbtiefe"
             ]
           },
           "felder": [],
@@ -762,14 +762,14 @@
               }
             ],
             "begriffe": [
-              "6.835",
-              "Ersatzrechnung",
-              "100.000",
               "5.274",
+              "Ersatzrechnung",
               "7.000",
               "5.150",
+              "6.835",
+              "100.000",
               "72.000",
-              "Scans"
+              "Datenvolumen"
             ]
           },
           "felder": [],
@@ -841,8 +841,8 @@
               "TB",
               "Level",
               "Rechenweg",
-              "Platten",
               "RAID",
+              "Platten",
               "Nutzung"
             ]
           },
@@ -1013,14 +1013,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Volle Ausnutzung",
-              "Plattengrößen",
               "Speicherkapazitäten",
-              "Relativ",
+              "Volle Ausnutzung",
               "Controller",
+              "Plattengrößen",
+              "Relativ",
               "Erweiterung",
-              "Platten",
-              "RAID"
+              "RAID",
+              "Platten"
             ]
           },
           "felder": [],
@@ -1084,14 +1084,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Administrators",
-              "Verwaltung",
-              "Standort",
-              "Daten-Volumen",
-              "Erlaubt",
               "Besonders",
               "Betriebssysteme",
-              "SAN"
+              "Ressourcenauslastung",
+              "Bietet Maximum",
+              "SAN",
+              "Administrators",
+              "Unabhängig",
+              "Standort"
             ]
           },
           "felder": [],
@@ -1154,14 +1154,14 @@
               }
             ],
             "begriffe": [
-              "QR",
-              "Datenmenge",
-              "Herstellung",
-              "Verschmutzung",
               "Sichtkontakt",
               "Auslesen",
+              "Chips",
               "RFID",
-              "Sichtbehinderung"
+              "Verschmutzung",
+              "QR",
+              "Herstellung",
+              "Datenmenge"
             ]
           },
           "felder": [
@@ -1258,13 +1258,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Nahezu",
+              "Sicherheitsmaßnahmen",
               "Protokoll-Headers",
               "Weltweite Erreichbarkeit",
-              "Verschlankung",
               "Adresszahl",
-              "Sicherheitsmaßnahmen",
+              "Verschlankung",
               "Verbesserte Integration",
+              "Nahezu",
               "Komponenten"
             ]
           },
@@ -1493,13 +1493,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Steuerung",
+              "Industrie-PC",
+              "Netzwerkanschluss",
               "Sensor",
               "Router",
-              "Steuerung",
-              "Netzwerkanschluss",
-              "Industrie-PC",
-              "Standard-Gateway",
               "Gateway",
+              "Standard-Gateway",
               "Switch"
             ]
           },
@@ -1598,8 +1598,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Link-Local",
               "Unicast",
+              "Link-Local",
               "Adresse"
             ]
           },
@@ -1650,14 +1650,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Noteplus",
               "Genie",
-              "Frankfurt",
-              "KG",
-              "Qualität",
               "AG",
               "Kriterien",
               "Notebook-Clever",
-              "Punktzahl"
+              "Lieferzeit",
+              "Qualität",
+              "Frankfurt"
             ]
           },
           "felder": [
@@ -1750,13 +1750,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Quantity",
-              "Width",
               "Length",
-              "Thickness",
+              "Width",
+              "Quantity",
               "WHERE",
-              "SELECT",
-              "FROM"
+              "Thickness",
+              "FROM",
+              "SELECT"
             ]
           },
           "felder": [],
@@ -1831,10 +1831,10 @@
               "HAVING",
               "AS",
               "GROUP",
+              "COUNT",
               "Thickness",
               "BY",
-              "COUNT",
-              "SELECT"
+              "FROM"
             ]
           },
           "felder": [],
@@ -1908,10 +1908,10 @@
               "SUM",
               "Gesamtanzahl",
               "AS",
-              "Width",
               "AND",
-              "Quantity",
+              "Width",
               "Length",
+              "Quantity",
               "GROUP"
             ]
           },
@@ -2062,13 +2062,13 @@
               }
             ],
             "begriffe": [
-              "WID",
-              "Zeitstempel",
-              "Bezeichnung",
-              "Kennzeichnung Primärschlüssel",
-              "Dicke",
               "Aufgabenstellung",
+              "Produktionsdaten",
+              "Dicke",
+              "Bezeichnung",
+              "Zeitstempel",
               "Spezifikation",
+              "Kennzeichnung Primärschlüssel",
               "Walzanlage"
             ]
           },
