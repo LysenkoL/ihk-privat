@@ -19,7 +19,48 @@
    Schreiblinien — so viele, wie die Punktzahl erwarten lässt.
    ========================================================================== */
 
+/* ---------------------------------------------------------------------------
+   Der Kasten vor dem Drucken (nur am Bildschirm)
+   -------------------------------------------------------------------------
+   Zwei Fragen, vier Knöpfe, keine Schieberegler. Die Wahl ist gemerkt, der
+   Kasten zeigt sie vorausgewählt — wer nichts ändern will, drückt zweimal.
+   ------------------------------------------------------------------------ */
+/* Die A4-Vorschau ist 794 px breit. Auf schmalen Geräten wird sie von
+   druckbogen.js verkleinert; der Rollbalken bleibt als Rückfall, falls der
+   Browser `zoom` nicht kennt.                                            */
+@media screen and (max-width:900px){
+  #druckWrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  #druckBogen{margin:12px auto}
+  .dr-leiste{padding:9px 12px; gap:8px}
+  .dr-leiste .dr-info{font-size:12px; flex:1 1 100%}
+  .dr-leiste .weit{display:none}
+  .dr-leiste .btn{flex:1 1 40%}
+}
+
+.dk-huelle{position:fixed; inset:0; z-index:120; display:flex; align-items:center;
+  justify-content:center; padding:16px; background:rgba(0,0,0,.45)}
+.dk-kasten{width:100%; max-width:480px; max-height:90vh; overflow:auto;
+  background:var(--card); border:1px solid var(--rule); border-top:3px solid var(--pruefer);
+  border-radius:5px; padding:18px 18px 14px; box-shadow:0 8px 30px rgba(0,0,0,.28)}
+.dk-titel{margin:0 0 12px; font-family:var(--display); font-size:16px}
+.dk-gruppe{display:flex; flex-direction:column; gap:7px; margin-bottom:14px}
+.dk-wahl{display:block; width:100%; text-align:left; cursor:pointer; font:inherit;
+  padding:10px 12px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--paper); color:var(--ink)}
+.dk-wahl:hover{border-color:var(--pruefer)}
+.dk-wahl.an{border-color:var(--pruefer); border-left:3px solid var(--pruefer);
+  background:var(--pruefer-soft)}
+.dk-wahl-t{display:block; font-size:13.5px; font-weight:700}
+.dk-wahl.an .dk-wahl-t{color:var(--pruefer)}
+.dk-wahl-h{display:block; font-size:12px; color:var(--muted); line-height:1.5; margin-top:2px}
+.dk-fuss{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap}
+.dk-fuss .btn{min-height:44px}
+@media (max-width:700px){ .dk-fuss .btn{flex:1 1 44%} }
+
 @media print{
+
+  /* Der Kasten selbst darf nie mit aufs Papier. */
+  .dk-huelle{display:none !important}
 
   /* --- Bogenkopf: Situation vollständig, nicht abgeschnitten ----------- */
   /* Auf dem Bildschirm ist der Situationstext nach 230 px abgeschnitten und
@@ -68,6 +109,9 @@
   /* Eine ganzseitige Abbildung frisst sonst ein Blatt und schiebt alles
      Folgende vor sich her.                                              */
   .bild img{max-height:105mm; width:auto; max-width:100%; margin:0 auto}
+  /* Ein feiner Netzplan ist bei 10,5 cm nicht mehr zu lesen — dann lieber
+     eine Seite mehr. Umgeschaltet wird im Kasten vor dem Drucken.       */
+  html[data-druck-bilder="gross"] .bild img{max-height:none; width:100%}
   .bild figcaption{font-size:6.5pt; padding:2pt 1pt 0}
   /* Fehlt die Bilddatei, bliebe sonst ein leerer Rahmen mit Bildunterschrift
      stehen — auf Papier sieht das aus wie ein vergessener Platzhalter.  */
@@ -91,6 +135,10 @@
 
   .feldzeile{display:block; margin-bottom:3pt; break-inside:avoid; page-break-inside:avoid}
   .feldzeile label{display:block; font-size:8.5pt; color:#444; padding:0 0 1pt}
+
+  /* Auf einem leeren Übungsbogen haben Musterlösungen nichts verloren —
+     auch dann nicht, wenn sie am Bildschirm gerade aufgeklappt sind.   */
+  html[data-druck-modus="leer"] .tk .loesung{display:none !important}
 
   /* --- Auf Papier überflüssig ------------------------------------------ */
   .tk-rand .punkte-wahl, .seite-link, .marke-katalog, .thema, .herkunft,

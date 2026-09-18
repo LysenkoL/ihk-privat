@@ -23,7 +23,9 @@
 <link rel="stylesheet" href="gen/rechnen.css">
 <link rel="stylesheet" href="gen/auftrag.css">
 <link rel="stylesheet" href="gen/handgriffe.css">
+<link rel="stylesheet" href="gen/endspurt.css">
 <link rel="stylesheet" href="gen/druck.css">
+<link rel="stylesheet" href="gen/druckbogen.css">
 <style>
   :root{
     --paper:#FCFCFA; --card:#FFFFFF; --ink:#14171C; --muted:#5E6570;
@@ -316,6 +318,10 @@
     background:var(--field); border:1px solid var(--rule); border-radius:2px; padding:4px 2px}
   table.gantt-tab input.falsch{background:var(--red-soft); color:var(--red); border-color:var(--red)}
   table.gantt-tab input.richtig{background:var(--ok-soft); color:var(--ok); border-color:var(--ok)}
+  /* Der Sollwert neben dem roten Feld — klein, grün, und die eigene Zahl
+     bleibt daneben stehen.                                             */
+  .soll-wert{display:block; margin-top:3px; font-family:var(--data); font-size:11px;
+    font-weight:700; color:var(--ok); white-space:nowrap}
   .gantt-spur{position:relative; height:16px; background:var(--rule-soft); border-radius:2px;
     min-width:260px}
   /* min-width, damit ein Vorgang von genau einem Tag nicht zum Strich wird:
@@ -2279,6 +2285,24 @@ $("btnNetzEigen").addEventListener("click", () => {
 });
 $("btnNetzZurueck").addEventListener("click", () => { renderStart(); schirm("scStart"); });
 
+/* Ein rotes Feld sagt „falsch“ und sonst nichts. Wer daraus lernen will,
+   muss die richtige Zahl daneben sehen — und die eigene behalten dürfen,
+   sonst ist der Vergleich weg, bevor man ihn machen konnte. Deshalb wird
+   die Eingabe nie überschrieben; der Sollwert kommt als kleiner Zusatz in
+   dieselbe Zelle.                                                        */
+function sollZeigen(feld, soll){
+  const zelle = feld.parentElement;
+  if (!zelle) return;
+  const alt = zelle.querySelector(".soll-wert");
+  if (alt) alt.remove();
+  if (soll == null) return;
+  const s = document.createElement("span");
+  s.className = "soll-wert";
+  s.textContent = "richtig: " + soll;
+  s.title = "Deine Eingabe bleibt stehen — so kannst du beides vergleichen.";
+  zelle.appendChild(s);
+}
+
 function felderPruefen(wurzel){
   let richtig = 0, gesamt = 0, leer = 0;
   const nachGruppe = {termine:[0,0], puffer:[0,0]};
@@ -2287,11 +2311,11 @@ function felderPruefen(wurzel){
     const ist = i.value.trim();
     i.classList.remove("richtig", "falsch");
     const gruppe = (i.dataset.feld === "gp" || i.dataset.feld === "fp") ? "puffer" : "termine";
-    if (ist === ""){ leer++; return; }
+    if (ist === ""){ leer++; sollZeigen(i, null); return; }
     gesamt++; nachGruppe[gruppe][1]++;
     if (parseFloat(ist.replace(",", ".")) === soll){
-      richtig++; nachGruppe[gruppe][0]++; i.classList.add("richtig");
-    } else i.classList.add("falsch");
+      richtig++; nachGruppe[gruppe][0]++; i.classList.add("richtig"); sollZeigen(i, null);
+    } else { i.classList.add("falsch"); sollZeigen(i, soll); }
   });
   return {richtig, gesamt, leer, nachGruppe};
 }
@@ -2348,7 +2372,8 @@ function fragenPruefen(){
   if (dauerRoh){
     const ok = parseFloat(dauerRoh.replace(",", ".")) === NETZ.ende;
     setz("fragDauer", ok, false);
-    teile.push((ok ? '<span class="gut">✓</span>' : '<span class="schlecht">✗</span>') + " Projektdauer");
+    teile.push((ok ? '<span class="gut">✓</span>' : '<span class="schlecht">✗</span>') +
+               " Projektdauer" + (ok ? "" : " (richtig: " + NETZ.ende + " Tage)"));
   } else setz("fragDauer", false, true);
 
   /* „ABEFH“ ohne Trennzeichen ist eine völlig normale Schreibweise — sie kam
@@ -2380,7 +2405,8 @@ function fragenPruefen(){
       const t = [];
       if (fehlt.length) t.push("fehlt: " + fehlt.join(", "));
       if (zuviel.length) t.push("hat Puffer: " + zuviel.join(", "));
-      zusatz = " (" + (t.length ? t.join(" · ") : soll.length + " Vorgänge mit GP 0") + ")";
+      t.push("richtig: " + soll.join("–"));
+      zusatz = " (" + t.join(" · ") + ")";
     }
     teile.push((ok ? '<span class="gut">✓</span>' : '<span class="schlecht">✗</span>') +
                " kritischer Pfad" + zusatz);
@@ -2392,8 +2418,12 @@ function fragenPruefen(){
     const soll = NETZ.maxPufferVorgang.map(x => x.toUpperCase());
     const ok = meins.length > 0 && meins.every(x => soll.includes(x));
     setz("fragPuffer", ok, false);
+    /* Welcher Vorgang — und wie viele Tage. Ohne die Zahl bleibt unklar,
+       warum gerade der gemeint ist.                                     */
+    const gp = soll.length && NETZ.byId[soll[0]] ? NETZ.byId[soll[0]].gp : null;
     teile.push((ok ? '<span class="gut">✓</span>' : '<span class="schlecht">✗</span>') +
-               " größter Puffer");
+               " größter Puffer" + (ok ? "" : " (richtig: " + soll.join(", ") +
+               (gp == null ? "" : " mit GP " + gp + " Tagen") + ")"));
   } else setz("fragPuffer", false, true);
 
   $("fragErgebnis").innerHTML = teile.length ? teile.join(" &nbsp;·&nbsp; ")
@@ -4238,6 +4268,7 @@ schirm("scStart");
 <script src="gen/satzbausteine.js"></script>
 <script src="gen/satzbau.js"></script>
 <script src="gen/formeln.js"></script>
+<script src="gen/merkblatt.js"></script>
 <script src="gen/operatoren.js"></script>
 <script src="gen/simulation.js"></script>
 <script src="gen/fehlerjournal.js"></script>
@@ -4270,6 +4301,7 @@ schirm("scStart");
 <script src="gen/kompakt.js"></script>
 <script src="gen/zeit.js"></script>
 <script src="gen/plan.js"></script>
+<script src="gen/endspurt.js"></script>
 <script src="gen/pseudocode.js"></script>
 </body>
 </html>

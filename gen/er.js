@@ -382,8 +382,12 @@ window.GENER = (function () {
         kardDa++;
         zeilen.push({ ok: true, text: "Kardinalität " + sb.von + " " + sb.kard + " " + sb.nach });
       } else {
-        zeilen.push({ ok: false, text: "Kardinalität zwischen " + sb.von + " und " + sb.nach +
-          " stimmt nicht" + (putz(meine.kard) ? " (eingetragen: " + putz(meine.kard) + ")" : " (leer)") });
+        /* „stimmt nicht“ allein ist keine Rückmeldung — man sieht weder die
+           eigene noch die richtige Kardinalität. Beide gehören in die Zeile,
+           und zwar in der Leserichtung, die im Feld steht.               */
+        zeilen.push({ ok: false, text: "Kardinalität " + sb.von + " – " + sb.nach + ": " +
+          (putz(meine.kard) ? "eingetragen " + putz(meine.kard) : "leer") +
+          ", richtig " + soll + (soll !== sb.kard ? " (in dieser Leserichtung)" : "") });
       }
       if ((sb.attribute || []).length) {
         const gs = putz(meine.attr).split(",").map(putz).filter(Boolean);

@@ -1136,11 +1136,35 @@ window.GENUI = (function () {
     const klasse = r.status === "richtig" ? "richtig" : (r.status === "teil" ? "teil" : (r.status === "falsch" ? "falsch" : ""));
 
     feldBox.querySelectorAll("input[type=text], textarea, select").forEach(x => x.classList.remove("richtig", "falsch", "teil"));
-    feldBox.querySelectorAll(".gwahl label, table.gwf tr").forEach(x => x.classList.remove("richtig", "falsch"));
+    feldBox.querySelectorAll(".gwahl label, table.gwf tr").forEach(x => x.classList.remove("richtig", "falsch", "soll"));
+    /* Reste einer früheren Prüfung wegräumen, sonst stehen zwei Sollwerte
+       übereinander, sobald man ein zweites Mal prüft.                    */
+    feldBox.querySelectorAll(".gsoll").forEach(x => x.remove());
+
+    /* -------------------------------------------------------------------
+       „Rotes Feld und sonst nichts“ war die häufigste Rückfrage: man sieht,
+       DASS es falsch ist, aber nicht, was dagestanden hätte — und wer die
+       Lösung aufklappt, verliert die eigene Antwort aus dem Blick. Deshalb
+       wird der Sollwert jetzt direkt neben die eigene Eingabe geschrieben
+       und die richtige Option zusätzlich markiert. Überschrieben wird nie
+       etwas: der Vergleich ist der ganze Zweck.
+       ---------------------------------------------------------------- */
+    const sollChip = (wohin, text) => {
+      if (!wohin || text == null || text === "") return;
+      const s = el("div", "gsoll");
+      s.append(el("span", "gsoll-lbl", "richtig:"), el("span", "gsoll-wert", String(text)));
+      wohin.appendChild(s);
+    };
 
     if (f.typ === "zahl" || f.typ === "text" || f.typ === "liste" || f.typ === "rechenweg") {
       const inp = feldBox.querySelector("input[type=text], textarea");
       if (inp && klasse) inp.classList.add(klasse);
+    }
+    /* Zahl: der Sollwert mit Einheit. Bei „teil“ genauso — dann war meist
+       die Einheit oder die Rundung das Problem, und ohne den Vergleich
+       sieht man nicht, welches von beidem.                              */
+    if (f.typ === "zahl" && r.status !== "richtig" && r.status !== "leer" && f.loesung != null) {
+      sollChip(feldBox, G.fmt.kurz(f.loesung) + (f.einheit ? " " + f.einheit : ""));
     }
     /* Rechenweg: die Zwischenwerte der Musterlösung anzeigen und markieren,
        welche in der eigenen Rechnung vorkommen — das zeigt die Bruchstelle. */
@@ -1163,32 +1187,64 @@ window.GENUI = (function () {
       }
     }
     if (f.typ === "auswahl") {
+      let daneben = false;
       feldBox.querySelectorAll(".gwahl label").forEach(l => {
         const inp = l.querySelector("input");
         if (!inp.checked) return;
-        l.classList.add(String(inp.value) === String(f.loesung) ? "richtig" : "falsch");
+        const gut = String(inp.value) === String(f.loesung);
+        l.classList.add(gut ? "richtig" : "falsch");
+        if (!gut) daneben = true;
+      });
+      /* Die richtige Antwort steht mit in der Liste — sie muss nur gezeigt
+         werden. Angekreuzt wird nichts, die eigene Wahl bleibt stehen.  */
+      if (daneben) feldBox.querySelectorAll(".gwahl label").forEach(l => {
+        const inp = l.querySelector("input");
+        if (String(inp.value) === String(f.loesung)) {
+          l.classList.add("soll");
+          l.title = "Das wäre richtig gewesen.";
+        }
       });
     }
     if (f.typ === "mehrfachwahl") {
+      const soll = (f.loesung || []).map(String);
+      let daneben = false;
       feldBox.querySelectorAll(".gwahl label").forEach(l => {
         const inp = l.querySelector("input");
         if (!inp.checked) return;
-        l.classList.add((f.loesung || []).map(String).includes(String(inp.value)) ? "richtig" : "falsch");
+        const gut = soll.includes(String(inp.value));
+        l.classList.add(gut ? "richtig" : "falsch");
+        if (!gut) daneben = true;
       });
+      const fehlend = [...feldBox.querySelectorAll(".gwahl label")]
+        .filter(l => { const i2 = l.querySelector("input"); return soll.includes(String(i2.value)) && !i2.checked; });
+      fehlend.forEach(l => { l.classList.add("soll"); l.title = "Das hätte auch angekreuzt gehört."; });
+      if (daneben || fehlend.length) { /* Markierung reicht — kein zweiter Text */ }
     }
     if (f.typ === "aussagen") {
       feldBox.querySelectorAll("table.gwf tbody tr").forEach(tr => {
         const k = +tr.dataset.k;
         const gew = (feldBox.querySelector('input[name="wf' + AUFG.indexOf(a) + "-" + f.nr + "-" + k + '"]:checked') || {}).value;
         if (!gew) return;
-        tr.classList.add((gew === "w") === !!f.aussagen[k].wahr ? "richtig" : "falsch");
+        const gut = (gew === "w") === !!f.aussagen[k].wahr;
+        tr.classList.add(gut ? "richtig" : "falsch");
+        if (!gut) {
+          const zelle = tr.querySelector("td:last-child") || tr.lastElementChild;
+          sollChip(zelle, f.aussagen[k].wahr ? "richtig" : "falsch");
+        }
       });
     }
     if (f.typ === "zuordnung") {
       feldBox.querySelectorAll("table.gzuo tbody tr").forEach(tr => {
         const k = +tr.dataset.k, s = tr.querySelector("select");
         if (!s.value) return;
-        s.classList.add(s.value === f.paare[k][1] ? "richtig" : "falsch");
+        const gut = s.value === f.paare[k][1];
+        s.classList.add(gut ? "richtig" : "falsch");
+        /* title für die Maus, Chip für das Telefon — auf dem Handy gibt es
+           kein Darüberfahren.                                          */
+        if (!gut) {
+          s.title = "richtig: " + f.paare[k][1];
+          sollChip(s.parentElement, f.paare[k][1]);
+        } else s.removeAttribute("title");
       });
     }
     if (f.typ === "flussbild" && window.GENFLUSS) {
@@ -1229,6 +1285,18 @@ window.GENUI = (function () {
       feldBox.querySelectorAll("input[data-zelle]").forEach(inp => {
         const z = r.zellen[inp.dataset.zelle];
         if (z === "richtig" || z === "falsch") inp.classList.add(z);
+        if (z !== "falsch") { inp.removeAttribute("title"); return; }
+        const [zi, ci] = inp.dataset.zelle.split("-").map(Number);
+        const c = ((f.zeilen || [])[zi] || { zellen: [] }).zellen[ci];
+        if (!c) return;
+        /* Textzellen haben mehrere erlaubte Formulierungen — die erste ist
+           die aus der Musterlösung und reicht als Anhalt.               */
+        const soll = c.text != null
+          ? (Array.isArray(c.text) ? c.text[0] : c.text)
+          : (c.loesung != null ? G.fmt.kurz(c.loesung) : null);
+        if (soll == null) return;
+        inp.title = "richtig: " + soll;
+        sollChip(inp.parentElement, soll);
       });
     }
 

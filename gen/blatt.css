@@ -131,6 +131,20 @@ table.gdaten td:nth-child(n+2){font-family:var(--data); font-variant-numeric:tab
 .gwahl label:hover{background:var(--field)}
 .gwahl label.richtig{border-color:var(--ok); background:var(--ok-soft)}
 .gwahl label.falsch{border-color:var(--red); background:var(--red-soft)}
+/* Die richtige Option, die man NICHT angekreuzt hat: gestrichelt, damit sie
+   sich von „ich hatte recht“ unterscheidet, und mit einem Wort dahinter,
+   weil Farbe allein auf dem Telefon oft nicht ankommt.                   */
+.gwahl label.soll{border-color:var(--ok); border-style:dashed; background:var(--ok-soft)}
+.gwahl label.soll::after{content:"richtig"; margin-left:auto; align-self:center;
+  font-family:var(--display); text-transform:uppercase; letter-spacing:.08em;
+  font-size:9.5px; font-weight:700; color:var(--ok); white-space:nowrap}
+
+/* Der Sollwert direkt an der eigenen Eingabe — nie an ihrer Stelle. */
+.gsoll{display:flex; flex-wrap:wrap; align-items:baseline; gap:5px; margin-top:4px}
+.gsoll-lbl{font-family:var(--display); text-transform:uppercase; letter-spacing:.08em;
+  font-size:9px; font-weight:700; color:var(--muted)}
+.gsoll-wert{font-family:var(--data); font-size:12.5px; font-weight:700; color:var(--ok)}
+@media print{ .gsoll{display:none} }
 .gwahl input{margin-top:3px; accent-color:var(--pruefer)}
 
 table.gzuo, table.graster, table.gwf{border-collapse:collapse; font-size:13.5px; width:100%; max-width:760px}
