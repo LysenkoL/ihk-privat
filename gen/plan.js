@@ -58,6 +58,56 @@ window.GENPLAN = (function () {
         });
       });
     } catch (e) { }
+
+    /* ------------------------------------------------------------------
+       Was wurde zuletzt wann geübt?
+
+       Ohne diese Frage stand hier fünf Tage lang dasselbe Thema: der Plan
+       wird jeden Tag neu gerechnet, und der erste Tag bekam immer das Thema
+       mit dem höchsten Risiko. Solange die Quote darin nicht über die der
+       anderen steigt — und von 63 % auf über alle anderen steigt sie nicht
+       an einem Tag —, gewann es wieder. Das Abhaken half nicht: es wurde
+       gespeichert, aber bei der Rechnung nie gelesen.
+
+       Jetzt zählt, wann ein Thema zuletzt dran war. Quelle sind die
+       tatsächlich erzeugten Arbeitsblätter (mit Datum und Themenschlüssel)
+       und die von Hand abgehakten Tage.
+       ------------------------------------------------------------------ */
+    L.zuletzt = {};
+    const merke = (key, tage, bewertet) => {
+      if (!key) return;
+      const alt = L.zuletzt[key];
+      if (!alt || tage < alt.tage) L.zuletzt[key] = { tage: tage, bewertet: !!bewertet };
+      else if (alt && tage === alt.tage && bewertet) alt.bewertet = true;
+    };
+    const tageHer = datumStr => {
+      const m = String(datumStr || "").match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+      if (!m) return null;
+      const d = tag0(new Date(+m[3], +m[2] - 1, +m[1]));
+      return Math.round((tag0(new Date()) - d) / 864e5);
+    };
+    try {
+      const b = JSON.parse(localStorage.getItem("ihk2:gen:blaetter") || "[]");
+      b.forEach(x => {
+        const t = tageHer(x.erstellt);
+        if (t == null || t < 0 || t > 14) return;
+        ((x.opt && x.opt.themen) || []).forEach(k => merke(k, t, x.bewertet || x.punkte > 0));
+      });
+    } catch (e) { }
+    /* Von Hand abgehakte Tage: dort steht seit dieser Fassung auch, WELCHES
+       Thema der Tag hatte.                                              */
+    try {
+      Object.keys(CFG.erledigt || {}).forEach(k => {
+        const e = CFG.erledigt[k];
+        const thema = e && e.thema;
+        if (!thema) return;
+        const m = k.match(/(\d{4})-(\d{2})-(\d{2})/);
+        if (!m) return;
+        const t = Math.round((tag0(new Date()) - tag0(new Date(+m[1], +m[2] - 1, +m[3]))) / 864e5);
+        if (t >= 0 && t <= 14) merke(thema, t, true);
+      });
+    } catch (e) { }
+
     try { L.fehlerOffen = window.GENFEHLER.liste().filter(x => !x.erledigt).length; } catch (e) { }
     try {
       const b = JSON.parse(localStorage.getItem("ihk2:gen:blaetter") || "[]");
@@ -66,6 +116,22 @@ window.GENPLAN = (function () {
       L.letzteSim = sims[0] || null;
     } catch (e) { }
     try { L.tempo = window.GENZEIT.daten(); } catch (e) { }
+
+    /* Frisch Geübtes rutscht nach hinten — nicht für immer, nur für ein paar
+       Tage. Ein Thema einmal zu bearbeiten heißt nicht, dass es sitzt; es
+       fünfmal hintereinander zu bearbeiten, während sechs andere Themen
+       unangetastet bleiben, bringt aber sicher weniger.                  */
+    const DAEMPFUNG = { 0: 0.15, 1: 0.40, 2: 0.70, 3: 0.85 };
+    L.themen.forEach(t => {
+      const z = L.zuletzt[t.key];
+      t.herTage = z ? z.tage : null;
+      t.rohRisiko = t.risiko;
+      if (z) {
+        const f = DAEMPFUNG[z.tage];
+        /* Nur angefangen, nicht bewertet: gilt nur für heute. */
+        t.risiko = t.risiko * (f == null ? 1 : (z.bewertet ? f : (z.tage === 0 ? 0.5 : 1)));
+      }
+    });
     L.themen.sort((a, b) => b.risiko - a.risiko);
     return L;
   }
@@ -145,9 +211,13 @@ window.GENPLAN = (function () {
         eintrag.bloecke.push({
           art: "thema", thema: t.key, titel: "Arbeitsblatt: " + t.label,
           minuten: Math.max(20, min - 10),
-          text: t.quote == null
+          text: (t.quote == null
             ? "Noch nie bewertet — " + Math.round(t.gewicht) + " BE Prüfungsgewicht. Blindfleck."
-            : Math.round(t.quote * 100) + " % bei " + Math.round(t.gewicht) + " BE Gewicht."
+            : Math.round(t.quote * 100) + " % bei " + Math.round(t.gewicht) + " BE Gewicht.") +
+            (t.herTage == null ? " Noch nicht geübt."
+             : t.herTage === 0 ? " Heute schon dran gewesen."
+             : t.herTage === 1 ? " Gestern geübt."
+             : " Zuletzt vor " + t.herTage + " Tagen geübt.")
         });
       }
       /* kurzer Zusatzblock */
@@ -224,6 +294,47 @@ window.GENPLAN = (function () {
     zeigen.forEach((t, i) => liste.appendChild(tagEl(t, i === 0)));
     b.appendChild(liste);
 
+    /* ------------------------------------------------------------------
+       „Was ist eigentlich noch offen?“ — die Frage, die der Tagesplan allein
+       nicht beantwortet. Hier stehen alle Prüfungsthemen mit Gewicht, Stand
+       und dem Tag, an dem sie zuletzt dran waren. Ein Klick startet das
+       Thema sofort, auch wenn der Plan heute etwas anderes vorschlägt.
+       ------------------------------------------------------------------ */
+    if (P.lage.themen.length) {
+      const ueb = el("details", "pl-themen");
+      ueb.open = b.dataset.themenOffen === "1";
+      ueb.addEventListener("toggle", () => { b.dataset.themenOffen = ueb.open ? "1" : "0"; });
+      const sum = el("summary");
+      const nieGeübt = P.lage.themen.filter(t => t.herTage == null).length;
+      sum.append(el("span", null, "Alle Themen — was ist offen?"),
+        el("span", "pl-th-zahl", P.lage.themen.length + " Themen" +
+          (nieGeübt ? " · " + nieGeübt + " noch nie geübt" : "")));
+      ueb.appendChild(sum);
+
+      const tab = el("div", "pl-th-liste");
+      P.lage.themen.forEach(t => {
+        const r = el("button", "pl-th");
+        r.type = "button";
+        const links = el("div", "pl-th-txt");
+        links.appendChild(el("div", "pl-th-name", t.label));
+        const stand = t.quote == null ? "noch nie bewertet" : Math.round(t.quote * 100) + " %";
+        const wann = t.herTage == null ? "noch nicht geübt"
+                   : t.herTage === 0 ? "heute geübt"
+                   : t.herTage === 1 ? "gestern geübt"
+                   : "vor " + t.herTage + " Tagen";
+        links.appendChild(el("div", "pl-th-meta",
+          stand + " · " + Math.round(t.gewicht) + " BE Gewicht · " + wann));
+        r.appendChild(links);
+        r.appendChild(el("span", "pl-th-los", "üben"));
+        if (t.herTage === 0) r.classList.add("frisch");
+        if (t.herTage == null) r.classList.add("neu");
+        r.onclick = () => starte({ art: "thema", thema: t.key, titel: "Arbeitsblatt: " + t.label });
+        tab.appendChild(r);
+      });
+      ueb.appendChild(tab);
+      b.appendChild(ueb);
+    }
+
     if (P.tage.length > 7) {
       const mehr = el("button", "pl-mehr", alle ? "nur die nächste Woche" : "alle " + P.tage.length + " Tage anzeigen");
       mehr.type = "button";
@@ -246,7 +357,13 @@ window.GENPLAN = (function () {
     const hak = el("button", "pl-hak" + (fertig ? " an" : ""), fertig ? "✓ erledigt" : "abhaken");
     hak.type = "button";
     hak.onclick = () => {
-      if (fertig) delete CFG.erledigt[t.key]; else CFG.erledigt[t.key] = 1;
+      if (fertig) delete CFG.erledigt[t.key];
+      else {
+        /* Das Thema mitschreiben — sonst weiß der Plan morgen nicht, was
+           heute dran war, und schlägt dasselbe noch einmal vor.        */
+        const haupt = t.bloecke.find(x => x.art === "thema");
+        CFG.erledigt[t.key] = { thema: haupt ? haupt.thema : null, art: haupt ? "thema" : (t.bloecke[0] || {}).art };
+      }
       sichern(); box();
     };
     kopf.appendChild(hak);

@@ -17,15 +17,22 @@
 .tb-rollen{overflow-x:auto; -webkit-overflow-scrolling:touch;
   border:1px solid var(--rule); border-radius:6px; background:var(--card)}
 table.tb{border-collapse:collapse; width:100%; font-size:13.5px; min-width:520px}
+/* Zwei oder drei Spalten brauchen keine Mindestbreite — sie passen auch
+   auf ein schmales Telefon, ohne dass etwas seitwärts geschoben wird. */
+table.tb.tb-schmal{min-width:0}
 table.tb th{font-family:var(--display); text-transform:uppercase; letter-spacing:.06em;
   font-size:10.5px; font-weight:700; color:var(--muted); text-align:left;
   padding:8px 10px; border-bottom:1px solid var(--rule); white-space:nowrap;
   background:var(--field); position:sticky; top:0}
 table.tb th.tb-leerkopf{min-width:34px}
+table.tb.tb-umbruch th{white-space:normal; line-height:1.35}
 table.tb td{padding:6px 10px; border-bottom:1px solid var(--rule-soft);
   vertical-align:middle; line-height:1.45}
 table.tb tr:last-child td{border-bottom:0}
-table.tb td.tb-kopfspalte{font-weight:600; white-space:nowrap}
+/* Zeilenbeschriftungen dürfen umbrechen. Mit nowrap zog ein langer Name
+   wie „Netzwerkadresse passt nicht bzw. ist nicht in der richtigen Range“
+   die erste Spalte so breit, dass die letzte Spalte aus dem Kasten fiel. */
+table.tb td.tb-kopfspalte{font-weight:600; white-space:normal; min-width:90px}
 table.tb td.tb-zahl, table.tb .tb-zahl{font-family:var(--data);
   font-variant-numeric:tabular-nums; white-space:nowrap}
 table.tb td.tb-luecke{background:var(--field); padding:4px 6px}
@@ -34,6 +41,12 @@ table.tb td.tb-luecke{background:var(--field); padding:4px 6px}
   min-height:38px; padding:5px 8px; background:var(--paper); color:var(--ink);
   border:1px solid var(--pruefer); border-radius:4px}
 .tb-feld.tb-zahl{font-family:var(--data); text-align:right}
+/* Textzellen sind <textarea> — ohne diese Zeile erbten sie die 100 px
+   Mindesthöhe der großen Antwortfelder, und eine Tabelle mit zehn Zellen
+   wäre einen Meter hoch.                                               */
+textarea.tb-feld{min-height:38px; line-height:1.4; resize:vertical; overflow:hidden}
+/* Nur für den Ausdruck — gen/druckbogen.js füllt ihn vor dem Drucken. */
+.tb-druck{display:none}
 .tb-feld:focus{outline:2px solid var(--pruefer); outline-offset:1px}
 
 .tb-hinweis{font-size:12px; color:var(--muted); line-height:1.55; margin-top:6px}
@@ -50,7 +63,17 @@ table.tb td.tb-luecke{background:var(--field); padding:4px 6px}
 .tb-karte-wert{flex:1 1 46%; font-family:var(--data); font-size:13.5px}
 .tb-karte-zeile .tb-feld{flex:1 1 46%; min-width:0}
 
+/* Lange Spaltenüberschriften passen nicht neben das Feld — dort steht die
+   Beschriftung über der Zeile und das Feld darunter über die volle Breite. */
+.tb-karten.tb-lang .tb-karte-zeile{display:block}
+.tb-karten.tb-lang .tb-karte-label{display:block; margin-bottom:4px; font-size:13px}
+.tb-karten.tb-lang .tb-karte-zeile .tb-feld{width:100%}
+
 @media (max-width:700px){
+  /* Bleibt es bei der Tabelle (wenige, kurze Spalten), dann wenigstens mit
+     umbrechenden Überschriften — sonst schiebt ein langes Kopfwort die
+     letzte Spalte aus dem Bild.                                        */
+  table.tb th{white-space:normal}
   .tb-rollen{display:none}
   .tb-karten{display:block}
   /* Tabellen mit wenigen Spalten bleiben Tabellen — dort gibt es keine
@@ -65,20 +88,30 @@ table.tb td.tb-luecke{background:var(--field); padding:4px 6px}
   /* Auf Papier gibt es kein seitwärts Rollen: die Spalten müssen sich die
      Blattbreite teilen. Feste Tabellenbreite plus umbrechende Kopfzeilen —
      sonst fällt die letzte Spalte über den Rand und fehlt im Ausdruck.  */
-  table.tb{min-width:0 !important; width:100%; table-layout:fixed;
+  table.tb{min-width:0 !important; width:100%; table-layout:auto;
     font-size:9pt; page-break-inside:auto}
   /* Umbrechen ja, Wörter zerhacken nein: word-break:break-word macht aus
      „Gewichtung“ ein „Gewichtun-g“. overflow-wrap bricht nur dort, wo es
      ohne Trennung nicht mehr passt.                                     */
+  /* Versalien und Sperrung machen „GEWICHTUNG“ rund ein Drittel breiter als
+     „Gewichtung“ — bei sieben Spalten auf A4 ist das der Unterschied
+     zwischen einem sauberen Kopf und einem „GEWICHTUN G“.              */
   table.tb th{background:#EEE; color:#000; position:static;
+    text-transform:none; letter-spacing:0; font-weight:700;
     white-space:normal; overflow-wrap:break-word; word-break:normal;
-    hyphens:auto; padding:4px 5px; font-size:7.5pt}
+    hyphens:auto; padding:4px 5px; font-size:8pt}
   table.tb td{padding:4px 5px; overflow-wrap:break-word; word-break:normal; hyphens:auto}
   table.tb td.tb-kopfspalte{white-space:normal}
   table.tb tr{page-break-inside:avoid}
   table.tb td.tb-luecke{background:#FFF}
   .tb-feld{border:1px solid #999; background:#FFF; color:#000; min-height:26px;
     -webkit-appearance:none; appearance:none}
+  /* Textzellen: der Ersatzblock statt des Eingabefelds — sonst endet der
+     Satz im Ausdruck am unteren Rand des Feldes.                       */
+  textarea.tb-feld{display:none !important}
+  .tb-druck{display:block; border:1px solid #999; min-height:24pt; padding:2pt 3pt;
+    font-size:8.5pt; line-height:1.35; white-space:pre-wrap;
+    overflow-wrap:break-word; hyphens:auto}
 }
 
 /* Laufende Nummer als kleine Kennziffer vor dem Zeilennamen */

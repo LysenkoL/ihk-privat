@@ -78,8 +78,8 @@
             "zahlen": [],
             "begriffe": [
               "Kartenscanners",
-              "Stimmenerkennung",
               "Zahlencodes",
+              "Stimmenerkennung",
               "Fingerabdrucksensor",
               "Eingabe",
               "Verwendung"
@@ -139,14 +139,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Geöffnete Fenster",
-              "Besprechungsraums",
-              "BYOD",
-              "Versehentliche Unterbrechung",
               "OHG",
-              "Verlassen",
+              "BYOD",
+              "Ausspähungen",
+              "Situation",
               "Kabel",
-              "Gefährdung"
+              "Versehentliche Unterbrechung",
+              "Hände",
+              "Besprechungsraums"
             ]
           },
           "felder": [
@@ -217,11 +217,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Eine Minimalkonfiguration",
               "Präsentationsrechner",
-              "Firmennetz",
+              "Eine Minimalkonfiguration",
               "Angriffsmöglichkeiten",
               "Nutzer",
+              "Firmennetz",
               "Daten"
             ]
           },
@@ -329,8 +329,8 @@
             "begriffe": [
               "Standardgateway",
               "20.10",
-              "20.1",
               "255.0",
+              "20.1",
               "Umstellung",
               "255.255",
               "Subnetzmaske",
@@ -384,14 +384,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Ping-Befehl",
-              "Gateway Beschriftung",
-              "Erfolg",
               "Präsentation",
+              "Ping-Befehl",
               "Befehls",
+              "Erfolg",
+              "Gateway Beschriftung",
               "RJ45",
-              "20.1",
-              "Buchse"
+              "Buchse",
+              "Gateway"
             ]
           },
           "felder": [],
@@ -554,13 +554,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Verwaltungsaufwand",
-              "Höherer Abstimmungs",
               "Sicherheits",
+              "Höherer Abstimmungs",
+              "Verwaltungsaufwand",
               "Weitergabe",
-              "Datenschutzbedenken",
               "Know-how",
               "Dritten",
+              "Datenschutzbedenken",
               "Abhängigkeit"
             ]
           },
@@ -632,14 +632,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Entwickler",
-              "Programmiersprache",
-              "Anwendungsfälle",
-              "Entwicklung",
-              "Zukünftige Perspektive",
               "Einige Sprachen",
+              "Zukünftige Perspektive",
+              "Entwickler",
+              "Anwendungsfälle",
+              "Verfügbare Tools",
+              "Programmiersprache",
               "Entwicklerfähigkeiten",
-              "Verfügbare Tools"
+              "Frameworks"
             ]
           },
           "felder": [],
@@ -710,9 +710,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Voraus",
-              "Ausführung",
               "Interpreter-Sprachen",
+              "Ausführung",
+              "Voraus",
               "Maschinencode",
               "Compiler-Sprachen",
               "Laufzeit"
@@ -784,12 +784,12 @@
               }
             ],
             "begriffe": [
-              "Punkt Administrator",
-              "Include",
-              "Punkt Vererbung",
               "Striche",
               "Anwendungsfällen",
               "Punkte Anwendungsfälle",
+              "Include",
+              "Punkt Vererbung",
+              "Punkt Administrator",
               "Beziehung"
             ]
           },
@@ -957,14 +957,14 @@
               }
             ],
             "begriffe": [
-              "2.300",
-              "1.745",
-              "40.445",
-              "Brutto",
-              "Netto",
               "48.129",
+              "Netto",
+              "Brutto",
+              "2.300",
               "3.120",
-              "33.280"
+              "1.745",
+              "33.280",
+              "40.445"
             ]
           },
           "felder": [],
@@ -1030,13 +1030,13 @@
             ],
             "begriffe": [
               "Tilgung",
-              "01.04",
-              "4.480",
-              "1.440",
-              "4.240",
-              "Restschuld",
+              "Zeitraum",
               "4.720",
-              "Zeitraum"
+              "Restschuld",
+              "Zinsen",
+              "Zahlungen",
+              "13.440",
+              "4.000"
             ]
           },
           "felder": [],
@@ -1099,8 +1099,8 @@
             ],
             "begriffe": [
               "DDR5",
-              "Geschwindigkeit",
               "DDR4",
+              "Geschwindigkeit",
               "Arbeitsspeicher"
             ]
           },
@@ -1199,8 +1199,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Geschwindigkeit",
               "DDR4",
+              "Geschwindigkeit",
               "Arbeitsspeicher",
               "Preis"
             ]
@@ -1287,14 +1287,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Spürbarer Leistungsschub",
+              "Lautlos-Betrieb",
+              "Erschütterung",
+              "Schreibgeschwindigkeiten",
+              "Kein Datenverlust",
+              "Geringer Energiebedarf",
               "Schnellere Lese",
               "HDD",
-              "Erschütterung",
-              "Lautlos-Betrieb",
-              "Schreibgeschwindigkeiten",
-              "Kompakte Bauform",
-              "Kein Datenverlust"
+              "Spürbarer Leistungsschub"
             ]
           },
           "felder": [],
@@ -1467,12 +1467,12 @@
             "zahlen": [],
             "begriffe": [
               "Aufforderung",
-              "Aufbau",
-              "Anrede",
-              "Fristsetzungen",
               "Zeitdruck",
-              "Keine",
+              "Anrede",
+              "Aufbau",
+              "Fristsetzungen",
               "Eingabe",
+              "Keine",
               "Fehler"
             ]
           },
@@ -1558,10 +1558,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Mail-Programms",
+              "Phishing-Angriffe",
               "Übungszwecken",
               "Spamfilter",
-              "Phishing-Angriffe",
+              "Mail-Programms",
               "Schulung",
               "Mitarbeiter"
             ]
@@ -1649,10 +1649,10 @@
             "zahlen": [],
             "begriffe": [
               "Keine Links",
-              "Verdachtsfälle",
               "Mails",
               "Keine Übermittlung",
               "Keine Anhänge",
+              "Verdachtsfälle",
               "Passwort",
               "IT"
             ]
@@ -1732,13 +1732,13 @@
             ],
             "begriffe": [
               "Abnahmekriterien",
-              "Leistungserbringung",
-              "Gesamtheit",
-              "Teilleistungen",
-              "Inhalt",
-              "Testszenarien",
               "Datenschutzes",
-              "Zweck"
+              "Leistungserbringung",
+              "Teilleistungen",
+              "Zweck",
+              "Gesamtheit",
+              "Testszenarien",
+              "Inhalt"
             ]
           },
           "felder": [
@@ -1895,14 +1895,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Wartungsaufwand",
+              "Betrag",
               "Absprache",
               "Leasinggegenstands",
-              "Betrag",
               "Belastung",
+              "Wartungsaufwand",
               "Anschaffungspreis",
               "Liquidität",
-              "Austausch"
+              "Leasingraten"
             ]
           },
           "felder": [],
@@ -1968,13 +1968,13 @@
             "zahlen": [],
             "begriffe": [
               "Vertragsgegenstand",
-              "Leasingvertrag",
               "Vertragslaufzeit",
               "Maschine",
+              "Leasingvertrag",
               "Ablauf",
               "Anpassung",
-              "Leasingraten",
-              "Leasingnehmer"
+              "Leasingnehmer",
+              "Leasinggeber"
             ]
           },
           "felder": [],
@@ -2039,13 +2039,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Ausschussquote",
-              "Staub",
               "Material",
+              "Schmutz",
               "Wärmestrahlung",
               "Emissionswerte",
-              "Schmutz",
               "Neue Maschinen",
+              "Staub",
+              "Ausschussquote",
               "Maschinen"
             ]
           },

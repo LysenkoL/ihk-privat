@@ -1,0 +1,104 @@
+/* ============================================================================
+   gen/druckbogen.css — Papierbogen der echten Prüfungen
+   ----------------------------------------------------------------------------
+   Vorher: jede Teilaufgabe war ein Block, der nicht getrennt werden durfte
+   (page-break-inside:avoid). Passte eine Aufgabe nicht mehr auf den Rest der
+   Seite, rutschte sie komplett auf die nächste — und ließ ein halbes bis
+   dreiviertel leeres Blatt zurück. Bei 38 Teilaufgaben waren das 18 Seiten,
+   davon ein Drittel Luft.
+
+   Jetzt darf eine Karte umbrechen, aber nur an sinnvollen Stellen:
+   nie direkt nach der Überschrift, nie mitten im Aufgabentext, nie mitten
+   in einer Abbildung oder Tabellenzeile. Das Ergebnis liest sich wie ein
+   echter Prüfungsbogen und spart mehrere Blatt Papier.
+
+   Zweite Änderung: Antworten. Ein <textarea> druckt nur das, was gerade
+   sichtbar ist — wer zehn Zeilen geschrieben hat, bekam vier aufs Papier.
+   druckbogen.js legt deshalb vor dem Druck einen Textblock daneben, der
+   den ganzen Inhalt zeigt. Ist nichts geschrieben, kommen stattdessen
+   Schreiblinien — so viele, wie die Punktzahl erwarten lässt.
+   ========================================================================== */
+
+@media print{
+
+  /* --- Bogenkopf: Situation vollständig, nicht abgeschnitten ----------- */
+  /* Auf dem Bildschirm ist der Situationstext nach 230 px abgeschnitten und
+     mit einer weichen Kante versehen. Auf Papier gibt es kein „mehr
+     anzeigen“ — dort muss alles stehen.                                  */
+  .sit-txt.clamped{max-height:none !important; overflow:visible !important;
+    -webkit-mask-image:none !important; mask-image:none !important}
+  #btnMehr{display:none !important}
+
+  /* --- Karten dürfen umbrechen ---------------------------------------- */
+  .tk{display:block !important; break-inside:auto; page-break-inside:auto;
+      border:1px solid #999; border-top:1px solid #999; margin-bottom:5pt;
+      orphans:2; widows:2}
+  .tk-haupt{padding:7pt 9pt 8pt}
+
+  /* Was zusammenbleiben muss */
+  .tk-nr{break-after:avoid; page-break-after:avoid; font-size:9.5pt; margin-bottom:2pt}
+  .tk-frage{break-inside:avoid; page-break-inside:avoid;
+            font-size:10.5pt; line-height:1.42; margin:3pt 0 6pt}
+  .tk-gintro, .gruppe, .hinweis, .katalog-hinweis{break-inside:avoid; page-break-inside:avoid}
+  .aufgabe-kopf{break-after:avoid; page-break-after:avoid; border-bottom:2px solid #000}
+  .aufgabe{margin-bottom:12pt}
+
+  /* --- BE-Feld: im Druck oben rechts statt als eigene Spalte ----------- */
+  /* Als Grid-Spalte müsste die ganze Karte als Raster über die Seitenkante
+     wandern — das macht Chrome nur widerwillig. Als kleiner Kasten, um den
+     der Text herumfließt, funktioniert der Umbruch dagegen zuverlässig.  */
+  /* Als Float kam der Kasten unzuverlässig an: er steht im Quelltext hinter
+     dem Aufgabentext, und ein Float kann nicht nach oben wandern — mal saß
+     er oben rechts, mal fehlte er ganz. Absolut gesetzt sitzt er immer an
+     derselben Stelle, und bei einer über zwei Seiten laufenden Karte
+     erscheint er genau einmal, auf der ersten.                          */
+  .tk{position:relative}
+  .tk-haupt{padding-right:62pt}
+  .tk-rand{position:absolute; top:4pt; right:4pt; width:48pt;
+           border:1px solid #999; border-left:1px solid #999;
+           background:#fff; padding:3pt 2pt; text-align:center;
+           display:block; break-inside:avoid; page-break-inside:avoid}
+  .rand-lbl{font-size:6.5pt; letter-spacing:.1em; display:block}
+  .rand-be{font-size:12pt; display:block; margin-top:1pt}
+  .rand-be small{font-size:8pt}
+
+  /* --- Abbildungen ---------------------------------------------------- */
+  .bild{break-inside:avoid; page-break-inside:avoid; border:1px solid #999;
+        padding:2pt; margin:0 0 6pt}
+  /* Eine ganzseitige Abbildung frisst sonst ein Blatt und schiebt alles
+     Folgende vor sich her.                                              */
+  .bild img{max-height:105mm; width:auto; max-width:100%; margin:0 auto}
+  .bild figcaption{font-size:6.5pt; padding:2pt 1pt 0}
+  /* Fehlt die Bilddatei, bliebe sonst ein leerer Rahmen mit Bildunterschrift
+     stehen — auf Papier sieht das aus wie ein vergessener Platzhalter.  */
+  .bild:has(.bild-fehler){display:none !important}
+  .bild-fehler{display:none !important}
+
+  /* --- Antwortbereich ------------------------------------------------- */
+  /* Das Eingabefeld selbst wird nicht gedruckt: es zeigt nur den sichtbaren
+     Ausschnitt. Gedruckt wird der Block, den druckbogen.js daneben legt. */
+  /* Nur die großen Antwortfelder — die Textzellen in den Tabellen sind
+     ebenfalls textarea und müssen gedruckt werden.                     */
+  .tk textarea:not(.tb-feld){display:none !important}
+  .dr-antwort{display:block; break-inside:auto; page-break-inside:auto;
+              font-size:10.5pt; line-height:1.5; white-space:pre-wrap;
+              border:1px solid #bbb; padding:4pt 5pt; margin-bottom:4pt;
+              min-height:0}
+  .dr-antwort.dr-leer{border:0; padding:0}
+  .dr-linie{border-bottom:1px solid #bbb; height:15pt}
+  .dr-marke{font-size:7pt; letter-spacing:.08em; text-transform:uppercase;
+            color:#666; margin-bottom:2pt}
+
+  .feldzeile{display:block; margin-bottom:3pt; break-inside:avoid; page-break-inside:avoid}
+  .feldzeile label{display:block; font-size:8.5pt; color:#444; padding:0 0 1pt}
+
+  /* --- Auf Papier überflüssig ------------------------------------------ */
+  .tk-rand .punkte-wahl, .seite-link, .marke-katalog, .thema, .herkunft,
+  .dr-nurschirm{display:none !important}
+
+  /* Ein einziger Millimeter Abstand hinter dem letzten Kasten reicht,
+     damit der Browser eine komplett leere Schlussseite anhängt.        */
+  .aufgabe:last-child, .aufgabe:last-child .tk:last-child,
+  #bogenMain > :last-child, .blatt > :last-child{margin-bottom:0 !important}
+  .blatt{padding-bottom:0 !important}
+}

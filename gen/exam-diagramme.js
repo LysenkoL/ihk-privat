@@ -274,8 +274,11 @@ window.GENEXAM = (function () {
     }
 
     const regel = el("div", "gmodell-regeln");
+    /* Der zweite Satz erklärt die Bedienung der App. Auf Papier ist er
+       sinnlos und kostet zwei Zeilen — deshalb dr-nurschirm.          */
     regel.innerHTML = "<b>Notation</b><div>· " + form.regel + "</div>" +
-      "<div>· Die Tabelle wird als Text an deine Antwort angehängt — für Export und Auswertung.</div>";
+      "<div class=\"dr-nurschirm\">· Die Tabelle wird als Text an deine Antwort " +
+      "angehängt — für Export und Auswertung.</div>";
     wrap.appendChild(regel);
     return wrap;
   }
@@ -295,7 +298,7 @@ window.GENEXAM = (function () {
          (gen/tabellen.js), dann hier keine zweite danebenstellen — sonst
          füllt man dieselben Werte zweimal aus und weiß nicht, welche
          gewertet wird.                                                  */
-      if (window.GENTAB && (window.GENTAB.finde(it.prompt || "") || []).length) {
+      if (window.GENTAB && (window.GENTAB.finde(it.prompt || "", it.maxPoints) || []).length) {
         karte.dataset.diaFertig = "1";
         const doppelt = karte.querySelector(".ex-dia");
         if (doppelt) doppelt.remove();

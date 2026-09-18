@@ -770,3 +770,32 @@ body.mk-stift .katalog-hinweis, body.mk-stift .gmerksatz{
   .kopf .btn.zurueck{padding:0 9px; min-height:34px}
   .kopf .btn.zurueck span{font-size:14px}
 }
+
+/* ---------------------------------------------------- Plan: Themenliste ---
+   Antwort auf „was ist eigentlich noch offen?“ — der Tagesplan zeigt nur
+   den heutigen Vorschlag, diese Liste zeigt alle Themen mit Stand und dem
+   Tag, an dem sie zuletzt dran waren.                                    */
+details.pl-themen{margin-top:14px; border:1px solid var(--rule); border-radius:4px;
+  background:var(--card)}
+details.pl-themen > summary{display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline;
+  cursor:pointer; padding:11px 14px; font-family:var(--display); font-weight:700;
+  font-size:13.5px; list-style:none}
+details.pl-themen > summary::-webkit-details-marker{display:none}
+details.pl-themen > summary::before{content:"▸"; color:var(--muted); font-size:11px}
+details.pl-themen[open] > summary::before{content:"▾"}
+.pl-th-zahl{margin-left:auto; font-family:var(--data); font-size:11.5px; font-weight:400;
+  color:var(--muted)}
+.pl-th-liste{display:flex; flex-direction:column; gap:4px; padding:0 12px 12px}
+.pl-th{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  min-height:44px; padding:8px 11px; cursor:pointer; font:inherit;
+  background:var(--field); border:1px solid var(--rule); border-radius:4px; color:var(--ink)}
+.pl-th:hover{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.pl-th-txt{flex:1 1 auto; min-width:0}
+.pl-th-name{font-size:13.5px; font-weight:600; line-height:1.3}
+.pl-th-meta{font-size:11.5px; color:var(--muted); font-family:var(--data); margin-top:1px}
+.pl-th-los{flex:0 0 auto; font-family:var(--display); text-transform:uppercase;
+  letter-spacing:.08em; font-size:10.5px; font-weight:700; color:var(--pruefer)}
+/* heute schon dran gewesen — nicht verboten, nur nicht mehr dringend */
+.pl-th.frisch{opacity:.6}
+.pl-th.neu{border-left:3px solid var(--warn)}
+@media print{ details.pl-themen{display:none} }

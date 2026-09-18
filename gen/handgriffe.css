@@ -1,0 +1,81 @@
+/* ============================================================================
+   gen/handgriffe.css — Lesezeichen, Sprungleiste, Offline-Zeichen
+   ----------------------------------------------------------------------------
+   Alles hier ist Beiwerk und muss sich so verhalten: sichtbar, wenn man es
+   sucht, unsichtbar, wenn man arbeitet. Die Sprungleiste ist deshalb
+   zugeklappt, bis man sie antippt, und das Offline-Zeichen ist einfach weg,
+   solange Netz da ist.
+   ========================================================================== */
+
+/* ------------------------------------------------- Weiter, wo ich war --- */
+.hg-weiter{display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  margin:0 0 22px; padding:13px 16px;
+  border:1px solid var(--pruefer); border-left-width:3px; border-radius:4px;
+  background:var(--pruefer-soft)}
+.hg-weiter-txt{flex:1 1 200px; min-width:0; display:flex; flex-direction:column; gap:2px}
+.hg-weiter-titel{font-family:var(--display); font-size:16px; font-weight:700}
+.hg-weiter-stand{font-size:12.5px; color:var(--muted)}
+.hg-weiter .btn{min-height:44px; flex:0 0 auto}
+
+/* ------------------------------------------------------ Sprungleiste --- */
+.hg-sprung{margin:0 0 16px}
+.hg-sprung-auf{display:inline-flex; align-items:center; gap:7px; min-height:38px;
+  padding:6px 14px; cursor:pointer; font:inherit; font-size:13px;
+  font-family:var(--display); text-transform:uppercase; letter-spacing:.08em; font-weight:700;
+  color:var(--muted); background:var(--field);
+  border:1px solid var(--rule); border-radius:4px}
+.hg-sprung-auf::after{content:"▾"; font-size:11px}
+.hg-sprung.offen .hg-sprung-auf{color:var(--pruefer); border-color:var(--pruefer)}
+.hg-sprung.offen .hg-sprung-auf::after{content:"▴"}
+.hg-sprung-auf:hover{border-color:var(--pruefer)}
+
+.hg-sprung-gitter{display:none; flex-wrap:wrap; gap:6px; margin-top:9px;
+  padding:11px; border:1px solid var(--rule); border-radius:4px; background:var(--card)}
+.hg-sprung.offen .hg-sprung-gitter{display:flex}
+
+.hg-punkt{min-width:44px; min-height:44px; padding:4px 7px; cursor:pointer;
+  font-family:var(--data); font-size:12.5px; color:var(--muted);
+  background:var(--paper); border:1px solid var(--rule); border-radius:4px}
+.hg-punkt:hover{border-color:var(--pruefer); color:var(--pruefer)}
+/* beantwortet, aber noch nicht bewertet — und bewertet */
+.hg-punkt.voll{background:var(--ok-soft); border-color:var(--ok); color:var(--ok); font-weight:700}
+.hg-punkt.bewertet{background:var(--ok); border-color:var(--ok); color:#fff; font-weight:700}
+
+/* ------------------------------------------------- Zurück nach oben --- */
+.hg-oben{position:fixed; right:12px; bottom:74px; z-index:55;
+  width:46px; height:46px; padding:0; cursor:pointer; border-radius:50%;
+  font-size:19px; line-height:1; color:var(--pruefer);
+  background:var(--card); border:1px solid var(--rule);
+  box-shadow:0 2px 10px rgba(0,0,0,.16)}
+.hg-oben:hover{border-color:var(--pruefer); background:var(--pruefer-soft)}
+
+/* --------------------------------------------------- Offline-Zeichen --- */
+.hg-netz{font-family:var(--display); text-transform:uppercase; letter-spacing:.1em;
+  font-size:10px; font-weight:700; color:var(--warn);
+  background:var(--warn-soft); border:1px solid var(--warn); border-radius:3px;
+  padding:3px 7px; white-space:nowrap}
+
+@media (max-width:700px){
+  .hg-weiter{padding:11px 12px; gap:10px}
+  .hg-weiter .btn{flex:1 1 100%}
+  .hg-sprung-gitter{gap:5px; padding:9px}
+  .hg-punkt{min-width:44px; font-size:12px}
+}
+
+@media print{ .hg-weiter, .hg-sprung, .hg-netz, .hg-oben{display:none !important} }
+
+/* ------------------------------------------------ Fassung / Update --- */
+/* Unten auf der Startseite, klein: welche Fassung läuft, und ein Knopf,
+   der beim Server nachfragt. Ersetzt „Strg+Shift+R“, das auf dem Telefon
+   niemand drücken kann.                                                */
+.ver-zeile{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px;
+  margin:26px 0 4px; padding-top:12px; border-top:1px solid var(--rule-soft)}
+.ver-txt{flex:1 1 auto; font-family:var(--data); font-size:11.5px; color:var(--muted)}
+.ver-knopf{flex:0 0 auto; min-height:38px; padding:6px 14px; cursor:pointer;
+  font:inherit; font-size:12px; font-family:var(--display); font-weight:700;
+  text-transform:uppercase; letter-spacing:.07em;
+  color:var(--pruefer); background:var(--card);
+  border:1px solid var(--rule); border-radius:4px}
+.ver-knopf:hover{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.ver-knopf[disabled]{opacity:.6; cursor:default}
+@media print{ .ver-zeile{display:none} }

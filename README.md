@@ -5,7 +5,7 @@ IT-gestützten Arbeitsplatzes»). Без сервера, без интернет
 открываешь `index.html` двойным кликом и решаешь.
 
 **10 экзаменов 2021–2026 · 279 Teilaufgaben · 176 карточек · тренажёры Netzplan,
-Gantt, UML-Aktivitäts- и Klassendiagramm · генератор: 107 типов заданий
+Gantt, UML-Aktivitäts- и Klassendiagramm · генератор: 114 типов заданий
 с бесконечным числом вариантов и автопроверкой · Spickzettel (20 глав) · Kompendium (52 темы) · офлайн PWA.**
 
 Из 279 заданий 21 (87 баллов) помечены как **вне действующего каталога** —
@@ -83,20 +83,20 @@ ausblenden»** в шапке (по умолчанию выключена).
 сценарий генерируются заново при каждом клике, а эталонное решение считается
 вместе с ними. Одна и та же тема — сколько угодно разных вариантов.
 
-**107 типов заданий в 11 главных темах** (структура тем — как в коммерческих
+**114 типов заданий в 11 главных темах** (структура тем — как в коммерческих
 тренажёрах, чтобы выбор был привычным):
 
 | Тема | Кол-во | Что генерируется |
 |---|---|---|
 | Netzwerke & Kommunikation | 15 | Netz-/Broadcastadresse, Subnetting, «в одной ли подсети», IPv6, MAC → Link-Local (EUI-64), ARP, DHCP/DORA, VPN, Bandbreite, PoE-Budget, OSI, Netzwerkdiagnose (ipconfig), IP-Konfigurationstabelle, Konsolenbefehle, Domäne |
 | IT-Sicherheit | 14 | TOM, Phishing, Schutzziele, Passwortrichtlinie + MFA, Ransomware-Notfall, Malware-Arten, Betriebssystemhärtung, Zertifikate & PKI, Kryptographie + Schlüsselanzahl, Hashfunktionen, Protokollierung, Zutrittskontrolle, Schutzbedarfsanalyse, **Berechtigungsmatrix** |
-| Hardware | 14 | выбор устройства с обоснованием, CPU-Kenndaten + Stromkosten, RAM & Dual Channel, USB-Standards + Übertragungszeit, Video-Schnittstellen + Datenrate, Netzteil & Leistungsaufnahme, Identifikationstechnologien (Barcode/QR/RFID/NFC), Speichermedien, Betriebssysteme & Lizenzen, Ergonomie, Barrierefreiheit, Ticketsystem, Virtualisierung, **Fehleranalyse Symptom → Ursache → Maßnahme** |
+| Hardware | 17 | выбор устройства с обоснованием, CPU-Kenndaten + Stromkosten, RAM & Dual Channel, USB-Standards + Übertragungszeit, Video-Schnittstellen + Datenrate, Netzteil & Leistungsaufnahme, Identifikationstechnologien (Barcode/QR/RFID/NFC), Speichermedien, Betriebssysteme & Lizenzen, Ergonomie, Barrierefreiheit, Ticketsystem, Virtualisierung, **Fehleranalyse Symptom → Ursache → Maßnahme**, **Einheitenvorsätze**, **P = U · I**, **USV-Auslegung** |
 | Projektmanagement | 15 | Wasserfall/Scrum, Lastenheft/Pflichtenheft, Projektstrukturplan, Risikomatrix, Tuckman, Testprotokoll, Netzplan, Gantt, SMART-Ziele, Stakeholderanalyse, funktionale/nicht-funktionale Anforderungen, Übergabe |
-| Wirtschaftlichkeit | 12 | TCO, AfA, Amortisation, Break-even, Angebotspreis, Stromkosten, Lizenzstaffeln, Laufende Kosten je Monat, Gesamtkosten über die Laufzeit, Marktformen, Darlehen/Tilgungsplan, Kostenrechnung & Deckungsbeitrag |
+| Wirtschaftlichkeit | 15 | TCO, AfA, Amortisation, Break-even, Angebotspreis, Stromkosten, Lizenzstaffeln, Laufende Kosten je Monat, Gesamtkosten über die Laufzeit, Marktformen, Darlehen/Tilgungsplan, Kostenrechnung & Deckungsbeitrag, **Netto → Brutto / Umsatzsteuer**, **Brutto → Netto Rückrechnung**, **Energie W = P · t & Stromkosten** |
 | Datenformate & Speicherung | 10 | Speicherbedarf (архив, видео), RAID, JBOD & Speichersysteme, Dateiformate & Datenkonvertierung, Zahlensysteme, Dateisysteme, SLA-Verfügbarkeit, Backups, **Backup-Wochenplan** |
 | Softwareentwicklung | 9 | UML-Aktivitätsdiagramm, Use-Case, Klassendiagramm, Schreibtischtest, Pseudocode über Datensätzen, Programmiersprachen (Compiler/Interpreter), Webtechnologien |
 | Recht & Compliance | 6 | Betroffenenrechte DSGVO, Anonymisierung/Pseudonymisierung, Auftragsverarbeitung, Mängelrechte, Arbeitsrecht, Vertragsarten |
-| Beschaffung | 5 | сравнение трёх предложений, Bezugspreis, Nutzwertanalyse, Leasing vs. Kauf, Make-or-Buy |
+| Beschaffung | 6 | сравнение трёх предложений, Bezugspreis, Nutzwertanalyse, Leasing vs. Kauf, Make-or-Buy, **Rabatt, Skonto & Bezugspreis** |
 | Datenbanken | 4 | ER-Modell & Kardinalitäten, Relationenmodell, Normalisierung bis 3. NF, SQL lesen und ergänzen |
 | KI & Digitalisierung | 3 | KI-Grundbegriffe & Fehlerquote, verzerrte Trainingsdaten (Bias), KI und Datenschutz |
 

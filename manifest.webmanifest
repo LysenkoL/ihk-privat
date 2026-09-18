@@ -1,7 +1,7 @@
 {
   "name": "IHK AP1 Prüfungssimulator",
   "short_name": "IHK AP1",
-  "description": "Zehn echte AP1-Prüfungen, 107 Aufgabengeneratoren, Prüfungssimulation über 90 Minuten — offline nutzbar.",
+  "description": "Zehn echte AP1-Prüfungen, 114 Aufgabengeneratoren, Prüfungssimulation über 90 Minuten — offline nutzbar.",
   "lang": "de",
   "dir": "ltr",
   "start_url": "./index.html",

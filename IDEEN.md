@@ -122,8 +122,40 @@
   текстовые таблицы с разделителями (|) из заданий экзаменов автоматически преобразуются
   в реальные <table> с полями ввода для пустых ячеек и вопросительных знаков (?),
   карточный режим на узких экранах смартфонов
-- **Service Worker v10** (`sw.js`): обновление версии кэша приложения до
-  `ihk-ap1-v10-app`
+- **Service Worker v10 – v17** (`sw.js`): обновление версии кэша приложения до
+  `ihk-ap1-v17-app`
+- **Einheiten & Umrechnungen** (`gen/vorlagen-einheiten.js`, 15.09):
+  7 новых генераторов задач с вариативными числами: Brutto/Netto, Umsatzsteuer 19 % / 7 %,
+  Vorsätze (mA, kW, MB/s, µs), P = U · I, W = P · t, USV-Auslegung, Bezugspreis/Skonto/Rabatt.
+  **Итого 114 типов заданий в генераторе**
+- **Auftrags-Analyse («Was will die Aufgabe eigentlich?»)** (`gen/auftrag.js`, `gen/auftrag.css`, 16.09):
+  автоматический анализ формулировки задачи на число требуемых пунктов и операторы
+  («Nennen Sie drei …», «Erläutern Sie …»), цветовая индикация полноты ответа в реальном
+  времени, напоминание о заключительном предложении с числом и единицей измерения для расчётов
+- **Chen-Notation & ER-Modell-Editor** (`gen/er.js`, `gen/er-daten.js`, `gen/er.css`, 16.09):
+  интерактивное построение ER-моделей в двух таблицах (Entitäten и Beziehungen с поддержкой
+  n:m и собственных атрибутов связи) с живой генерацией SVG-схемы в нотации Чена и сверкой решений
+- **Gantt-Diagramm-Trainer** (`gen/gantt.js`, `gen/gantt-daten.js`, `gen/gantt.css`, 17.09):
+  ввод таблицы Vorgangsliste с автоматическим расчётом сроков (Tag 1..N, Dauer, Abhängigkeiten),
+  критического пути, свободных/общих буферов (GP, FP) и синхронной отрисовкой полос диаграммы Ганта
+- **Rechenaufgaben als eigener Bereich** (`gen/rechnen.js`, `gen/rechnen.css`, 17.09):
+  единый каталог всех расчётных задач экзаменов (~40 задач, 158 BE) с фильтрацией по темам,
+  нерешённым и случайным подборкам
+- **Handgriffe & Lesezeichen** (`gen/handgriffe.js`, `gen/handgriffe.css`, 17.09):
+  запоминание позиции скролла для каждого экзамена, плашка «Weiter, wo ich war» на стартовом
+  экране, интерактивная Sprungleiste по заданиям с индикацией статуса ответа, индикатор офлайн-режима
+- **Druckbogen-Optimierung** (`gen/druckbogen.js`, `gen/druckbogen.css`, 18.09):
+  интеллектуальный постраничный перенос без разрыва условий и пустых хвостов, раскрытие
+  ответов из textarea в полный текст или разлинованные поля по количеству BE, подгрузка lazy-изображений
+- **Intelligente Wiederholung im Lernplan** (`gen/plan.js`, `gen/blatt.css`, 18.09):
+  учёт даты последнего повторения тем (Dämpfung свежепройденного материала), раскрывающийся
+  список «Was ist eigentlich noch offen?» с весами тем и возможностью мгновенного запуска,
+  фиксация истории выполненных тем
+- **Versionsanzeige & Update-Knopf** (`gen/version.js`, 18.09):
+  отображение номера версии (Fassung ihk-ap1-v18) и даты/времени загрузки внизу стартовой страницы,
+  кнопка «nach Update suchen» для принудительного обновления Service Worker и моментального перезапуска
+- **Service Worker v18** (`sw.js`): обновление версии кэша приложения до `ihk-ap1-v18-app`
+
 
 ## Чего не хватает
 

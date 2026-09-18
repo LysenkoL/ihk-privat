@@ -31,7 +31,8 @@ const DATEIEN = [
   "kern.js", "vorlagen-kalkulation.js", "vorlagen-netz.js", "vorlagen-text.js",
   "vorlagen-katalog.js", "vorlagen-diagramm.js", "vorlagen-modelle.js",
   "vorlagen-problemfaelle.js", "vorlagen-tabellen.js", "vorlagen-sicherheit.js",
-  "vorlagen-hardware.js", "vorlagen-fachthemen.js", "vorlagen-ki.js"
+  "vorlagen-hardware.js", "vorlagen-fachthemen.js", "vorlagen-ki.js",
+  "vorlagen-einheiten.js"
 ];
 
 const fenster = { window: null, console, localStorage: null, document: undefined };

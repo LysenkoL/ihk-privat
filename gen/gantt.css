@@ -1,0 +1,133 @@
+/* ============================================================================
+   gen/gantt.css — Vorgangsliste, Balkendiagramm, Rechnung
+   ----------------------------------------------------------------------------
+   Das Diagramm ist waagerecht und wächst mit der Projektdauer — es rollt
+   deshalb in seinem eigenen Kasten, statt die Seite breitzuziehen. Der
+   kritische Pfad ist die einzige Stelle mit Farbe: wer ihn sieht, sieht auch,
+   wo es keinen Puffer gibt.
+   ========================================================================== */
+
+.ga-block{margin:10px 0 14px; border:1px solid var(--rule); border-left:3px solid var(--pruefer);
+  border-radius:4px; background:var(--card); padding:12px 14px 14px}
+
+.ga-kopf{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; margin-bottom:10px}
+.ga-titel{font-family:var(--display); text-transform:uppercase; letter-spacing:.09em;
+  font-size:11px; font-weight:700; color:var(--pruefer)}
+.ga-note{font-size:12.5px; color:var(--muted)}
+.ga-unter{font-family:var(--display); text-transform:uppercase; letter-spacing:.08em;
+  font-size:10.5px; font-weight:700; color:var(--muted); margin:12px 0 5px}
+
+/* -------------------------------------------------------- Tabelle --- */
+.ga-tab-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch}
+table.ga-tab{border-collapse:collapse; width:100%; font-size:13px}
+table.ga-tab th{font-family:var(--display); text-transform:uppercase; letter-spacing:.06em;
+  font-size:9.5px; font-weight:700; color:var(--muted); text-align:left;
+  padding:4px 6px; border-bottom:1px solid var(--rule); white-space:nowrap}
+table.ga-tab td{padding:3px 4px; vertical-align:middle}
+table.ga-tab td.ga-weg{width:34px; padding:3px 0; text-align:center}
+.ga-feld{width:100%; min-width:76px; box-sizing:border-box; font:inherit; font-size:13px;
+  min-height:38px; padding:5px 7px; background:var(--paper); color:var(--ink);
+  border:1px solid var(--rule); border-radius:4px}
+.ga-feld.ga-zahl{font-family:var(--data); text-align:right; min-width:64px}
+.ga-feld:focus{border-color:var(--pruefer); outline:2px solid var(--pruefer-soft)}
+.ga-weg-knopf{width:30px; height:30px; padding:0; cursor:pointer; line-height:1; font-size:15px;
+  color:var(--muted); background:none; border:1px solid transparent; border-radius:4px}
+.ga-weg-knopf:hover{color:var(--red); border-color:var(--red)}
+
+/* Die Rechentabelle ist reine Ausgabe */
+table.ga-rechnung{margin-top:8px; font-family:var(--data); font-size:12.5px}
+table.ga-rechnung td{padding:4px 8px; border-bottom:1px solid var(--rule-soft); text-align:right}
+table.ga-rechnung td:first-child{text-align:left; font-weight:700}
+table.ga-rechnung tr.ga-zeile-kritisch td{color:var(--red); font-weight:700}
+
+/* ------------------------------------------------------ Zeichnung --- */
+.ga-bild{overflow-x:auto; -webkit-overflow-scrolling:touch;
+  border:1px solid var(--rule); border-radius:4px; background:var(--paper); padding:6px}
+svg.ga-svg{display:block; height:auto; max-width:none}
+
+.ga-raster{stroke:var(--rule-soft); stroke-width:1}
+.ga-raster-stark{stroke:var(--rule)}
+.ga-balken{fill:var(--pruefer); stroke:none}
+.ga-balken.ga-kritisch{fill:var(--red)}
+.ga-puffer{fill:var(--warn-soft); stroke:var(--warn); stroke-dasharray:3 3; stroke-width:1}
+.ga-pfeil{stroke:var(--ink); stroke-width:1.2; fill:none}
+.ga-spitze{fill:var(--ink)}
+
+svg.ga-svg text{font-family:var(--display); fill:var(--ink)}
+.ga-t-name{font-size:12.5px; font-weight:700}
+.ga-t-dauer{font-size:11px; fill:#fff; font-family:var(--data)}
+.ga-t-tag{font-size:10.5px; fill:var(--muted); font-family:var(--data)}
+.ga-t-leer{font-size:13px; fill:var(--muted)}
+
+/* --------------------------------------------------------- Prüfen --- */
+.ga-knopfe{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.ga-knopfe .btn{min-height:44px}
+
+.ga-hinweis{margin-top:10px; padding:10px 12px; border-radius:4px;
+  background:var(--field); border:1px solid var(--rule); font-size:12.5px; line-height:1.55}
+.ga-hinweis b{display:block; margin-bottom:4px}
+.ga-hinweis div{margin-top:2px; color:var(--muted)}
+.ga-hinweis-auf{margin-top:8px !important; padding-top:8px;
+  border-top:1px solid var(--rule); color:var(--ink) !important}
+
+.ga-ausgabe{margin-top:12px}
+.ga-ausgabe:empty{display:none}
+.ga-erg{font-size:14.5px; margin-bottom:6px}
+.ga-erg b{font-family:var(--data); font-size:16px; color:var(--pruefer)}
+.ga-erg-note{font-size:12.5px; color:var(--muted)}
+.ga-liste{display:flex; flex-direction:column; gap:3px; margin-bottom:9px}
+.ga-zeile{display:flex; gap:8px; align-items:baseline; font-size:13px; line-height:1.5}
+.ga-zeichen{flex:0 0 auto; font-family:var(--data); font-weight:700}
+.ga-ja .ga-zeichen{color:var(--ok)}
+.ga-nein{color:var(--warn)}
+.ga-nein .ga-zeichen{color:var(--warn)}
+.ga-warn{margin:8px 0; padding:9px 11px; border-radius:4px; font-size:12.5px; line-height:1.55;
+  background:var(--warn-soft); border-left:3px solid var(--warn)}
+.ga-schluessel{font-size:11.5px; color:var(--muted); line-height:1.5; margin-top:8px}
+
+.ga-druck{display:none}
+
+@media (max-width:700px){
+  .ga-block{padding:10px 10px 12px}
+  table.ga-tab{min-width:360px}
+  .ga-feld{min-width:68px; font-size:12.5px}
+  .ga-knopfe .btn{flex:1 1 44%}
+}
+
+/* --------------------------------------------------------- Drucken --- */
+@media print{
+  .ga-knopfe, .ga-hinweis, .ga-weg{display:none !important}
+  .ga-block{border:1px solid #999; border-left:1px solid #999; padding:6pt 7pt;
+    break-inside:avoid; page-break-inside:avoid}
+  .ga-tab-wrap, .ga-bild{overflow:visible}
+  table.ga-tab{min-width:0 !important; font-size:8.5pt}
+  table.ga-tab th{font-size:7pt; text-transform:none; letter-spacing:0}
+  .ga-feld{display:none !important}
+  .ga-druck{display:block; border:1px solid #999; background:#fff; color:#000;
+    min-height:20pt; padding:2pt 3pt; font-size:8.5pt; white-space:pre-wrap}
+  .ga-bild{border:1px solid #999}
+  svg.ga-svg{width:100%; max-width:100%}
+  .ga-balken{fill:#666}
+  .ga-balken.ga-kritisch{fill:#111}
+  .ga-puffer{fill:#fff; stroke:#999}
+  .ga-pfeil, .ga-spitze{stroke:#000; fill:none}
+  .ga-spitze{fill:#000}
+  svg.ga-svg text{fill:#000}
+  .ga-t-dauer{fill:#fff}
+  table.ga-rechnung tr.ga-zeile-kritisch td{color:#000}
+}
+
+/* Die Kalendertag-Spalten sind die, auf die es im Balkenplan ankommt —
+   im Netzplan stehen an derselben Stelle andere Zahlen.                */
+table.ga-rechnung td.ga-tagspalte{background:var(--pruefer-soft); font-weight:700}
+@media print{ table.ga-rechnung td.ga-tagspalte{background:#EEE} }
+
+/* ------------------------------------------------------- Legende --- */
+.ga-legende{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:8px;
+  font-size:12px; color:var(--muted); line-height:1.5}
+.ga-legende span{display:flex; align-items:baseline; gap:7px}
+.ga-legende i{flex:0 0 auto; width:15px; height:10px; border-radius:2px; position:relative; top:1px}
+.ga-legende i.lg-kritisch{background:var(--red)}
+.ga-legende i.lg-frei{background:var(--pruefer)}
+.ga-legende i.lg-puffer{background:var(--warn-soft); border:1px dashed var(--warn)}
+@media print{ .ga-legende i.lg-kritisch{background:#111} .ga-legende i.lg-frei{background:#666} }

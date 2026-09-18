@@ -1,5 +1,5 @@
 global.window = global;
-const M=["kern","vorlagen-kalkulation","vorlagen-netz","vorlagen-text","vorlagen-katalog","vorlagen-diagramm","vorlagen-modelle","vorlagen-problemfaelle","vorlagen-tabellen","vorlagen-sicherheit","vorlagen-hardware","vorlagen-fachthemen","vorlagen-ki"];
+const M=["kern","vorlagen-kalkulation","vorlagen-netz","vorlagen-text","vorlagen-katalog","vorlagen-diagramm","vorlagen-modelle","vorlagen-problemfaelle","vorlagen-tabellen","vorlagen-sicherheit","vorlagen-hardware","vorlagen-fachthemen","vorlagen-ki","vorlagen-einheiten"];
 M.forEach(m=>require("./"+m+".js"));
 const G = window.GEN;
 const bloedsinn = "Man macht das halt so wie immer und dann passt das schon irgendwie ganz gut.\nDas ist wichtig.\nJa.\nWeiss nicht.";

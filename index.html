@@ -14,12 +14,16 @@
 <link rel="icon" href="icon-192.png" sizes="192x192">
 
 <link rel="stylesheet" href="gen/blatt.css">
+<link rel="stylesheet" href="gen/auth.css">
 <link rel="stylesheet" href="gen/spick.css">
 <link rel="stylesheet" href="gen/kompendium.css">
 <link rel="stylesheet" href="gen/tabellen.css">
+<link rel="stylesheet" href="gen/er.css">
+<link rel="stylesheet" href="gen/gantt.css">
+<link rel="stylesheet" href="gen/rechnen.css">
+<link rel="stylesheet" href="gen/auftrag.css">
+<link rel="stylesheet" href="gen/handgriffe.css">
 <link rel="stylesheet" href="gen/druck.css">
-<link rel="stylesheet" href="gen/auth.css">
-<script src="gen/auth.js"></script>
 <style>
   :root{
     --paper:#FCFCFA; --card:#FFFFFF; --ink:#14171C; --muted:#5E6570;
@@ -314,11 +318,20 @@
   table.gantt-tab input.richtig{background:var(--ok-soft); color:var(--ok); border-color:var(--ok)}
   .gantt-spur{position:relative; height:16px; background:var(--rule-soft); border-radius:2px;
     min-width:260px}
-  .gantt-spur i{position:absolute; top:0; height:100%; background:var(--pruefer);
+  /* min-width, damit ein Vorgang von genau einem Tag nicht zum Strich wird:
+     bei 20 Vorgängen wäre ein Tag sonst zwei Bildpunkte breit.          */
+  .gantt-spur i{position:absolute; top:0; height:100%; min-width:5px; background:var(--pruefer);
     border-radius:2px; box-shadow:0 0 0 2px var(--card)}
   .gantt-spur i.kritisch{background:var(--red)}
   .gantt-skala{display:flex; justify-content:space-between; font-family:var(--data);
     font-size:11px; color:var(--muted); margin-top:3px}
+  .gantt-legende{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:9px;
+    font-size:12px; color:var(--muted); line-height:1.5}
+  .gantt-legende span{display:flex; align-items:baseline; gap:7px}
+  .gantt-legende i{flex:0 0 auto; width:15px; height:10px; border-radius:2px;
+    position:relative; top:1px}
+  .gantt-legende i.lg-kritisch{background:var(--red)}
+  .gantt-legende i.lg-frei{background:var(--pruefer)}
 
   /* Modelle */
   .modell-aufgabe{background:var(--card); border:1px solid var(--rule); border-left:3px solid var(--ink);
@@ -454,20 +467,20 @@
   .lupe img{max-width:100%; max-height:100%; background:#fff}
   @media (prefers-reduced-motion:reduce){ *{transition:none !important} }
 
+  /* Der Druckbogen selbst steht in gen/druckbogen.css — dort gehören die
+     Umbruchregeln hin, die entscheiden, ob ein Blatt halb leer bleibt.  */
   @media print{
     .kopf,.fuss,.rand,.toast,.lupe,.punkte-wahl,.loesung,.pruefhilfe,
     .seite-link,.btn,.katalog-hinweis button{ display:none !important }
     body{background:#fff; color:#000; font-size:11pt}
     .blatt{display:block; padding:0; max-width:none}
-    .tk{grid-template-columns:1fr 70px; break-inside:avoid; page-break-inside:avoid;
-        border:1px solid #999; margin-bottom:6pt}
-    .tk-rand{border-left:1px solid #999}
     .tk.veraltet{display:none}
-    textarea{min-height:70pt; background:#fff; border:1px solid #bbb}
-    .aufgabe-kopf{border-bottom:2px solid #000}
   }
 </style>
 <link rel="stylesheet" href="gen/mobil.css">
+<!-- Zuletzt, damit die Druckregeln die Bildschirmregeln oben
+     überschreiben können, ohne überall !important zu brauchen. -->
+<link rel="stylesheet" href="gen/druckbogen.css">
 </head>
 <body>
 
@@ -1583,6 +1596,9 @@ function karte(it, opt){
       lab.textContent = f.label + (f.maxPoints ? "  (" + f.maxPoints + " BE)" : "");
       const ta = document.createElement("textarea");
       ta.id = fid;
+      /* Die Punktzahl am Feld bestimmt beim Drucken, wie viele Schreib-
+         linien darunter stehen (gen/druckbogen.js).                     */
+      if (f.maxPoints) ta.dataset.be = f.maxPoints;
       ta.rows = 1; ta.value = ANSWERS[it.k + "#" + i] || ""; ta.placeholder = "…";
       ta.addEventListener("input", () => {
         ANSWERS[it.k + "#" + i] = ta.value;
@@ -1595,6 +1611,7 @@ function karte(it, opt){
     });
     main.appendChild(box);
     const frei = document.createElement("textarea");
+    frei.dataset.be = "";
     frei.style.minHeight = "60px"; frei.placeholder = "Nebenrechnung / Ergänzung …";
     frei.value = ANSWERS[it.k] || "";
     frei.addEventListener("input", () => { ANSWERS[it.k] = frei.value;
@@ -1605,6 +1622,7 @@ function karte(it, opt){
     requestAnimationFrame(() => autoHeight(frei, 60));
   } else {
     const ta = document.createElement("textarea");
+    if (it.maxPoints) ta.dataset.be = it.maxPoints;
     ta.value = ANSWERS[it.k] || "";
     ta.placeholder = it.answerType === "diagram"
       ? "Beschreibe deine Lösung in Worten: Elemente, Beziehungen, Werte …"
@@ -2035,6 +2053,26 @@ function netzRechnen(vorgaenge){
     v.gp = v.saz - v.faz;
     v.fp = (v.nach.length ? Math.min(...v.nach.map(n => byId[n].faz)) : ende) - v.fez;
   });
+  /* ---------------------------------------------------------------------
+     Zwei Zeitrechnungen, die man nicht verwechseln darf:
+
+     NETZPLAN rechnet mit ZEITPUNKTEN. Der Projektstart ist der Zeitpunkt 0,
+     FEZ = FAZ + Dauer. „FAZ 7“ heißt: nach 7 vollen Tagen, also am Übergang
+     von Tag 7 zu Tag 8.
+
+     GANTT rechnet mit KALENDERTAGEN. Ein Vorgang von 6 Tagen, der beim
+     Zeitpunkt 7 anfängt, belegt die Tage 8 bis 13 — er beginnt am Tag 8 und
+     nicht „am Tag 7“. Deshalb:
+
+         Starttag = FAZ + 1        Endtag = FEZ
+         Dauer    = Endtag − Starttag + 1
+
+     Ein Projekt mit ende = 22 läuft von Tag 1 bis Tag 22, nicht von 0 bis 22.
+     Beide Größen stehen jetzt am Vorgang, damit der Gantt-Teil nicht mit den
+     Netzplan-Zahlen geprüft wird.
+     ------------------------------------------------------------------ */
+  liste.forEach(v => { v.gstart = v.faz + 1; v.gende = v.fez; });
+
   const pfad = fertig.filter(id => byId[id].gp === 0);
   const maxGp = Math.max(...liste.map(v => v.gp));
   return {liste, ende, byId, reihenfolge: fertig,
@@ -2139,7 +2177,7 @@ function zeichneGantt(){
   const box = $("ganttGitter"); box.innerHTML = "";
   const tab = document.createElement("table"); tab.className = "gantt-tab";
   tab.innerHTML = "<thead><tr><th>Vorgang</th><th>Dauer</th><th>Vorgänger</th>" +
-                  "<th>Start (Tag)</th><th>Ende (Tag)</th><th>Balken</th></tr></thead>";
+                  "<th>1. Tag</th><th>letzter Tag</th><th>Balken</th></tr></thead>";
   const tb = document.createElement("tbody");
   NETZ.reihenfolge.forEach(id => {
     const v = NETZ.byId[id];
@@ -2147,7 +2185,7 @@ function zeichneGantt(){
     const feld = f => {
       const i = document.createElement("input");
       i.type = "text"; i.inputMode = "numeric"; i.dataset.feld = f; i.dataset.id = v.id;
-      i.setAttribute("aria-label", (f === "faz" ? "Start" : "Ende") + " von " + v.id);
+      i.setAttribute("aria-label", (f === "gstart" ? "erster Tag" : "letzter Tag") + " von " + v.id);
       i.addEventListener("input", ganttBalken);
       return i;
     };
@@ -2159,19 +2197,35 @@ function zeichneGantt(){
     const tdSpur = document.createElement("td"); tdSpur.appendChild(spur);
     tr.append(td(v.id + " · " + v.name), td(String(v.dauer)),
               td(v.vor.length ? v.vor.join(", ") : "—"),
-              td(feld("faz")), td(feld("fez")), tdSpur);
+              td(feld("gstart")), td(feld("gende")), tdSpur);
     tb.appendChild(tr);
   });
   tab.appendChild(tb);
   box.appendChild(tab);
   const skala = document.createElement("div");
   skala.className = "gantt-skala";
-  skala.innerHTML = "<span>Tag 0</span><span>Tag " + NETZ.ende + "</span>";
+  skala.innerHTML = "<span>Tag 1</span><span>Tag " + NETZ.ende + "</span>";
   box.appendChild(skala);
+  /* Ohne Legende ist die Farbe nur Dekoration — mit ihr ist sie die Antwort
+     auf „welcher Vorgang hat Puffer?“.                                    */
+  const legende = document.createElement("div");
+  legende.className = "gantt-legende";
+  legende.innerHTML =
+    '<span><i class="lg-kritisch"></i>kritischer Pfad — kein Puffer (GP 0), ' +
+    'jeder Tag Verzug verschiebt das Projektende</span>' +
+    '<span><i class="lg-frei"></i>hat Puffer — darf sich um GP Tage verschieben, ' +
+    'ohne dass das Projekt später fertig wird</span>';
+  box.appendChild(legende);
   const hinweis = document.createElement("div");
-  hinweis.style.cssText = "font-size:13px;color:var(--muted);margin-top:10px";
-  hinweis.textContent = "Trage Start und Ende ein — der Balken zeichnet sich mit. " +
-    "Start = frühester Anfang (alle Vorgänger fertig), Ende = Start + Dauer.";
+  hinweis.style.cssText = "font-size:13px;color:var(--muted);margin-top:10px;line-height:1.55";
+  /* Der wichtigste Satz dieses Schirms — hier wird in der Prüfung geschludert. */
+  hinweis.innerHTML =
+    "Ein Balkenplan zählt <b>Kalendertage</b>, nicht Zeitpunkte. Ein Vorgang über " +
+    "3 Tage, der als Erster beginnt, belegt die Tage <b>1, 2 und 3</b> — erster Tag 1, " +
+    "letzter Tag 3.<br>" +
+    "<b>letzter Tag = erster Tag + Dauer − 1.</b> Der Nachfolger beginnt am Tag danach.<br>" +
+    "Im Netzplan steht dieselbe Lage als FAZ 0 / FEZ 3 — dort sind es Zeitpunkte, " +
+    "und dort gilt FEZ = FAZ + Dauer. Umrechnung: erster Tag = FAZ + 1, letzter Tag = FEZ.";
   box.appendChild(hinweis);
   ganttBalken();
 }
@@ -2182,13 +2236,15 @@ function ganttBalken(){
   NETZ.liste.forEach(v => {
     const bal = document.querySelector('#ganttGitter i[data-balken="' + v.id + '"]');
     if (!bal) return;
-    const s0 = document.querySelector('#ganttGitter input[data-id="' + v.id + '"][data-feld="faz"]');
-    const e0 = document.querySelector('#ganttGitter input[data-id="' + v.id + '"][data-feld="fez"]');
+    const s0 = document.querySelector('#ganttGitter input[data-id="' + v.id + '"][data-feld="gstart"]');
+    const e0 = document.querySelector('#ganttGitter input[data-id="' + v.id + '"][data-feld="gende"]');
     const a = parseFloat((s0.value || "").replace(",", ".")),
           b = parseFloat((e0.value || "").replace(",", "."));
-    if (isNaN(a) || isNaN(b) || b <= a){ bal.style.width = "0"; return; }
-    bal.style.left  = (a / skala * 100) + "%";
-    bal.style.width = ((b - a) / skala * 100) + "%";
+    /* Tagesnummern: Tag 1 beginnt am linken Rand. Ein Vorgang von Tag 1 bis
+       Tag 3 belegt drei Tage, also (3 − 1 + 1) Felder ab Position 0.     */
+    if (isNaN(a) || isNaN(b) || b < a){ bal.style.width = "0"; return; }
+    bal.style.left  = ((a - 1) / skala * 100) + "%";
+    bal.style.width = ((b - a + 1) / skala * 100) + "%";
     bal.className = (v.gp === 0 ? "kritisch" : "");
   });
 }
@@ -2295,19 +2351,44 @@ function fragenPruefen(){
     teile.push((ok ? '<span class="gut">✓</span>' : '<span class="schlecht">✗</span>') + " Projektdauer");
   } else setz("fragDauer", false, true);
 
+  /* „ABEFH“ ohne Trennzeichen ist eine völlig normale Schreibweise — sie kam
+     vorher als EIN Name an und wurde deshalb immer als falsch gewertet.
+     Wenn alle Vorgänge einbuchstabig heißen, wird jede Buchstabenkette in
+     ihre Buchstaben zerlegt.                                             */
+  const einzeln = Object.keys(NETZ.byId).every(id => id.length === 1);
+  const zerlege = roh => {
+    const stuecke = roh.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+    if (!einzeln) return stuecke;
+    const raus = [];
+    stuecke.forEach(s => { if (NETZ.byId[s]) raus.push(s); else raus.push(...s.split("")); });
+    return raus;
+  };
+
   const pfadRoh = $("fragPfad").value.trim();
   if (pfadRoh){
-    const meins = pfadRoh.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+    const meins = zerlege(pfadRoh);
     const soll = NETZ.kritisch.map(x => x.toUpperCase());
     const ok = meins.length === soll.length && meins.every((x, i) => x === soll[i]);
     setz("fragPfad", ok, false);
+    /* „5 Vorgänge mit GP 0“ allein hilft nicht weiter — es sagt nicht, WELCHE
+       fehlen und auch nicht, dass es mehrere kritische Pfade geben kann,
+       die sich verzweigen und wieder zusammenlaufen.                     */
+    let zusatz = "";
+    if (!ok) {
+      const fehlt = soll.filter(x => !meins.includes(x));
+      const zuviel = meins.filter(x => !soll.includes(x));
+      const t = [];
+      if (fehlt.length) t.push("fehlt: " + fehlt.join(", "));
+      if (zuviel.length) t.push("hat Puffer: " + zuviel.join(", "));
+      zusatz = " (" + (t.length ? t.join(" · ") : soll.length + " Vorgänge mit GP 0") + ")";
+    }
     teile.push((ok ? '<span class="gut">✓</span>' : '<span class="schlecht">✗</span>') +
-               " kritischer Pfad" + (ok ? "" : " (" + soll.length + " Vorgänge mit GP 0)"));
+               " kritischer Pfad" + zusatz);
   } else setz("fragPfad", false, true);
 
   const pufRoh = $("fragPuffer").value.trim();
   if (pufRoh){
-    const meins = pufRoh.toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
+    const meins = zerlege(pufRoh);
     const soll = NETZ.maxPufferVorgang.map(x => x.toUpperCase());
     const ok = meins.length > 0 && meins.every(x => soll.includes(x));
     setz("fragPuffer", ok, false);
@@ -4148,6 +4229,7 @@ schirm("scStart");
 <script src="gen/vorlagen-hardware.js"></script>
 <script src="gen/vorlagen-fachthemen.js"></script>
 <script src="gen/vorlagen-ki.js"></script>
+<script src="gen/vorlagen-einheiten.js"></script>
 <script src="gen/flussbild.js"></script>
 <script src="gen/blatt.js"></script>
 <script src="gen/druck.js"></script>
@@ -4164,7 +4246,14 @@ schirm("scStart");
 <script src="gen/mobil.js"></script>
 <script src="gen/pwa.js"></script>
 <script src="gen/offline.js"></script>
+<script src="gen/auth.js"></script>
 <script src="gen/tabellen.js"></script>
+<script src="gen/druckbogen.js"></script>
+<script src="gen/er-daten.js"></script>
+<script src="gen/er.js"></script>
+<script src="gen/gantt-daten.js"></script>
+<script src="gen/gantt.js"></script>
+<script src="gen/auftrag.js"></script>
 <script src="gen/spick-daten.js"></script>
 <script src="gen/spick.js"></script>
 <script src="gen/kompendium-daten.js"></script>
@@ -4172,6 +4261,11 @@ schirm("scStart");
 <script src="gen/archiv.js"></script>
 <script src="gen/zurueck.js"></script>
 <script src="gen/start.js"></script>
+<!-- nach start.js: die „weiter wo ich war“-Karte soll ganz oben stehen,
+     also zuletzt eingefügt werden. -->
+<script src="gen/rechnen.js"></script>
+<script src="gen/handgriffe.js"></script>
+<script src="gen/version.js"></script>
 <script src="gen/marker.js"></script>
 <script src="gen/kompakt.js"></script>
 <script src="gen/zeit.js"></script>

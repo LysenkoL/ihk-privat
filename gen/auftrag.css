@@ -1,0 +1,62 @@
+/* ============================================================================
+   gen/auftrag.css — die Zeile „Verlangt: 3 Antworten“ und die Durchsicht
+   ----------------------------------------------------------------------------
+   Die Zeile steht direkt über dem Antwortfeld und muss dort ruhig bleiben:
+   sie ist Buchführung, keine Warnung. Farbe kommt erst, wenn wirklich etwas
+   fehlt, und auch dann gedeckt — ein rotes Feld über jedem zweiten Textfeld
+   würde man nach zehn Minuten nicht mehr sehen.
+   ========================================================================== */
+
+.au-zeile{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px;
+  margin:0 0 6px; padding:6px 10px; border-radius:4px;
+  border:1px solid var(--rule); background:var(--field);
+  font-size:12.5px; line-height:1.45}
+.au-soll{flex:1 1 auto; min-width:0; color:var(--muted)}
+.au-ist{flex:0 0 auto; font-family:var(--data); font-weight:600; color:var(--muted)}
+.au-hinweis{flex:1 1 100%; font-size:12px; font-weight:600}
+
+.au-zeile.au-leer{border-color:var(--rule); background:var(--field)}
+.au-zeile.au-leer .au-hinweis{color:var(--muted); font-weight:400}
+.au-zeile.au-wenig{border-color:var(--warn); background:var(--warn-soft)}
+.au-zeile.au-wenig .au-ist, .au-zeile.au-wenig .au-hinweis{color:var(--warn)}
+.au-zeile.au-voll{border-color:var(--ok); background:var(--ok-soft)}
+.au-zeile.au-voll .au-ist{color:var(--ok)}
+.au-zeile.au-voll .au-hinweis{color:var(--warn)}
+
+/* ------------------------------------------------------- Durchsicht --- */
+.au-hg{position:fixed; inset:0; z-index:75; background:rgba(0,0,0,.55);
+  display:flex; align-items:center; justify-content:center; padding:18px}
+.au-kasten{background:var(--card); border:1px solid var(--rule); border-radius:6px;
+  padding:18px 20px; max-width:560px; width:100%; max-height:84vh; overflow-y:auto;
+  box-shadow:0 12px 40px rgba(0,0,0,.28)}
+.au-kasten h3{margin:0 0 8px; font-family:var(--display); font-size:17px}
+.au-text{margin:0 0 14px; font-size:13.5px; color:var(--muted); line-height:1.55}
+
+.au-liste{display:flex; flex-direction:column; gap:6px; margin-bottom:16px}
+.au-treffer{display:flex; align-items:baseline; gap:10px; width:100%; text-align:left;
+  min-height:44px; padding:9px 12px; cursor:pointer;
+  background:var(--field); border:1px solid var(--rule); border-radius:4px;
+  font:inherit; font-size:13.5px; color:var(--ink)}
+.au-treffer:hover{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.au-treffer-nr{font-family:var(--data); font-weight:700; color:var(--pruefer); white-space:nowrap}
+.au-treffer-grund{flex:1 1 auto; color:var(--muted)}
+
+.au-knopfe{display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap}
+.au-knopfe .btn{min-height:44px}
+
+/* Kurz aufleuchten, wenn man aus der Durchsicht hierher gesprungen ist */
+.au-blitz{animation:auBlitz 1.6s ease-out}
+@keyframes auBlitz{
+  0%, 40%{box-shadow:0 0 0 3px var(--warn)}
+  100%   {box-shadow:0 0 0 3px transparent}
+}
+@media (prefers-reduced-motion:reduce){ .au-blitz{animation:none; outline:2px solid var(--warn)} }
+
+@media (max-width:700px){
+  .au-zeile{font-size:12px; padding:6px 8px}
+  .au-kasten{padding:14px 14px; max-height:90vh}
+  .au-knopfe{justify-content:stretch}
+  .au-knopfe .btn{flex:1 1 40%}
+}
+
+@media print{ .au-zeile, .au-hg{display:none !important} }
