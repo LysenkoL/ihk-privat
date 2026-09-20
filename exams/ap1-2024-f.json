@@ -93,11 +93,11 @@
               }
             ],
             "begriffe": [
-              "Vollständige Tabelle",
               "Grafikkarte",
               "Rangfolge",
-              "Monitor",
+              "Vollständige Tabelle",
               "RAM",
+              "Monitor",
               "Folgefehler",
               "Arbeitsspeicher",
               "Summe"
@@ -164,11 +164,11 @@
               }
             ],
             "begriffe": [
-              "Bedingung",
-              "Ausschluss",
-              "KO",
               "Bedingungen",
+              "Ausschluss",
+              "Bedingung",
               "Unternehmung",
+              "KO",
               "Unternehmen"
             ]
           },
@@ -287,9 +287,9 @@
               }
             ],
             "begriffe": [
-              "Softwareleasing",
               "2.137",
               "Wartungspauschale",
+              "Softwareleasing",
               "3.420",
               "Folgefehler",
               "Summe",
@@ -358,8 +358,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Displayport",
               "DP",
+              "Displayport",
               "HDMI",
               "DVI",
               "USB"
@@ -449,11 +449,11 @@
               }
             ],
             "begriffe": [
-              "Annahme",
-              "Handeln",
               "Antrag",
               "Willenserklärung",
               "Oktober",
+              "Handeln",
+              "Annahme",
               "Kaufvertrag",
               "Bestellung",
               "Lieferung"
@@ -531,14 +531,14 @@
               }
             ],
             "begriffe": [
-              "Beschaffenheit",
               "Kaufpreis",
-              "Liefertermin",
+              "Sache",
+              "Kaufgegenstand",
+              "Beschaffenheit",
+              "Lieferbedingungen",
               "Zahlungsbedingungen",
               "Kaufsache",
-              "Kaufgegenstand",
-              "Lieferbedingungen",
-              "Sache"
+              "Liefertermin"
             ]
           },
           "felder": [],
@@ -667,12 +667,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Lieferkette",
-              "Konventionalstrafen",
-              "Mahnung",
               "Andere Maßnahmen",
-              "Lieferanten",
+              "Mahnung",
+              "Konventionalstrafen",
+              "Lieferkette",
               "Mangelhafte Lieferung",
+              "Lieferanten",
               "Kontrolle",
               "Analyse"
             ]
@@ -740,14 +740,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Datenaustausch",
-              "Netzwerkverbindung",
-              "Netzwerkports",
               "Netzwerkkommunikation",
+              "Netzwerkports",
+              "Übertragungsgeschwindigkeit",
+              "Datenaustausch",
               "Netzwerkgerät",
+              "Netzwerkverbindung",
               "Ihrem",
-              "Link Speed",
-              "Übertragungsgeschwindigkeit"
+              "Link Speed"
             ]
           },
           "felder": [
@@ -813,14 +813,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Application",
-              "Data Link",
-              "Verbindungslokale",
-              "Physical",
               "Begriff",
+              "Data Link",
+              "Physical",
+              "Application",
+              "Verbindungslokale",
+              "Buchse",
               "Network",
-              "TCP",
-              "Physische Adresse"
+              "TCP"
             ]
           },
           "felder": [
@@ -919,9 +919,9 @@
               }
             ],
             "begriffe": [
-              "Interface-Identifier",
-              "Präfixlänge",
               "Ungekürzte Darstellung",
+              "Präfixlänge",
+              "Interface-Identifier",
               "Hexadezimalschreibweise",
               "Länge",
               "IPv6",
@@ -977,8 +977,8 @@
             "begriffe": [
               "Werte",
               "Angabe",
-              "IPv4",
               "Subnetzmaske",
+              "IPv4",
               "Adresse"
             ]
           },
@@ -1029,9 +1029,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Ermittlung",
               "MAC",
               "0.1",
+              "Ermittlung",
               "Adressen",
               "192.168",
               "IP",
@@ -1230,14 +1230,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Online-Recherche",
+              "Handbücher",
               "Fachliteratur",
               "Suchmaschine",
               "Foren",
-              "Handbücher",
               "Online-Communities",
-              "Online-Recherche",
-              "Frage",
-              "Chatbot"
+              "Chatbot",
+              "Frage"
             ]
           },
           "felder": [],
@@ -1294,10 +1294,10 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Importmöglichkeiten",
               "CAD",
-              "Exportmöglichkeit",
               "Dateiformatkonverter",
+              "Importmöglichkeiten",
+              "Exportmöglichkeit",
               "Eigenen Konverter",
               "Programms"
             ]
@@ -1362,12 +1362,12 @@
               }
             ],
             "begriffe": [
-              "Format",
               "Texteditor",
-              "Eine Binärdatei",
-              "Binärdatei",
-              "Eine Datei",
+              "Format",
               "ASCII",
+              "Binärdatei",
+              "Eine Binärdatei",
+              "Eine Datei",
               "Zeichen",
               "Anwendung"
             ]
@@ -1608,9 +1608,9 @@
               }
             ],
             "begriffe": [
+              "Punkt Auswahl",
               "Punkte Berechnung",
               "Leistungsaufnahme",
-              "Punkt Auswahl",
               "Netzteil"
             ]
           },
@@ -1735,14 +1735,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Folge",
-              "Unberechtigter Zugriff",
-              "Bildschirminhalt",
-              "Zugangs",
-              "Unberechtigten Personen",
-              "Verhaltensweisen",
               "Blickschutzfolie",
-              "Zugriffskontrolle"
+              "Unberechtigter Zugriff",
+              "Zugangs",
+              "Verhaltensweisen",
+              "Zugriffskontrolle",
+              "Bildschirminhalt",
+              "Folge",
+              "Unberechtigten Personen"
             ]
           },
           "felder": [],
@@ -1799,14 +1799,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Sinngemäß",
               "Virtual Private",
-              "Smartphone",
-              "Verschlüsselte Verbindung",
+              "Eine Netzwerkverbindung",
               "Eine Technologie",
               "Gerät",
-              "Eine Netzwerkverbindung",
-              "Computer"
+              "Verschlüsselte Verbindung",
+              "Smartphone",
+              "Sinngemäß",
+              "Internet"
             ]
           },
           "felder": [],
@@ -1864,14 +1864,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Passworts",
-              "Großvater-Vater-Sohn-Prinzip",
-              "Nachdem",
-              "Generationsprinzips",
-              "Sicherungsvorgang",
               "Sicherungsstände",
-              "Reihenfolge",
-              "Ausfall"
+              "Sicherungsvorgang",
+              "Generationsprinzips",
+              "Großvater-Vater-Sohn-Prinzip",
+              "Passworts",
+              "Nachdem",
+              "Aspekte",
+              "Reihenfolge"
             ]
           },
           "felder": [],
@@ -1949,14 +1949,14 @@
               }
             ],
             "begriffe": [
-              "Backdoor",
               "Eingebettet",
-              "Riskware",
-              "Dropper",
               "Adware",
+              "Backdoor",
               "Scareware",
-              "Viren",
-              "Archivbomben"
+              "Riskware",
+              "Archivbomben",
+              "Dropper",
+              "Viren"
             ]
           },
           "felder": [],
@@ -2033,13 +2033,13 @@
               }
             ],
             "begriffe": [
-              "Merkmal",
               "Lösegeld",
+              "Arten",
               "Virus",
               "Tastatureingaben",
-              "Arten",
-              "Programmcode",
-              "Ransomware",
+              "Merkmal",
+              "Spyware",
+              "Keylogger",
               "Dritten"
             ]
           },
@@ -2111,13 +2111,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Regelmäßig Updates",
               "Kein Download",
-              "Makros",
               "Keine Ausführung",
+              "Makros",
+              "Regelmäßig Updates",
               "Mail-Anhänge",
-              "Dateien",
               "Betriebssystem",
+              "Dateien",
               "Datenträger"
             ]
           },
@@ -2221,14 +2221,14 @@
               }
             ],
             "begriffe": [
-              "Sekunden",
-              "Entspricht",
               "Übertragungsdauer",
-              "Gesamtergebnisses",
+              "Entspricht",
               "Punkteverteilung",
+              "Sekunden",
+              "Gesamtergebnisses",
               "Umrechnung",
-              "Berechnung",
-              "1.000"
+              "1.000",
+              "Berechnung"
             ]
           },
           "felder": [],

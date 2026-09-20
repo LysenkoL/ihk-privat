@@ -33,21 +33,90 @@ window.GENGESAMT = (function () {
     return G().alleVorlagen().filter(v => examThema(v) === key).map(v => v.id);
   }
 
+  /* ---------------------------------------------------------------------
+     Wie alt darf ein Ergebnis sein, um noch zu zählen?
+
+     Bisher wurde alles gleich gewichtet: ein Blatt von vor drei Wochen zählte
+     wie das von heute. Wer sich in einem Thema von 51 % auf 79 % hochgearbeitet
+     hat, sah als Quote den Mittelwert 65 % — eine Zahl, die zu keinem Zeitpunkt
+     gestimmt hat und die den Fortschritt unsichtbar macht.
+
+     Jetzt halbiert sich das Gewicht alle 14 Tage. Nach einer Woche zählt ein
+     Ergebnis noch zu 70 %, nach einem Monat zu 23 %, nach zwei Monaten zu 5 %.
+     Das ist kein Vergessen, sondern die richtige Frage: wie gut bist du HEUTE.
+     -------------------------------------------------------------------- */
+  const HALBWERT = 14;
+  function gewichtFuer(tage) {
+    if (tage == null || !isFinite(tage) || tage < 0) return 1;
+    return Math.pow(0.5, tage / HALBWERT);
+  }
+  function tageHer(datumStr) {
+    const m = String(datumStr || "").match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+    if (!m) return null;
+    const d = new Date(+m[3], +m[2] - 1, +m[1]); d.setHours(0, 0, 0, 0);
+    const h = new Date(); h.setHours(0, 0, 0, 0);
+    return Math.max(0, Math.round((h - d) / 864e5));
+  }
+
   /* ---------------------------------------------------------------- Daten */
   function daten() {
     const analyse = window.themenAnalyse ? window.themenAnalyse() : { liste: [], gesamt: 0 };
     const stat = lies(SK_STAT, {});
     const blaetter = lies(SK_BLAETTER, []);
 
-    /* Generator-Punkte je Prüfungsthema einsammeln */
+    /* -------------------------------------------------------------------
+       Generator-Punkte je Prüfungsthema — aus den einzelnen BLÄTTERN, nicht
+       aus der Summenstatistik. Nur dort steht ein Datum, und nur mit Datum
+       lässt sich frisch von alt unterscheiden. Gewichtet wird mit BE, nicht
+       mit Prozenten: ein Blatt über 82 BE wiegt schwerer als eines über 28.
+       ---------------------------------------------------------------- */
     const gen = {};
+    const holen = k => gen[k] || (gen[k] = { punkte: 0, max: 0, rohMax: 0, versuche: 0,
+                                             typen: new Set(), blaetter: 0, juengste: null });
+    blaetter.forEach(bl => {
+      const erg = bl.ergebnisse || {};
+      const keys = Object.keys(erg);
+      if (!keys.length) return;
+      const tage = tageHer(bl.erstellt);
+      const w = gewichtFuer(tage);
+      const beruehrt = new Set();
+      keys.forEach(ki => {
+        const e = erg[ki];
+        const a = (bl.aufgaben || [])[ki];
+        if (!e || !a) return;
+        const v = G().vorlageVon(a.vorlageId);
+        if (!v) return;
+        /* Nur beurteilte BE: leere Felder und noch nicht selbst gewerteter
+           Freitext dürfen die Quote nicht drücken.                      */
+        const be = e.sicherBe != null ? e.sicherBe : (e.max || 0);
+        const p = e.sicherBe != null ? e.sicherPunkte : (e.punkte || 0);
+        if (!be) return;
+        const k = examThema(v);
+        const t = holen(k);
+        t.punkte += p * w; t.max += be * w; t.rohMax += be;
+        t.versuche++; t.typen.add(v.id);
+        if (t.juengste == null || (tage != null && tage < t.juengste)) t.juengste = tage;
+        beruehrt.add(k);
+      });
+      beruehrt.forEach(k => { holen(k).blaetter++; });
+    });
+
+    /* Ältere Blätter sind irgendwann aus der Liste gefallen (es werden 40
+       aufbewahrt). Für Themen, von denen deshalb gar nichts mehr übrig ist,
+       springt die alte Summenstatistik ein — ungewichtet, aber besser als
+       eine Lücke.                                                        */
     Object.keys(stat).forEach(id => {
       const v = G().vorlageVon(id);
       if (!v || !stat[id].max) return;
       const k = examThema(v);
-      const e = gen[k] || (gen[k] = { punkte: 0, max: 0, versuche: 0, typen: new Set() });
-      e.punkte += stat[id].punkte; e.max += stat[id].max; e.versuche += stat[id].versuche;
+      if (gen[k] && gen[k].max > 0) { gen[k].typen.add(id); return; }
+      const e = holen(k);
+      e.punkte += stat[id].punkte * 0.25;      /* alt: viertel Gewicht */
+      e.max += stat[id].max * 0.25;
+      e.rohMax += stat[id].max;
+      e.versuche += stat[id].versuche;
       e.typen.add(id);
+      e.altbestand = true;
     });
 
     /* verfügbare Aufgabentypen je Thema — auch dort, wo noch nichts geübt wurde */
@@ -66,7 +135,9 @@ window.GENGESAMT = (function () {
       return {
         key: e.key, label: e.label, gewicht: e.gewicht,
         examQuote: e.quote, examBE: e.getestet || 0,
-        genQuote, genBE: g ? g.max : 0, genVersuche: g ? g.versuche : 0,
+        genQuote, genBE: g ? g.max : 0, genRohBE: g ? g.rohMax : 0,
+        genVersuche: g ? g.versuche : 0,
+        genBlaetter: g ? g.blaetter : 0, juengste: g ? g.juengste : null,
         quote, risiko: quote === null ? null : e.gewicht * (1 - quote),
         typen: angebot[e.key] || 0
       };
@@ -97,6 +168,8 @@ window.GENGESAMT = (function () {
       abgedeckt, prognose, hoch,
       examBE: zeilen.reduce((s, z) => s + z.examBE, 0),
       genBE: zeilen.reduce((s, z) => s + z.genBE, 0),
+      genRohBE: zeilen.reduce((s, z) => s + (z.genRohBE || 0), 0),
+      duenn: zeilen.filter(z => z.gewicht >= 3 && z.quote !== null && (z.genRohBE || 0) < 15).length,
       papier
     };
   }
@@ -117,7 +190,10 @@ window.GENGESAMT = (function () {
     b.appendChild(el("h2", null, "Wo stehe ich? — Prüfungen und Generator zusammen"));
     b.appendChild(el("p", null,
       "Das Gewicht kommt aus den zehn echten Prüfungen, die Quote aus allem, was du bewertet hast: " +
-      "Prüfungsaufgaben und generierte Arbeitsblätter."));
+      "Prüfungsaufgaben und Arbeitsblätter. Frisches zählt mehr — das Gewicht eines Ergebnisses " +
+      "halbiert sich alle 14 Tage, damit die Zahl deinen heutigen Stand zeigt und nicht den " +
+      "Durchschnitt der letzten Monate. Gerechnet wird über BE, nicht über Blätter: ein Blatt " +
+      "über 80 BE wiegt schwerer als eines über 25."));
 
     if (!d.examBE && !d.genBE) {
       b.appendChild(el("div", "leer-hinweis",
@@ -136,7 +212,12 @@ window.GENGESAMT = (function () {
       '<div><span class="eyebrow">Datenbasis</span><div class="neben">' +
         Math.round(d.abgedeckt) + " %</div><small>des Prüfungsstoffs bewertet</small></div>" +
       '<div class="txt">Aus <b>' + G().fmt.kurz(Math.round(d.examBE)) + " BE</b> Prüfungsaufgaben und <b>" +
-        G().fmt.kurz(Math.round(d.genBE)) + " BE</b> aus dem Generator. " +
+        G().fmt.kurz(Math.round(d.genRohBE)) + " BE</b> aus Arbeitsblättern" +
+        (d.genRohBE > 0 && d.genBE < d.genRohBE * 0.75
+          ? " (davon zählt nach Alter noch etwa " + Math.round(d.genBE / d.genRohBE * 100) + " %)"
+          : "") + ". " +
+      (d.duenn ? "<b>" + (d.duenn === 1 ? "Ein Thema ruht" : d.duenn + " Themen ruhen") +
+        "</b> auf weniger als 15 geübten BE — dort ist die Quote eher Stimmung als Messwert. " : "") +
       (d.abgedeckt < 40
         ? "Die Datenbasis ist noch dünn — die Zahl schwankt. Jedes Arbeitsblatt macht sie belastbarer."
         : d.hoch >= 50
@@ -160,10 +241,20 @@ window.GENGESAMT = (function () {
       const prio = window.prioVon ? window.prioVon(z.risiko) : null;
       const proz = q => q === null || q === undefined ? "—" : Math.round(q * 100) + " %";
 
+      /* Wie dick ist die Datenbasis? Ohne diese Angabe sieht eine Quote aus
+         einem einzigen Blatt genauso verbindlich aus wie eine aus zehn.  */
+      const deckung = z.genRohBE
+        ? Math.round(z.genRohBE) + " BE geübt" +
+          (z.genBlaetter ? " in " + z.genBlaetter + " Blättern" : "") +
+          (z.juengste == null ? "" :
+            z.juengste === 0 ? " · zuletzt heute"
+          : z.juengste === 1 ? " · zuletzt gestern"
+          : " · zuletzt vor " + z.juengste + " Tagen")
+        : "noch nicht geübt";
       const td1 = el("td", "prio-thema");
       td1.innerHTML = esc(z.label) +
-        "<small>" + z.typen + " Aufgabentypen im Generator" +
-        (z.genVersuche ? " · " + z.genVersuche + "× geübt" : " · noch nicht geübt") + "</small>";
+        "<small>" + z.typen + " Aufgabentypen · " + esc(deckung) +
+        (z.genRohBE && z.genRohBE < 15 ? ' · <b class="duenn">dünne Basis</b>' : "") + "</small>";
       tr.appendChild(td1);
 
       tr.appendChild(el("td", "r zahl-m", z.gewicht ? Math.round(z.gewicht) + " BE" : "—"));

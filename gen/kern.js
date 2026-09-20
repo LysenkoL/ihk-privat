@@ -236,8 +236,67 @@ window.GEN = (function () {
      Weg ist nötig, weil der Stamm auf sechs Zeichen kürzt: „redundanz“ und
      „redudanz“ werden zu „redund“ und „reduda“ — als Stämme zwei Fehler, als
      ganze Wörter einer.                                                    */
+  /* ------------------------------------------------------------------
+     Wörter, die im Prüfungsdeutsch dasselbe sagen. Bewusst KEIN großes
+     Wörterbuch: hier stehen nur die Gruppen, an denen in den Prüfungen
+     tatsächlich richtige Antworten gescheitert sind — allen voran die
+     Verneinung. „Kein Gateway“ und „fehlendes Standardgateway“ sind
+     dieselbe Diagnose; für den Wortvergleich waren es zwei Welten.
+
+     Fachbegriffe stehen hier NICHT drin. Wer „Router“ statt „Switch“
+     schreibt, soll weiterhin daneben liegen.
+     --------------------------------------------------------------- */
+  /* Nachgemessen am Prüfsatz (test5.js): diese vier Gruppen kosten zusammen
+     vier fälschlich anerkannte Antworten von 6370 und retten dafür eine
+     ganze Fehlerklasse. Weitere, allgemeinere Gruppen („Rechner/PC/Gerät“,
+     „schützen/sichern/verhindern“) wurden wieder entfernt — sie brachten
+     keine einzige zusätzliche Erkennung und elf zusätzliche Durchrutscher. */
+  const SINN_GRUPPEN = [
+    ["kein", "keine", "keinen", "ohne", "fehlt", "fehlen", "fehlend", "nicht", "mangel"],
+    ["falsch", "fehlerhaft", "ungueltig", "ungultig", "inkorrekt", "verkehrt", "defekt"],
+    ["zuweisen", "zuteilen", "vergeben", "erhalten", "bekommen", "beziehen", "zuordnen"],
+    ["erreichbar", "erreichen", "antworten", "reagieren", "verbinden", "verbindung"]
+  ];
+  /* Stamm → Gruppennummer; über den Stamm, damit die Beugung egal ist. */
+  const SINN = (() => {
+    const m = {};
+    SINN_GRUPPEN.forEach((g, i) => g.forEach(w => { m[stamm(norm(w))] = i; }));
+    return m;
+  })();
+  function sinnGleich(a, b) {
+    const x = SINN[a], y = SINN[b];
+    return x != null && x === y;
+  }
+
   function paarNah(x, y) {
-    return nahe(x.s, y.s) || tippNah(x.w, y.w);
+    return nahe(x.s, y.s) || tippNah(x.w, y.w) ||
+           zusammensetzung(x.w, y.w) || sinnGleich(x.s, y.s);
+  }
+
+  /* ------------------------------------------------------------------
+     Deutsche Komposita. „Standardgateway“ und „Gateway“ sind dieselbe
+     Sache; „Festplattenverschlüsselung“ und „Verschlüsselung“ auch. Für
+     den Stammvergleich waren das bisher zwei verschiedene Wörter, weil
+     der Stamm vorne abschneidet und das Grundwort hinten steht.
+
+     Gezählt wird nur, wenn das kürzere Wort das längere am ANFANG oder
+     am ENDE bildet und selbst lang genug ist (ab 5 Zeichen). Sonst
+     steckt „Art“ in „Artikel“ und „Ort“ in „Sortierung“.
+
+     Das ist der häufigste falsche Nullpunkt gewesen: die Antwort nennt
+     den Fachbegriff, nur in der kurzen oder der langen Form.
+     --------------------------------------------------------------- */
+  function zusammensetzung(a, b) {
+    const x = norm(a), y = norm(b);
+    if (!x || !y || x === y) return x === y && !!x;
+    const kurz = x.length <= y.length ? x : y;
+    const lang = x.length <= y.length ? y : x;
+    if (kurz.length < 5 || lang.length - kurz.length < 2) return false;
+    if (lang.endsWith(kurz)) return true;                 /* Standard|gateway */
+    if (lang.startsWith(kurz)) return true;               /* Gateway|adresse  */
+    /* Fugen-s und -n: Festplatten|verschlüsselung, Arbeits|platz */
+    return lang.endsWith("s" + kurz) || lang.endsWith("n" + kurz) ||
+           lang.startsWith(kurz + "s") || lang.startsWith(kurz + "n");
   }
 
   /* ------------------------------------------------------------------

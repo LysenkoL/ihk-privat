@@ -65,11 +65,11 @@
               }
             ],
             "begriffe": [
-              "Wartungskosten",
               "Spalte",
-              "Geschwindigkeit Druck",
               "Matrix",
               "Geschwindigkeit Scan",
+              "Geschwindigkeit Druck",
+              "Wartungskosten",
               "Ergebnis",
               "Preis"
             ]
@@ -209,14 +209,14 @@
               }
             ],
             "begriffe": [
+              "2.844",
+              "Abzug",
+              "3.456",
               "1.656",
               "Multifunktionsgerät",
-              "Abzug",
-              "2.844",
-              "3.456",
-              "Falls",
               "2.000",
-              "Rechnungen"
+              "Falls",
+              "Folgefehler"
             ]
           },
           "felder": [],
@@ -285,8 +285,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bluetooth",
               "Symbol",
+              "Bluetooth",
               "WLAN"
             ]
           },
@@ -372,14 +372,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Regelmäßiges Aktualisieren",
-              "Deutsch",
               "Toolkit",
-              "Features",
-              "Sicherheitsvorschriften",
-              "Englisch",
+              "Deutsch",
+              "BS",
+              "Memory Integrity",
+              "Regelmäßiges Aktualisieren",
               "Aktivierung",
-              "Security Compliance"
+              "Betriebssystems",
+              "Englisch"
             ]
           },
           "felder": [],
@@ -412,9 +412,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Rechte",
               "Aktionen",
               "Unternehmenssicht",
+              "Rechte",
               "Anwender",
               "Malware",
               "Rechner",
@@ -552,8 +552,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Anwalts",
               "Nachricht",
+              "Anwalts",
               "Schlüssel",
               "Mandanten"
             ]
@@ -640,8 +640,8 @@
               "Rechenaufwand",
               "Schlüssels",
               "Entschlüsselung",
-              "Übertragung",
               "Verschlüsselung",
+              "Übertragung",
               "Nachteil",
               "Vorteil"
             ]
@@ -684,12 +684,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Service",
-              "Open-Source",
-              "Proprietäre Software",
-              "Zusammenarbeit",
               "Source-Code",
               "Interessierten",
+              "Proprietäre Software",
+              "Open-Source",
+              "Service",
+              "Zusammenarbeit",
               "Herstellers",
               "Hersteller"
             ]
@@ -737,8 +737,8 @@
               "Nutzer",
               "Download",
               "Hashwert",
-              "Integrität",
               "Datenübertragung",
+              "Integrität",
               "Fehler"
             ]
           },
@@ -789,13 +789,13 @@
             "zahlen": [],
             "begriffe": [
               "Mailpostfachs",
-              "Verbleib",
-              "Dadurch",
-              "IMAP",
               "Mail-Kopie",
+              "IMAP",
+              "Dadurch",
+              "Verbleib",
               "Abruf",
-              "Clients",
-              "Bearbeitung"
+              "Bearbeitung",
+              "Clients"
             ]
           },
           "felder": [],
@@ -975,8 +975,8 @@
               "Benutzerinteraktionen",
               "Parametern",
               "Website",
-              "Grundlage",
               "Laufzeit",
+              "Grundlage",
               "Inhalte"
             ]
           },
@@ -1018,13 +1018,13 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "PHP",
-              "HTML",
-              "Edition",
-              "CSS",
               "Python",
+              "HTML",
+              "PHP",
+              "CSS",
               "Programmiersprachen",
-              "Java Enterprise"
+              "Java Enterprise",
+              "Edition"
             ]
           },
           "felder": [],
@@ -1068,12 +1068,12 @@
             "begriffe": [
               "Suchmaschinen",
               "Sitzungen",
-              "Durchschnittliche Seitenaufrufe",
-              "Prozentsatz",
-              "Seitenaufruf",
               "Bounce-Rate",
+              "Prozentsatz",
+              "Rückgabewerte",
+              "Durchschnittliche Seitenaufrufe",
               "Besucher",
-              "Rückgabewerte"
+              "Seitenaufruf"
             ]
           },
           "felder": [
@@ -1182,14 +1182,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Urteilen",
-              "Vertragsklauseln",
-              "Mandantendaten",
+              "Nachrichten",
+              "Terminvorschlägen",
+              "Übersetzungshilfe",
+              "Rechtsanwalt",
               "Qualifizierte Erstberatung",
-              "Information",
-              "Zusammenfassung",
-              "Sachverhaltsinformationen",
-              "Zuweisen"
+              "Anschreiben",
+              "Termins",
+              "Dialog"
             ]
           },
           "felder": [],
@@ -1230,9 +1230,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Freiraum",
               "Effektivität",
               "Fehlerhäufigkeit",
-              "Freiraum",
               "Arbeitsleistung",
               "Tätigkeiten"
             ]
@@ -1306,11 +1306,11 @@
               }
             ],
             "begriffe": [
-              "3.600",
-              "1.800",
               "10.800",
-              "Angabe",
+              "1.800",
+              "3.600",
               "Benennung",
+              "Angabe",
               "Rechenweg",
               "Monate",
               "Kosten"
@@ -1355,14 +1355,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Erstberatung",
-              "Mögliche Nachteile",
               "Mögliche Vorteile",
-              "Beanspruchung",
               "Kanzlei",
               "Kontakt",
+              "Erstberatung",
               "Image",
-              "Potenzielle Mandanten"
+              "Mögliche Nachteile",
+              "Potenzielle Mandanten",
+              "Beanspruchung"
             ]
           },
           "felder": [],
@@ -1397,10 +1397,10 @@
             "zahlen": [],
             "begriffe": [
               "Host Name",
+              "SSH",
               "230.33",
               "Connection",
               "32.42",
-              "SSH",
               "IP"
             ]
           },
@@ -1449,8 +1449,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Telnet",
-              "Verbindungstypen Serial"
+              "Verbindungstypen Serial",
+              "Telnet"
             ]
           },
           "felder": [],
@@ -1491,8 +1491,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Formulierungen",
               "Mehrfachspeicherungen",
+              "Formulierungen",
               "Daten"
             ]
           },
@@ -1542,12 +1542,12 @@
             "zahlen": [],
             "begriffe": [
               "Ungewollte Nebeneffekte",
-              "Löschen",
-              "Änderungen",
-              "Ändern",
+              "Inkonsistenzen",
               "Einfügen",
               "Erhöhter Zeitaufwand",
-              "Inkonsistenzen",
+              "Ändern",
+              "Löschen",
+              "Änderungen",
               "Durchführung"
             ]
           },

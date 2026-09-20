@@ -350,8 +350,16 @@ window.GENER = (function () {
       if (!meine) return;
       const geschrieben = putz(meine.attr).split(",").map(putz).filter(Boolean);
       geschrieben.forEach(g => {
-        const gehoert = (loes.entitaeten || []).find(x => (x.attribute || []).some(a => gleich(a, g)));
-        if (gehoert && gehoert.name !== se.name)
+        /* Manche Attributnamen kommen bei mehreren Entitäten vor — „Name“
+           gibt es beim Patienten UND beim Behandler, „Datum“ an mehreren
+           Stellen. Ein solches Wort ist kein Hinweis auf eine falsche
+           Zuordnung, und die Meldung stand dann auch an einer vollständig
+           richtigen Lösung. Gemeckert wird nur, wenn der Name in der
+           Musterlösung genau EINER Entität gehört.                      */
+        const besitzer = (loes.entitaeten || []).filter(x => (x.attribute || []).some(a => gleich(a, g)));
+        if (besitzer.length !== 1) return;
+        const gehoert = besitzer[0];
+        if (gehoert.name !== se.name)
           zeilen.push({ ok: false, text: "„" + g + "“ steht bei " + se.name + ", gehört aber zu " + gehoert.name });
       });
     });

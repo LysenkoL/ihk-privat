@@ -71,14 +71,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Lesbarkeit",
+              "Lösungshinweise",
               "Prüfling",
               "Anführung",
-              "Notizbereich",
-              "Lösungshinweise",
-              "Folienbereich",
               "Aufzählungspunkte",
-              "Lesbarkeit",
-              "Zertifizierte Kompetenzen"
+              "Folienbereich",
+              "Zertifizierte Kompetenzen",
+              "Notizbereich"
             ]
           },
           "felder": [],
@@ -128,14 +128,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Partnerschaften",
-              "Aufträgen",
               "Nachgewiesene Standards",
-              "Kundenzufriedenheit",
               "Branchenübergreifender Kundenstamm",
+              "Kompetenzen",
               "Fristgerechte Bewältigung",
-              "Zertifizierungen",
-              "Durchfüh"
+              "Zukunft",
+              "Jahre Marktpräsenz",
+              "Aufträgen",
+              "Aufträge"
             ]
           },
           "felder": [],
@@ -178,14 +178,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Webhosting",
-              "Strafen",
-              "Erläuternder Text",
-              "Hinblick",
-              "Analyse Ihres",
-              "Prozesse",
-              "Ihres",
-              "Ausstattungen"
+              "Prozess",
+              "Verarbei",
+              "Internetdienstanbietern",
+              "Datenschutzgrundverordnung",
+              "Informations",
+              "Industrie",
+              "Abläufen",
+              "Sätzen"
             ]
           },
           "felder": [],
@@ -251,13 +251,13 @@
             "zahlen": [],
             "begriffe": [
               "Gegebenheiten",
-              "Geplanter Zeitrahmen",
+              "Erläuterungen",
               "Ausgangslage",
               "Ergebnisse",
+              "Terminierung",
               "Grund",
               "Entfernungen",
-              "Terminierung",
-              "Erläuterungen"
+              "Geplanter Zeitrahmen"
             ]
           },
           "felder": [],
@@ -321,9 +321,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Bindungsfrist",
-              "Formale Information",
               "Angebots",
+              "Formale Information",
+              "Bindungsfrist",
               "Kontaktdaten",
               "Datum",
               "Ansprechpartner",
@@ -467,10 +467,10 @@
             "zahlen": [],
             "begriffe": [
               "Gewalt",
-              "Pfeil",
-              "Prozessors",
               "Prozessorsockel",
+              "Pfeil",
               "Oberseite",
+              "Prozessors",
               "CPU"
             ]
           },
@@ -536,9 +536,9 @@
             "zahlen": [],
             "begriffe": [
               "Kontaktflächen",
-              "Wärmeleitpaste",
+              "Unebenheiten",
               "Wärmeleiter",
-              "Unebenheiten"
+              "Wärmeleitpaste"
             ]
           },
           "felder": [],
@@ -595,12 +595,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Belegung",
-              "Riegel",
               "Handbuch",
-              "Kanäle",
+              "Riegel",
               "Speichergröße",
               "Einsetzen",
+              "Kanäle",
+              "Belegung",
               "RAM"
             ]
           },
@@ -660,9 +660,9 @@
             "begriffe": [
               "Motherboard",
               "Meist",
-              "Schneller",
               "Teurer",
               "Kompakte Bauweise",
+              "Schneller",
               "Anschlüsse",
               "Nachteil",
               "Vorteil"
@@ -722,8 +722,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "DVI",
-              "HDMI"
+              "HDMI",
+              "DVI"
             ]
           },
           "felder": [],
@@ -896,8 +896,8 @@
             "zahlen": [],
             "begriffe": [
               "Beidseitig",
-              "Höhere Stromversorgung",
-              "Höhere Datenrate"
+              "Höhere Datenrate",
+              "Höhere Stromversorgung"
             ]
           },
           "felder": [],
@@ -983,12 +983,12 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Kerne",
-              "Threads",
-              "Teilung",
               "Prozessorkern",
-              "Hyperthreading",
               "Prozessoren",
+              "Kerne",
+              "Teilung",
+              "Threads",
+              "Hyperthreading",
               "CPU"
             ]
           },
@@ -1074,9 +1074,9 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Cache-Speicher",
               "Cache",
               "Speichermedium",
-              "Cache-Speicher",
               "Zwischenspeicher",
               "Zugriffe",
               "Anzahl"
@@ -1170,8 +1170,8 @@
               }
             ],
             "begriffe": [
-              "000.000",
-              "3.400"
+              "3.400",
+              "000.000"
             ]
           },
           "felder": [],
@@ -1246,8 +1246,8 @@
             "begriffe": [
               "SSID",
               "WLAN",
-              "Netzes",
               "PSK",
+              "Netzes",
               "Passwort"
             ]
           },
@@ -1313,14 +1313,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "RADIUS",
-              "Komplizierter",
-              "Nutzern",
-              "EAP",
-              "Verfahren",
+              "PW",
               "Kombination",
+              "Unsicher",
+              "WPA",
+              "Verfahren",
               "Mittlere",
-              "Unsicher"
+              "Kleine Unternehmen",
+              "RADIUS"
             ]
           },
           "felder": [],
@@ -1384,14 +1384,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Möglicher Fehler",
-              "Serverkonfiguration",
-              "UDP",
               "Transportschicht",
-              "Schicht Name",
               "Ethernet",
-              "Segments",
-              "Falsche"
+              "Falsche",
+              "Verwendete",
+              "Schicht Name",
+              "UDP",
+              "Serverkonfiguration",
+              "Möglicher Fehler"
             ]
           },
           "felder": [
@@ -1504,11 +1504,11 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
+              "Aktivität",
               "Datenübertragungsrate",
+              "Signalqualität",
               "Medienstatus",
               "Interpretation",
-              "Signalqualität",
-              "Aktivität",
               "OSI",
               "Schicht",
               "Fehler"
@@ -1576,8 +1576,8 @@
             "zahlen": [],
             "begriffe": [
               "Netzwerkkarte",
-              "Hersteller",
               "MAC",
+              "Hersteller",
               "Adresse"
             ]
           },
@@ -1766,9 +1766,9 @@
             ],
             "begriffe": [
               "Broadcastadresse",
-              "0.255",
               "Hostadresse",
               "0.0",
+              "0.255",
               "0.52",
               "Netzadresse",
               "192.168"
@@ -1841,8 +1841,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Fehlerursache",
               "Zuteilung",
+              "Fehlerursache",
               "IP"
             ]
           },
@@ -1911,10 +1911,10 @@
             "begriffe": [
               "Lizenzmanagement",
               "Updatemanagement",
-              "Softwarekonfiguration",
-              "Inventur",
+              "Softwareverteilung",
               "Patchmanagement",
-              "Softwareverteilung"
+              "Inventur",
+              "Softwarekonfiguration"
             ]
           },
           "felder": [],
@@ -1971,14 +1971,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Fehlende Verfügbarkeit",
-              "Störung",
-              "Möglicherweise Speicherung",
-              "Cloud-Anbieter",
-              "Internetzuganges",
+              "Hackerangriffe",
               "Stets",
-              "Ausland",
-              "Hackerangriffe"
+              "Investitionskosten",
+              "Möglicherweise Speicherung",
+              "Fehlende Verfügbarkeit",
+              "Cloud-Anbieter",
+              "Bessere Skalierbarkeit",
+              "Ausland"
             ]
           },
           "felder": [],
@@ -2036,14 +2036,14 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Stundenlohn",
-              "105.000",
-              "900.000",
+              "1.005",
               "4.020",
-              "Lizenzen",
-              "Preis Lizenz",
               "100.500",
-              "1.005"
+              "Preis Lizenz",
+              "Eigenfertigung",
+              "Stundenlohn",
+              "Lizenzen",
+              "105.000"
             ]
           },
           "felder": [],
@@ -2085,8 +2085,8 @@
           "pruefung": {
             "zahlen": [],
             "begriffe": [
-              "Abbildung",
               "Lösungsseite",
+              "Abbildung",
               "Musterlösung"
             ]
           },
@@ -2159,10 +2159,10 @@
               }
             ],
             "begriffe": [
-              "Upstream",
-              "Dateigröße",
-              "Mibyte",
               "40.000",
+              "Upstream",
+              "Mibyte",
+              "Dateigröße",
               "1.024"
             ]
           },

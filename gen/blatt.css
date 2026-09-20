@@ -202,6 +202,37 @@ table.gwf tr.falsch td{background:var(--red-soft)}
 .gzusammen .txt{flex:1 1 260px; font-size:13.5px; color:var(--muted); line-height:1.65}
 .gzusammen .txt b{color:var(--ink)}
 
+/* ---------- Offene Wertungen -------------------------------------------
+   Freitext, den die Wortprüfung nicht voll anerkannt hat. Der Kasten steht
+   im Abschluss und nimmt die ganze Breite — er ist keine Randnotiz, sondern
+   der Schritt, ohne den die Prozentzahl darüber nichts wert ist.         */
+.gst-offen{color:var(--warn) !important}
+
+.goffen{flex:1 1 100%; margin-top:16px; padding-top:14px; border-top:1px solid var(--rule)}
+.goffen h4{margin:0 0 4px; font-family:var(--display); font-size:14px}
+.goffen-hin{margin:0 0 12px; font-size:12.5px; color:var(--muted); line-height:1.55}
+
+.goffen-zeile{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start;
+  padding:10px 0; border-top:1px solid var(--rule-soft)}
+.goffen-txt{flex:1 1 240px; min-width:0}
+.goffen-frage{font-size:13px; font-weight:700}
+.goffen-meine{font-size:13px; line-height:1.55; margin-top:3px;
+  padding:5px 8px; border-left:2px solid var(--rule); background:var(--field);
+  white-space:pre-wrap; overflow-wrap:anywhere}
+.goffen-soll{font-size:12px; color:var(--muted); margin-top:3px; font-family:var(--data)}
+.goffen-knopfe{display:flex; gap:6px; flex-wrap:wrap; flex:0 0 auto}
+.goffen-k{min-height:40px; padding:6px 13px; cursor:pointer; font:inherit; font-size:12.5px;
+  font-family:var(--display); font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--muted); background:var(--card); border:1px solid var(--rule); border-radius:3px}
+.goffen-k:hover{border-color:var(--pruefer); color:var(--pruefer)}
+.goffen-hinweg{text-transform:none; letter-spacing:0; font-weight:400}
+
+@media (max-width:700px){
+  .goffen-knopfe{width:100%}
+  .goffen-k{flex:1 1 22%}
+}
+@media print{ .goffen{display:none} }
+
 @media print{
   .gen-leiste, .gwerkzeug, .gloesung, .gmerksatz, .grueck{display:none !important}
   .gaufgabe{break-inside:avoid; page-break-inside:avoid; border:1px solid #999; margin-bottom:6pt}

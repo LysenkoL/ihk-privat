@@ -127,3 +127,32 @@ svg.er-svg text{font-family:var(--display); fill:var(--ink)}
   svg.er-svg text{fill:#000}
   .er-t-kard{fill:#000}
 }
+
+/* ---------------------------------------------------------------------------
+   Startblock der ER-Übungsaufgaben (gen/er-uebung.js)
+   -------------------------------------------------------------------------
+   Drei Karten, eine Zeile pro Aufgabe. Bewusst wie die Rechenaufgaben
+   aufgebaut — es ist dieselbe Handlung: aussuchen und loslegen.
+   ------------------------------------------------------------------------ */
+.erue-innen{padding:0 14px 14px}
+.erue-satz{font-size:13px; color:var(--muted); line-height:1.6; margin:2px 0 12px}
+
+.erue-liste{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
+.erue-karte{display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  cursor:pointer; font:inherit; min-height:52px; padding:9px 12px;
+  background:var(--paper); color:var(--ink);
+  border:1px solid var(--rule); border-radius:4px}
+.erue-karte:hover{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.erue-karte.fertig{border-left:3px solid var(--ok)}
+.erue-txt{flex:1 1 auto; min-width:0}
+.erue-titel{font-size:13.5px; font-weight:700; line-height:1.3}
+.erue-meta{font-size:11.5px; color:var(--muted); font-family:var(--data); margin-top:2px}
+.erue-los{flex:0 0 auto; font-family:var(--display); text-transform:uppercase;
+  letter-spacing:.08em; font-size:10px; font-weight:700; color:var(--pruefer)}
+
+@media (max-width:700px){
+  .erue-innen{padding:0 10px 12px}
+  .erue-karte{padding:9px 10px}
+  .erue-innen > .btn{width:100%}
+}
+@media print{ #erUebungBlock{display:none} }

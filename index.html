@@ -25,7 +25,6 @@
 <link rel="stylesheet" href="gen/handgriffe.css">
 <link rel="stylesheet" href="gen/endspurt.css">
 <link rel="stylesheet" href="gen/druck.css">
-<link rel="stylesheet" href="gen/druckbogen.css">
 <style>
   :root{
     --paper:#FCFCFA; --card:#FFFFFF; --ink:#14171C; --muted:#5E6570;
@@ -405,6 +404,8 @@
   table.prio tbody tr:hover{background:var(--field)}
   .prio-thema{font-weight:600}
   .prio-thema small{display:block; font-weight:400; color:var(--muted); font-size:12px}
+  /* Eine Quote aus drei BE sieht sonst aus wie eine aus achtzig. */
+  .prio-thema small b.duenn{color:var(--warn); font-weight:700}
   .spur{height:10px; background:var(--rule-soft); border-radius:0 2px 2px 0; overflow:hidden;
         min-width:110px}
   .spur i{display:block; height:100%; border-radius:0 4px 4px 0}
@@ -4282,6 +4283,7 @@ schirm("scStart");
 <script src="gen/druckbogen.js"></script>
 <script src="gen/er-daten.js"></script>
 <script src="gen/er.js"></script>
+<script src="gen/er-uebung.js"></script>
 <script src="gen/gantt-daten.js"></script>
 <script src="gen/gantt.js"></script>
 <script src="gen/auftrag.js"></script>

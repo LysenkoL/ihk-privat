@@ -122,8 +122,17 @@ window.GENUI = (function () {
     const k = el("div", "gen-karte" + (b.bewertet ? " fertig" : ""));
     k.appendChild(el("h3", null, b.titel));
     const m = el("div", "meta");
+    /* Die Prozentzahl auf der Karte rechnet jetzt über das Beurteilte, nicht
+       über das ganze Blatt — sonst steht bei einem halb bearbeiteten Blatt
+       eine Zahl, die niemand so gemeint hat.                            */
+    const bl = bilanz(b);
     m.textContent = b.aufgaben.length + " Aufgaben · " + nz(b.maxPoints) + " BE" +
-      (b.bewertet ? " · " + nz(b.punkte) + " BE erreicht (" + Math.round(b.punkte / b.maxPoints * 100) + " %)" : "");
+      (bl.geprueft && bl.quote != null
+        ? " · " + nz(bl.zaehler) + " von " + nz(bl.nenner) + " BE bewertet (" +
+          Math.round(bl.quote * 100) + " %)" +
+          (bl.offenBe > 0 ? " · " + nz(bl.offenBe) + " BE offen" : "") +
+          (bl.teilweise && bl.modus === "uebung" ? " · nur teilweise bearbeitet" : "")
+        : "");
     k.appendChild(m);
     if (b.themenLabel) k.appendChild(el("div", "meta", b.themenLabel));
     if (b.papierErgebnis) {
@@ -1079,8 +1088,43 @@ window.GENUI = (function () {
     const KLICK = { auswahl: 1, mehrfachwahl: 1, aussagen: 1, zuordnung: 1 };
     let kBe = 0, kP = 0;
     erg.felder.forEach(r => { if (KLICK[r.typ]) { kBe += r.be || 0; kP += r.punkte || 0; } });
-    BLATT.ergebnisse[i] = { punkte: erg.punkte, max: erg.max,
-                            klickBe: G.runde(kBe, 2), klickPunkte: G.runde(kP, 2) };
+
+    /* -------------------------------------------------------------------
+       Drei Töpfe statt einem.
+
+       Die Wortprüfung kann „richtig gesagt, nur anders formuliert“ nicht
+       von „falsch“ unterscheiden. Sie hat es trotzdem getan, und zwar mit
+       null Punkten — auf einem Blatt mit viel Freitext kam so ein Ergebnis
+       von 2 von 28 BE heraus, obwohl die Antworten weitgehend stimmten.
+       Diese Zahl ist danach als IHK-Note ausgewiesen worden, und sie ist
+       in die Statistik eingeflossen. Beides war falsch.
+
+       Deshalb:
+         sicher  — eindeutig maschinell prüfbar (Zahlen, Ankreuzen,
+                   Zuordnen) plus vollständig erkannter Freitext plus
+                   alles, was selbst gewertet wurde
+         offen   — Freitext, den die Wortprüfung nicht voll anerkannt hat
+                   und der noch nicht selbst gewertet ist
+         leer    — nichts eingetragen; zählt in der Übung gar nicht mit,
+                   in der Simulation dagegen als null
+       ---------------------------------------------------------------- */
+    let sicherBe = 0, sicherP = 0, offenBe = 0, offenVorschlag = 0, bearbeitetBe = 0;
+    erg.felder.forEach(r => {
+      const be = r.be || 0;
+      if (r.status === "leer") return;
+      bearbeitetBe += be;
+      const unsicher = SELBST_TYPEN[r.typ] && !r.selbst && (r.punkte || 0) < be - 0.001;
+      if (unsicher) { offenBe += be; offenVorschlag += r.punkte || 0; r.unsicher = true; }
+      else { sicherBe += be; sicherP += r.punkte || 0; }
+    });
+
+    BLATT.ergebnisse[i] = {
+      punkte: erg.punkte, max: erg.max,
+      klickBe: G.runde(kBe, 2), klickPunkte: G.runde(kP, 2),
+      bearbeitetBe: G.runde(bearbeitetBe, 2),
+      sicherBe: G.runde(sicherBe, 2), sicherPunkte: G.runde(sicherP, 2),
+      offenBe: G.runde(offenBe, 2), offenVorschlag: G.runde(offenVorschlag, 2)
+    };
 
     const box = $("gfelder-" + i);
     erg.felder.forEach(r => {
@@ -1101,7 +1145,11 @@ window.GENUI = (function () {
       karte.classList.add(q > 0.99 ? "richtig" : (q > 0 ? "teil" : "falsch"));
       rand.classList.add(q > 0.99 ? "ok" : (q > 0 ? "halb" : "nein"));
       rand.querySelector(".wert").innerHTML = nz(erg.punkte) + "<small>von " + nz(a.maxPoints) + " BE</small>";
-      if (!ohneStat) statMerken(a.vorlageId, erg.punkte, a.maxPoints);
+      /* In die Statistik geht nur, was wirklich beurteilt ist: leere Felder
+         und noch nicht bewerteter Freitext würden die Quote sonst nach
+         unten ziehen, ohne dass jemand etwas falsch gemacht hat.        */
+      const s = BLATT.ergebnisse[i];
+      if (!ohneStat && s.sicherBe > 0) statMerken(a.vorlageId, s.sicherPunkte, s.sicherBe);
     }
 
     const rueck = $("grueck-" + i);
@@ -1381,15 +1429,68 @@ window.GENUI = (function () {
     STAT[id] = s; store.set(SK.stat, STAT);
   }
 
+  /* ---------------------------------------------------------------------
+     Die Bilanz eines Blatts an EINER Stelle. Alles, was eine Prozentzahl
+     zeigt — Stand, Abschluss, Archiv, Statistik —, rechnet ab hier gleich.
+
+       modus "uebung"   Nenner = beurteilte BE (leer zählt nicht mit)
+       modus "pruefung" Nenner = das ganze Blatt (leer zählt als null,
+                        denn in der Prüfung ist ein leeres Feld null)
+     -------------------------------------------------------------------- */
+  function bilanz(blatt) {
+    const b = blatt || BLATT;
+    const erg = b.ergebnisse || {};
+    const keys = Object.keys(erg);
+    let sicherBe = 0, sicherP = 0, offenBe = 0, offenVor = 0, bearbeitet = 0, roh = 0, rohMax = 0;
+    keys.forEach(k => {
+      const e = erg[k];
+      /* Ältere Blätter kennen die Aufteilung noch nicht — dort gilt alles
+         Geprüfte als sicher, damit sie weiter auswertbar bleiben.      */
+      const hat = e.sicherBe != null;
+      sicherBe += hat ? e.sicherBe : (e.max || 0);
+      sicherP  += hat ? e.sicherPunkte : (e.punkte || 0);
+      offenBe  += hat ? e.offenBe : 0;
+      offenVor += hat ? e.offenVorschlag : 0;
+      bearbeitet += hat ? e.bearbeitetBe : (e.max || 0);
+      roh += e.punkte || 0; rohMax += e.max || 0;
+    });
+    const gesamtBe = b.maxPoints || rohMax;
+    const pruefung = !!b.pruefung;
+    const nenner = pruefung ? gesamtBe : sicherBe;
+    const zaehler = pruefung ? (sicherP + offenVor) : sicherP;
+    return {
+      modus: pruefung ? "pruefung" : "uebung",
+      sicherBe: G.runde(sicherBe, 2), sicherPunkte: G.runde(sicherP, 2),
+      offenBe: G.runde(offenBe, 2), offenVorschlag: G.runde(offenVor, 2),
+      bearbeitetBe: G.runde(bearbeitet, 2), gesamtBe: G.runde(gesamtBe, 2),
+      geprueft: keys.length, aufgaben: (b.aufgaben || []).length,
+      quote: nenner > 0 ? zaehler / nenner : null,
+      zaehler: G.runde(zaehler, 2), nenner: G.runde(nenner, 2),
+      teilweise: bearbeitet < gesamtBe - 0.001,
+      /* Ab wann ist eine Note überhaupt aussagekräftig? Wenn mehr als ein
+         Zehntel des Bearbeiteten noch auf die eigene Wertung wartet,
+         steht die Zahl auf zu dünnem Eis.                              */
+      /* … und aus zu wenigen Punkten lässt sich ohnehin keine Note ableiten.
+         Zehn BE sind etwa eine große Prüfungsaufgabe — darunter ist die
+         Zahl Zufall.                                                     */
+      belastbar: offenBe <= 0.1 * Math.max(1, bearbeitet) && sicherBe >= 10
+    };
+  }
+
   function standAktualisieren() {
     const erz = Object.keys(BLATT.ergebnisse);
-    const p = erz.reduce((s, k) => s + BLATT.ergebnisse[k].punkte, 0);
-    const m = erz.reduce((s, k) => s + BLATT.ergebnisse[k].max, 0);
-    BLATT.punkte = G.runde(p, 2);
-    BLATT.bewertet = erz.length === AUFG.length;
+    const b = bilanz();
+    BLATT.punkte = b.sicherPunkte;
+    BLATT.bearbeitetBe = b.bearbeitetBe;
+    BLATT.sicherBe = b.sicherBe;
+    BLATT.offenBe = b.offenBe;
+    BLATT.bewertet = erz.length === AUFG.length && b.offenBe <= 0.001;
     const st = $("genStand");
     if (st) st.innerHTML = erz.length
-      ? nz(G.runde(p, 2)) + " / " + nz(m) + " BE <small>geprüft · " + erz.length + " von " + AUFG.length + " Aufgaben</small>"
+      ? nz(b.sicherPunkte) + " / " + nz(b.sicherBe) + " BE <small>bewertet · " +
+        erz.length + " von " + AUFG.length + " Aufgaben" +
+        (b.offenBe > 0 ? ' · <b class="gst-offen">' + nz(b.offenBe) + " BE selbst bewerten</b>" : "") +
+        "</small>"
       : "<small>" + AUFG.length + " Aufgaben · " + nz(BLATT.maxPoints) + " BE gesamt</small>";
     sichern();
   }
@@ -1401,33 +1502,116 @@ window.GENUI = (function () {
   }
 
   function abschluss() {
-    const p = AUFG.reduce((s, a, i) => s + ((BLATT.ergebnisse[i] || {}).punkte || 0), 0);
-    const m = BLATT.maxPoints;
-    const proz = m ? Math.round(p / m * 100) : 0;
-    const n = window.note ? window.note(proz) : { note: "—", text: "" };
+    const b = bilanz();
+    const proz = b.quote == null ? null : Math.round(b.quote * 100);
+    const n = (proz != null && window.note) ? window.note(proz) : { note: "—", text: "" };
 
-    /* schwächste Themen dieses Blatts */
+    /* schwächste Themen dieses Blatts — auch hier nur über Beurteiltes */
     const proThema = {};
     AUFG.forEach((a, i) => {
       const e = BLATT.ergebnisse[i]; if (!e) return;
       const t = proThema[a.themaLabel] || (proThema[a.themaLabel] = { p: 0, m: 0 });
-      t.p += e.punkte; t.m += e.max;
+      t.p += (e.sicherPunkte != null ? e.sicherPunkte : e.punkte);
+      t.m += (e.sicherBe != null ? e.sicherBe : e.max);
     });
-    const schwach = Object.keys(proThema).map(k => ({ k, q: proThema[k].p / Math.max(1, proThema[k].m) }))
-      .sort((a, b) => a.q - b.q).slice(0, 3);
+    const schwach = Object.keys(proThema).filter(k => proThema[k].m > 0)
+      .map(k => ({ k, q: proThema[k].p / proThema[k].m }))
+      .sort((a, b2) => a.q - b2.q).slice(0, 3);
 
     const z = $("genAbschluss");
     z.hidden = false;
-    z.innerHTML = '<div><span class="eyebrow">Ergebnis</span><div class="zahl">' + proz + ' %</div></div>' +
-      '<div><span class="eyebrow">IHK-Note</span><div class="zahl">' + n.note + '</div></div>' +
-      '<div class="txt"><b>' + nz(G.runde(p, 2)) + " von " + nz(m) + " BE</b> — " + esc(n.text) + ".<br>" +
-      (schwach.length ? "Schwächstes Thema hier: <b>" + esc(schwach[0].k) + "</b> (" +
-        Math.round(schwach[0].q * 100) + " %). " : "") +
-      "Die Prüfung ist bestanden ab 50 %. Ein neues Blatt mit denselben Themen liefert andere Zahlen — " +
-      "so lange, bis der Rechenweg sitzt.</div>" +
-      (BLATT.pruefung ? quotenKasten() + zeitAuswertung(p, m) : "");
+
+    const zeigeNote = proz != null && b.belastbar;
+    z.innerHTML =
+      '<div><span class="eyebrow">Ergebnis</span><div class="zahl">' +
+        (proz == null ? "—" : proz + " %") + '</div></div>' +
+      '<div><span class="eyebrow">IHK-Note</span><div class="zahl">' +
+        (zeigeNote ? n.note : "—") + '</div></div>' +
+      '<div class="txt">' + bilanzText(b, zeigeNote ? n : null) +
+      (schwach.length ? "<br>Schwächstes Thema hier: <b>" + esc(schwach[0].k) + "</b> (" +
+        Math.round(schwach[0].q * 100) + " %)." : "") + "</div>" +
+      (BLATT.pruefung ? quotenKasten() + zeitAuswertung(b.zaehler, b.nenner) : "");
+
+    offeneLeiste(z, b);
     z.scrollIntoView({ behavior: "smooth", block: "center" });
     sichern();
+  }
+
+  /** Der erklärende Satz unter den beiden großen Zahlen. */
+  function bilanzText(b, n) {
+    const t = [];
+    if (b.modus === "pruefung") {
+      t.push("<b>" + nz(b.zaehler) + " von " + nz(b.gesamtBe) + " BE</b> — in der Simulation " +
+             "zählt das ganze Blatt, ein leeres Feld ist null Punkte.");
+    } else {
+      t.push("<b>" + nz(b.sicherPunkte) + " von " + nz(b.sicherBe) + " bewerteten BE</b>" +
+             (n ? " — " + esc(n.text) + "." : "."));
+      if (b.teilweise)
+        t.push("Teilbearbeitung: " + nz(b.bearbeitetBe) + " von " + nz(b.gesamtBe) +
+               " BE des Blattes angefasst. Was du nicht angefasst hast, zählt hier nicht " +
+               "gegen dich — im Prüfungsmodus dagegen schon.");
+    }
+    if (b.offenBe > 0)
+      t.push('<b class="gst-offen">' + nz(b.offenBe) + " BE warten auf deine Wertung.</b> " +
+             "Die Wortprüfung vergleicht Formulierungen; wo du dieselbe Sache anders gesagt " +
+             "hast, kann sie das nicht sehen. Solange das offen ist, " +
+             (b.belastbar ? "verschiebt sich die Zahl noch." : "steht hier keine Note."));
+    t.push("Bestanden ist ab 50 %.");
+    return t.join("<br>");
+  }
+
+  /* ---------------------------------------------------------------------
+     Die offenen Freitextfelder in einer Liste, mit drei Knöpfen je Zeile.
+     Vorher musste man dafür durch das ganze Blatt scrollen und jedes Feld
+     einzeln suchen — entsprechend selten ist es passiert, und entsprechend
+     falsch waren die Zahlen danach.
+     -------------------------------------------------------------------- */
+  function offeneLeiste(z, b) {
+    if (!b.offenBe) return;
+    const kasten = el("div", "goffen");
+    kasten.appendChild(el("h4", null, "Selbst bewerten — " + nz(b.offenBe) + " BE"));
+    kasten.appendChild(el("p", "goffen-hin",
+      "Vergleiche deine Antwort mit der Musterlösung und entscheide. Halb heißt: " +
+      "die Sache ist getroffen, aber Begründung oder Fachbegriff fehlen."));
+
+    AUFG.forEach((a, i) => {
+      const e = BLATT.ergebnisse[i];
+      if (!e || !e.offenBe) return;
+      const erg = G.pruefeAufgabe(a, BLATT.antworten[i] || {});
+      erg.felder.forEach(r => {
+        const be = r.be || 0;
+        if (!SELBST_TYPEN[r.typ] || r.status === "leer") return;
+        if (selbstWert(i, r.nr) != null) return;
+        if ((r.punkte || 0) >= be - 0.001) return;
+        const zeile = el("div", "goffen-zeile");
+        const txt = el("div", "goffen-txt");
+        txt.appendChild(el("div", "goffen-frage",
+          (i + 1) + ". " + (r.label || a.titel || "Freitext") + " · " + nz(be) + " BE"));
+        const meine = String((BLATT.antworten[i] || {})[r.nr] || "").trim();
+        txt.appendChild(el("div", "goffen-meine", meine.length > 160 ? meine.slice(0, 160) + " …" : meine));
+        if (r.fehlt && r.fehlt.length)
+          txt.appendChild(el("div", "goffen-soll", "erwartet: " + r.fehlt.slice(0, 3).join(" · ")));
+        zeile.appendChild(txt);
+
+        const knopfe = el("div", "goffen-knopfe");
+        const halb = G.runde(be / 2, 2);
+        [["ganz", be], ["halb", halb], ["null", 0]].forEach(([name, wert]) => {
+          if (name === "halb" && !(halb > 0 && halb < be)) return;
+          const k = el("button", "goffen-k", name);
+          k.type = "button";
+          k.onclick = () => { selbstSetzen(i, r.nr, wert); abschluss(); };
+          knopfe.appendChild(k);
+        });
+        const hin = el("button", "goffen-k goffen-hinweg", "↗ ansehen");
+        hin.type = "button";
+        hin.title = "Zur Aufgabe springen und die Musterlösung aufklappen";
+        hin.onclick = () => { loesungZeigen(i); $("gauf-" + i).scrollIntoView({ behavior: "smooth", block: "center" }); };
+        knopfe.appendChild(hin);
+        zeile.appendChild(knopfe);
+        kasten.appendChild(zeile);
+      });
+    });
+    z.appendChild(kasten);
   }
 
   /**
@@ -1641,5 +1825,6 @@ window.GENUI = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
   else einhaengen();
 
-  return { erzeugeBlatt, oeffne, assistent, startBox, speichern: sichern, abgeben, archivieren };
+  return { erzeugeBlatt, oeffne, assistent, startBox, speichern: sichern, abgeben, archivieren,
+           bilanz, blaetter: () => BLAETTER };
 })();
