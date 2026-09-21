@@ -271,11 +271,13 @@ window.GENSTART = (function () {
   function kopfBauen() {
     const s = $("scStart");
     if (!s) return;
+    const intro = s.querySelector(".start-intro");
+    const anker = intro ? intro.nextSibling : s.firstChild;
     if (!$("stKopf")) {
       const k = el("div", "st-kopf"); k.id = "stKopf";
-      s.insertBefore(k, s.firstChild);
-    } else if (s.firstChild !== $("stKopf")) {
-      s.insertBefore($("stKopf"), s.firstChild);
+      s.insertBefore(k, anker);
+    } else if ($("stKopf").previousElementSibling !== intro) {
+      s.insertBefore($("stKopf"), anker);
     }
     kopfAktualisieren();
   }
@@ -302,11 +304,32 @@ window.GENSTART = (function () {
     }
     k.appendChild(leiste);
 
+    /* Vier scannbare Kennzahlen: bewusst keine eigene Navigation, sondern
+       eine kurze Lageübersicht vor der heutigen Empfehlung. */
+    const stats = el("dl", "dashboard-stats");
+    const stat = (label, value, hint, tone) => {
+      const item = el("div", "dashboard-stat" + (tone ? " is-" + tone : ""));
+      item.appendChild(el("dt", null, label));
+      item.appendChild(el("dd", null, value));
+      item.appendChild(el("span", null, hint));
+      stats.appendChild(item);
+    };
+    stat("Prüfungen", String(z.pruefungen), z.begonnen + " begonnen");
+    stat("Arbeitsblätter", String(z.blaetter), z.vorlagen + " Aufgabentypen");
+    stat("Offene Fehler", String(z.fehlerOffen), z.fehlerOffen ? "im Journal" : "alles erledigt",
+      z.fehlerOffen >= 5 ? "warn" : "ok");
+    stat("Prognose", z.prognose == null ? "—" : z.prognose + " %",
+      z.prognose == null ? "noch keine Daten" : "aus bewerteten Aufgaben");
+    k.appendChild(stats);
+
     /* Empfehlung */
-    const h = el("div", "st-heute");
+    const h = el("section", "st-heute");
+    h.setAttribute("aria-labelledby", "stHeuteTitel");
     const links = el("div", "st-htxt");
     links.appendChild(el("div", "st-hlabel", "Heute"));
-    links.appendChild(el("div", "st-htitel", e.titel));
+    const heuteTitel = el("h2", "st-htitel", e.titel);
+    heuteTitel.id = "stHeuteTitel";
+    links.appendChild(heuteTitel);
     links.appendChild(el("div", "st-hwarum", e.warum));
     h.appendChild(links);
     const b = el("button", "btn primary st-hknopf", e.knopf);
@@ -317,13 +340,18 @@ window.GENSTART = (function () {
 
     /* Kacheln */
     const g = el("div", "st-kacheln");
+    g.setAttribute("role", "list");
+    g.setAttribute("aria-label", "Schnellzugriffe");
     const kachel = (name, unten, ziel, warn) => {
       const t = el("button", "st-kachel" + (warn ? " warn" : ""));
       t.type = "button";
       t.appendChild(el("span", "st-kn", name));
       t.appendChild(el("span", "st-ku", unten));
       t.onclick = ziel;
-      g.appendChild(t);
+      const item = el("div", "st-kachel-wrap");
+      item.setAttribute("role", "listitem");
+      item.appendChild(t);
+      g.appendChild(item);
     };
     kachel("Prüfungen", z.begonnen ? z.begonnen + " von " + z.pruefungen + " begonnen" : z.pruefungen + " echte Prüfungen",
       () => oeffneBlock("pruefungen"));
