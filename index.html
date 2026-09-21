@@ -818,6 +818,7 @@
 <script src="exams/exams.js"></script>
 <script src="gen/abbildungen.js"></script>
 <script src="gen/storage-tools.js"></script>
+<script src="gen/progress-tools.js"></script>
 <script>
 "use strict";
 
@@ -1971,10 +1972,16 @@ function refresh(){
   if (bew.length){
     const got = bew.reduce((a,s) => a + SCORES[s.k], 0);
     const max = bew.reduce((a,s) => a + (s.maxPoints||0), 0);
-    const proz = max ? Math.round(got / max * 100) : 0;
+    const stand = window.IHKProgressTools
+      ? IHKProgressTools.summary(got, max, beAll, bew.length, items.length)
+      : {gradedRate:max ? Math.round(got / max * 100) : 0,
+         examRate:beAll ? Math.round(got / beAll * 100) : 0,
+         complete:bew.length >= items.length};
+    const noteText = stand.complete ? "Note" : "Zwischennote";
     $("kPunkte").textContent = got + " / " + beAll + " BE";
     $("statNote").innerHTML = "Bewertet <b>" + bew.length + "/" + items.length +
-      "</b> · Stand <b>" + proz + "%</b> · Note <b>" + note(proz).note + "</b>";
+      "</b> · Trefferquote <b>" + stand.gradedRate + "%</b> · Prüfungsstand <b>" +
+      stand.examRate + "%</b> · " + noteText + " <b>" + note(stand.examRate).note + "</b>";
   } else {
     $("kPunkte").textContent = "— / " + beAll + " BE";
     $("statNote").textContent = "";
@@ -4168,7 +4175,8 @@ function ausSumme(){
   const offen = VIEW.items.filter(s => !hatPunkte(s)).length;
   const proz = max ? Math.round(got / max * 100) : 0;
   const n = note(proz);
-  $("ausUnter").innerHTML = "<b>" + got + " / " + max + " BE</b> · " + proz + "% · Note <b>" + n.note +
+  $("ausUnter").innerHTML = "<b>" + got + " / " + max + " BE</b> · " + proz +
+    "% · " + (offen ? "Zwischennote" : "Note") + " <b>" + n.note +
     "</b> (" + n.text + ")" + (offen ? " · " + offen + " noch nicht bewertet" : "");
   refresh();
 }
@@ -4189,11 +4197,16 @@ $("btnAusSpeichern").addEventListener("click", () => {
   renderStart(); schirm("scStart");
 });
 function themenErgebnis(items){
+  if (window.IHKProgressTools) return IHKProgressTools.distributeByTopics(items, SCORES);
   const m = {};
-  items.forEach(it => (it.topics || []).forEach(t => {
+  items.forEach(it => {
+    const topics = (it.topics && it.topics.length) ? it.topics : ["sonstiges"];
+    topics.forEach(t => {
     const e = m[t] || (m[t] = {got:0, max:0});
-    e.got += SCORES[it.k] || 0; e.max += it.maxPoints || 0;
-  }));
+      e.got += (SCORES[it.k] || 0) / topics.length;
+      e.max += (it.maxPoints || 0) / topics.length;
+    });
+  });
   return m;
 }
 
