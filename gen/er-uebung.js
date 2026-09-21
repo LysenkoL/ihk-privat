@@ -288,6 +288,74 @@ window.GENERUEBUNG = (function () {
     alle.onclick = () => starte(UEBUNGEN, "alle drei Übungen");
     innen.appendChild(alle);
 
+    /* ------------------------------------------------------------------
+       Gewürfelte Aufgaben. Drei feste Übungen sind nach zwei Abenden
+       auswendig gelernt; hier kommt bei jedem Klick ein anderer Betrieb
+       mit anderem Ausschnitt. Die Wahl daneben bestimmt, worauf es in der
+       Aufgabe ankommen soll.
+       ------------------------------------------------------------------ */
+    if (window.GENERGEN) {
+      innen.appendChild(el("div", "erue-trenner"));
+      innen.appendChild(el("p", "erue-satz",
+        "Oder eine neue Aufgabe würfeln: ein anderer Betrieb, ein anderer Ausschnitt " +
+        "aus seinem Datenmodell. Dieselbe Saat ergibt wieder dieselbe Aufgabe — " +
+        "zum Wiederholen und zum Ausdrucken."));
+
+      const wunsch = { entitaeten: 3, beziehungen: 3, nm: true, vorgabe: true };
+      const stell = el("div", "erue-stell");
+
+      const gruppe = (titel, felder) => {
+        const g = el("div", "erue-gruppe");
+        g.appendChild(el("span", "erue-lbl", titel));
+        felder.forEach(f => g.appendChild(f));
+        stell.appendChild(g);
+      };
+      const schalter = (txt, an, tun) => {
+        const k = el("button", "erue-sch" + (an() ? " an" : ""), txt);
+        k.type = "button";
+        k.onclick = () => { tun(); [...stell.querySelectorAll(".erue-sch")].forEach(x => x.__auf && x.__auf()); };
+        k.__auf = () => k.classList.toggle("an", an());
+        return k;
+      };
+
+      gruppe("Entitäten:", [
+        schalter("3", () => wunsch.entitaeten === 3, () => { wunsch.entitaeten = 3; }),
+        schalter("4", () => wunsch.entitaeten === 4, () => { wunsch.entitaeten = 4; })
+      ]);
+      gruppe("Beziehungen:", [
+        schalter("nur 1:n", () => !wunsch.nm, () => { wunsch.nm = false; }),
+        schalter("mit n:m", () => wunsch.nm, () => { wunsch.nm = true; })
+      ]);
+      gruppe("Vorgabe:", [
+        schalter("eine Entität steht schon da", () => wunsch.vorgabe,
+          () => { wunsch.vorgabe = !wunsch.vorgabe; })
+      ]);
+      innen.appendChild(stell);
+
+      const reihe = el("div", "erue-knopfe");
+      const wuerfeln = el("button", "btn primary", "Aufgabe würfeln");
+      wuerfeln.type = "button";
+      wuerfeln.onclick = () => {
+        const a = window.GENERGEN.neu(Object.assign({}, wunsch));
+        if (!a) { if (window.toast) window.toast("Für diese Auswahl gibt es keinen Ausschnitt."); return; }
+        window.GENERGEN.starten(a);
+      };
+      reihe.appendChild(wuerfeln);
+
+      const frueher = window.GENERGEN.liste();
+      if (frueher.length) {
+        const wieder = el("button", "btn ghost", "letzte noch einmal");
+        wieder.type = "button";
+        wieder.title = "Saat " + frueher[0].saat;
+        wieder.onclick = () => {
+          const a = window.GENERGEN.ausSaat(frueher[0].saat, frueher[0].wunsch);
+          if (a) window.GENERGEN.starten(a);
+        };
+        reihe.appendChild(wieder);
+      }
+      innen.appendChild(reihe);
+    }
+
     det.appendChild(innen);
     return det;
   }

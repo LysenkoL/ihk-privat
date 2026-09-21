@@ -156,3 +156,18 @@ svg.er-svg text{font-family:var(--display); fill:var(--ink)}
   .erue-innen > .btn{width:100%}
 }
 @media print{ #erUebungBlock{display:none} }
+
+/* Gewürfelte Aufgaben: Auswahl und Knöpfe im Übungsblock */
+.erue-trenner{height:1px; background:var(--rule); margin:14px 0 12px}
+.erue-stell{display:flex; flex-wrap:wrap; gap:8px 18px; margin-bottom:11px}
+.erue-gruppe{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.erue-lbl{font-size:12px; color:var(--muted)}
+.erue-sch{min-height:36px; padding:5px 12px; cursor:pointer; font:inherit; font-size:12.5px;
+  color:var(--muted); background:var(--card);
+  border:1px solid var(--rule); border-radius:4px}
+.erue-sch:hover{border-color:var(--pruefer); color:var(--pruefer)}
+.erue-sch.an{border-color:var(--pruefer); background:var(--pruefer-soft);
+  color:var(--pruefer); font-weight:700}
+.erue-knopfe{display:flex; flex-wrap:wrap; gap:8px}
+.erue-knopfe .btn{min-height:44px}
+@media (max-width:700px){ .erue-knopfe .btn{flex:1 1 100%} }

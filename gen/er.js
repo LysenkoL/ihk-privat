@@ -515,15 +515,79 @@ window.GENER = (function () {
     }
     function geaendert() { sichere(k, daten); neuzeichnen(); }
 
-    box.appendChild(el("div", "er-unter", "Entitäten"));
-    box.appendChild(tabelle([
+    /* ---------------------------------------------------------------------
+       Zwei Eingabearten auf DENSELBEN Daten.
+
+       Tippen ist am Telefon schneller, Zeichnen am großen Bildschirm. Beide
+       verändern `daten.ent` und `daten.bez`, deshalb kostet das Umschalten
+       nichts und der Prüfer sieht keinen Unterschied. Gemerkt wird die Wahl
+       im Browser; voreingestellt ist sie nach Bildschirmbreite.
+       ------------------------------------------------------------------ */
+    const MSK = "ihk2:er:modus";
+    const breitGenug = () => (window.innerWidth || 0) >= 760;
+    let modus = "tabelle";
+    try { modus = localStorage.getItem(MSK) || (breitGenug() ? "zeichnen" : "tabelle"); } catch (e) {
+      modus = breitGenug() ? "zeichnen" : "tabelle";
+    }
+    if (!window.GENERCANVAS) modus = "tabelle";
+
+    const umschalter = el("div", "er-modus");
+    const tabBereich = el("div", "er-bereich");
+    const zeichenBereich = el("div", "er-bereich");
+
+    function bereicheZeigen() {
+      tabBereich.hidden = modus !== "tabelle";
+      zeichenBereich.hidden = modus !== "zeichnen";
+      [...umschalter.children].forEach(b => b.classList.toggle("an", b.dataset.modus === modus));
+      if (modus === "zeichnen") zeichenBereichFuellen();
+      else neuzeichnen();
+    }
+    let zeichenGebaut = false;
+    function zeichenBereichFuellen() {
+      if (zeichenGebaut) return;
+      zeichenGebaut = true;
+      zeichenBereich.innerHTML = "";
+      zeichenBereich.appendChild(el("div", "er-unter", "Zeichnen"));
+      zeichenBereich.appendChild(window.GENERCANVAS.bau(daten, () => {
+        sichere(k, daten);
+        /* Die Tabellen werden beim nächsten Umschalten neu aufgebaut —
+           deshalb hier nur merken, dass sie veraltet sind.            */
+        tabellenVeraltet = true;
+      }, loes));
+    }
+    let tabellenVeraltet = false;
+
+    [["tabelle", "Tabellen"], ["zeichnen", "Zeichnen"]].forEach(([m, txt]) => {
+      const b = el("button", null, txt);
+      b.type = "button"; b.dataset.modus = m;
+      if (m === "zeichnen" && !window.GENERCANVAS) b.disabled = true;
+      b.onclick = () => {
+        modus = m;
+        try { localStorage.setItem(MSK, m); } catch (e) { }
+        if (m === "tabelle" && tabellenVeraltet) {
+          /* Auf der Fläche angelegte Entitäten und Beziehungen müssen in
+             den Tabellen auftauchen — die zeichnen ihre Zeilen einmal beim
+             Aufbau, also wird der ganze Block neu aufgebaut.           */
+          tabellenVeraltet = false;
+          const neuerBlock = baue(karte, it, loes);
+          box.parentNode.replaceChild(neuerBlock, box);
+          return;
+        }
+        bereicheZeigen();
+      };
+      umschalter.appendChild(b);
+    });
+    box.appendChild(umschalter);
+
+    tabBereich.appendChild(el("div", "er-unter", "Entitäten"));
+    tabBereich.appendChild(tabelle([
       { key: "name", label: "Entität", platz: "z. B. Artikel" },
       { key: "pk", label: "Primärschlüssel", platz: "z. B. AID" },
       { key: "attr", label: "weitere Attribute (Komma)", platz: "Name, Gewicht" }
     ], daten.ent, geaendert, { plus: "+ Entität" }));
 
-    box.appendChild(el("div", "er-unter", "Beziehungen"));
-    box.appendChild(tabelle([
+    tabBereich.appendChild(el("div", "er-unter", "Beziehungen"));
+    tabBereich.appendChild(tabelle([
       { key: "von", label: "von" },
       { key: "name", label: "Beziehung", platz: "z. B. verladen" },
       { key: "nach", label: "nach" },
@@ -531,9 +595,12 @@ window.GENER = (function () {
       { key: "attr", label: "Attribute an der Beziehung", platz: "nur bei n:m" }
     ], daten.bez, geaendert, { plus: "+ Beziehung" }));
 
-    box.appendChild(el("div", "er-unter", "So sieht es aus"));
-    box.appendChild(bild);
+    tabBereich.appendChild(el("div", "er-unter", "So sieht es aus"));
+    tabBereich.appendChild(bild);
     neuzeichnen();
+
+    box.append(tabBereich, zeichenBereich);
+    bereicheZeigen();
 
     /* --- Knöpfe --- */
     const pruefKnopf = el("button", "btn", "ER-Modell prüfen");

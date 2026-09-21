@@ -1,0 +1,101 @@
+/* ============================================================================
+   gen/er-canvas.css — Zeichenfläche für das ER-Modell
+   ----------------------------------------------------------------------------
+   Die Fläche soll aussehen wie kariertes Papier und sich anfassen lassen wie
+   Papier: das Raster blass, die Formen schwarz auf weiß, und Farbe nur dort,
+   wo sie etwas bedeutet — die Auswahl. Alles andere wäre Dekoration auf
+   einem Blatt, das am Ende von Hand gezeichnet werden muss.
+   ========================================================================== */
+
+.ec-wurzel{border:1px solid var(--rule); border-radius:4px; background:var(--card);
+  overflow:hidden}
+
+/* ------------------------------------------------------------- Leiste --- */
+.ec-leiste{display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+  padding:8px 10px; background:var(--field); border-bottom:1px solid var(--rule)}
+.ec-k{min-height:38px; padding:6px 12px; cursor:pointer; font:inherit; font-size:12.5px;
+  font-family:var(--display); font-weight:700; letter-spacing:.03em;
+  color:var(--ink); background:var(--card);
+  border:1px solid var(--rule); border-radius:4px; white-space:nowrap}
+.ec-k:hover{border-color:var(--pruefer); color:var(--pruefer)}
+.ec-k.ec-prim{color:var(--pruefer); border-color:var(--rule)}
+.ec-k.ec-an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.ec-meldung{font-size:12.5px; color:var(--pruefer); line-height:1.4; flex:1 1 180px}
+
+/* ------------------------------------------------------------ Fläche --- */
+.ec-flaeche{overflow:auto; -webkit-overflow-scrolling:touch;
+  background:var(--paper); max-height:min(70vh, 640px)}
+svg.ec-svg{display:block; touch-action:none}
+
+.ec-raster{fill:none; stroke:var(--rule-soft); stroke-width:1}
+
+.ec-linie{stroke:var(--ink); stroke-width:1.3; fill:none}
+.ec-kasten{fill:var(--card); stroke:var(--ink); stroke-width:1.6}
+.ec-raute{fill:var(--card); stroke:var(--ink); stroke-width:1.6}
+.ec-ellipse{fill:var(--card); stroke:var(--ink); stroke-width:1.3}
+.ec-ellipse.ec-pk{stroke-width:2}
+
+svg.ec-svg text{font-family:var(--display); fill:var(--ink); pointer-events:none;
+  -webkit-user-select:none; user-select:none}
+.ec-t-ent{font-size:14px; font-weight:700}
+.ec-t-bez{font-size:12.5px}
+.ec-t-attr{font-size:12px}
+.ec-t-pk{text-decoration:underline; font-weight:700}
+.ec-t-kard{font-size:13px; font-family:var(--data); font-weight:700; fill:var(--pruefer)}
+
+/* Der ganze Knoten ist die Greiffläche — nicht nur der Strich. */
+.ec-knoten{cursor:grab; touch-action:none}
+.ec-knoten:active{cursor:grabbing}
+.ec-knoten:hover .ec-kasten, .ec-knoten:hover .ec-raute, .ec-knoten:hover .ec-ellipse{
+  stroke:var(--pruefer)}
+.ec-gewaehlt .ec-kasten, .ec-gewaehlt .ec-raute, .ec-gewaehlt .ec-ellipse{
+  stroke:var(--pruefer); stroke-width:2.6; fill:var(--pruefer-soft)}
+/* Vorgegebene Entitäten: dürfen bewegt, aber nicht umbenannt oder gelöscht
+   werden — das zeigt der graue Rand.                                     */
+.ec-fest .ec-kasten{stroke-dasharray:none; fill:var(--field)}
+
+/* --------------------------------------------------------------- Fuß --- */
+.ec-fuss{display:flex; flex-wrap:wrap; gap:7px; align-items:center;
+  padding:8px 10px; border-top:1px solid var(--rule); background:var(--field);
+  min-height:44px}
+.ec-was{font-size:13px; font-weight:700; margin-right:4px}
+.ec-hilfe{font-size:12px; color:var(--muted); line-height:1.45}
+.ec-kard{min-height:38px; padding:5px 8px; font:inherit; font-size:13px;
+  font-family:var(--data); background:var(--card); color:var(--ink);
+  border:1px solid var(--rule); border-radius:4px}
+.ec-doppel{font-family:var(--data); font-weight:700}
+
+/* ------------------------------------------------------- Umschalter --- */
+/* Zwei Eingabearten, eine Wahl. Sie steht oben im ER-Block, damit sie beim
+   Öffnen sofort sichtbar ist.                                           */
+.er-modus{display:flex; gap:0; margin:2px 0 10px; border:1px solid var(--rule);
+  border-radius:4px; overflow:hidden; width:fit-content}
+.er-modus button{min-height:40px; padding:7px 16px; cursor:pointer; font:inherit;
+  font-size:12.5px; font-family:var(--display); font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em;
+  color:var(--muted); background:var(--card); border:0}
+.er-modus button + button{border-left:1px solid var(--rule)}
+.er-modus button.an{background:var(--pruefer); color:#fff}
+.er-modus button:not(.an):hover{background:var(--pruefer-soft); color:var(--pruefer)}
+
+@media (max-width:700px){
+  .ec-leiste{padding:7px 8px; gap:5px}
+  .ec-k{padding:6px 10px; font-size:12px}
+  .ec-flaeche{max-height:62vh}
+  .er-modus{width:100%}
+  .er-modus button{flex:1 1 50%}
+}
+
+@media print{
+  .ec-leiste, .ec-fuss, .er-modus{display:none !important}
+  .ec-wurzel{border:1px solid #999}
+  .ec-flaeche{overflow:visible; max-height:none; background:#fff}
+  svg.ec-svg{width:100% !important; height:auto !important}
+  .ec-raster{stroke:#EEE}
+  .ec-linie, .ec-kasten, .ec-raute, .ec-ellipse{stroke:#000}
+  .ec-kasten, .ec-raute, .ec-ellipse{fill:#fff}
+  .ec-gewaehlt .ec-kasten, .ec-gewaehlt .ec-raute, .ec-gewaehlt .ec-ellipse{
+    stroke:#000; stroke-width:1.6; fill:#fff}
+  svg.ec-svg text{fill:#000}
+  .ec-t-kard{fill:#000}
+}
