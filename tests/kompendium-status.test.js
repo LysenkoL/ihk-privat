@@ -61,6 +61,9 @@ function article(slug) {
 
 assert.doesNotMatch(article("cloud-modelle-iaas-paas-saas"), /Für die AP1 sind vor allem\s*<strong>IaaS, PaaS und SaaS/i);
 assert.doesNotMatch(article("algorithmen-ablaufdiagramme"), /Besonders wichtig sind Programmablaufplan \(PAP\)/i);
+assert.doesNotMatch(article("algorithmen-ablaufdiagramme"), /Algorithmus, PAP, Struktogramm, Pseudocode und Aktivitätsdiagramm unterscheiden/i);
+assert.doesNotMatch(article("algorithmen-ablaufdiagramme"), /PAP-Symbole lesen und anwenden/i);
+assert.doesNotMatch(article("algorithmen-ablaufdiagramme"), /Struktogramm lesen und erstellen/i);
 assert.doesNotMatch(article("datensicherungskonzepte"), /Für die AP1 sind[^<]{0,120}RAID-Level/i);
 
 console.log("kompendium-status: catalog and empty-answer behavior OK");

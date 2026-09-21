@@ -2,6 +2,7 @@
 
 const assert = require("assert");
 const tools = require("../gen/storage-tools.js");
+assert.equal(tools.API_VERSION, 2);
 
 function fakeStorage(start) {
   const data = new Map(Object.entries(start || {}));

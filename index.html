@@ -3938,6 +3938,16 @@ $("importDatei").addEventListener("change", e => {
     let d;
     try { d = JSON.parse(r.result); } catch { return toast("Keine gültige JSON-Datei."); }
     if (d.typ !== "ihk-ap1-fortschritt") return toast("Das ist keine Fortschrittsdatei.");
+    if (d.speicher && (!window.IHKStorageTools ||
+        IHKStorageTools.API_VERSION !== 2 ||
+        typeof IHKStorageTools.mergeUniqueBy !== "function" ||
+        typeof IHKStorageTools.replaceAppStorage !== "function")) {
+      window.__ihkImport = "abbruch";
+      alert("Import noch nicht gestartet: Programmdateien stammen aus unterschiedlichen Versionen. " +
+            "Bitte die Seite neu laden und den Import danach wiederholen.");
+      toast("Bitte erst neu laden — dein Stand wurde nicht verändert.");
+      return;
+    }
     /* Wie viel steckt in der Datei, wie viel liegt hier? Eine ältere Datei
        (Version 2) kennt die Antworten der zehn Prüfungen und das Archiv gar
        nicht — beim „ersetzen“ würde sie den hiesigen Stand mit Leere

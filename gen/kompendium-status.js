@@ -110,6 +110,12 @@
         [/Algorithmen & Ablaufdiagramme in der AP1/g, "Algorithmen: aktueller AP1-Kern und historische Darstellungen"],
         [/Typische AP1-Anforderungen/g, "Aktuelle AP1-Anforderungen und historischer Vergleich"],
         [/PAP- oder Struktogramm-Symbole verstehen/g, "PAP und Struktogramm nur historisch einordnen"],
+        [/Algorithmus, PAP, Struktogramm, Pseudocode und Aktivitätsdiagramm unterscheiden/g,
+          "Algorithmus, Pseudocode und UML-Aktivitätsdiagramm anwenden; PAP und Struktogramm historisch einordnen"],
+        [/PAP-Symbole lesen und anwenden/g, "PAP-Symbole nur historisch einordnen"],
+        [/Struktogramm lesen und erstellen/g, "Struktogramme nur historisch einordnen"],
+        [/Für die AP1 solltest du können:/g,
+          "Für AP1 solltest du den aktuellen Kern können; historische Darstellungen dienen nur der Einordnung:"],
         [/PAP und Struktogramme bleiben aber als Grundlagen/g,
           "PAP und Struktogramme dienen nur noch als historischer Vergleich"],
         [/AP1-Kernidee/g, "Kataloghinweis"]

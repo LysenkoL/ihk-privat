@@ -100,6 +100,7 @@
   }
 
   return {
+    API_VERSION: 2,
     appKeys,
     replaceAppStorage,
     mergeUniqueBy,
