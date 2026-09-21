@@ -522,6 +522,11 @@
 
 <!-- ===================== START ===================== -->
 <div class="seite" id="scStart">
+  <header class="start-intro">
+    <span class="eyebrow">IHK AP1 · Prüfungsvorbereitung</span>
+    <h1>Dein Lerncockpit</h1>
+    <p>Prüfungen bearbeiten, gezielt üben und den eigenen Fortschritt nachvollziehen.</p>
+  </header>
   <div class="abschnitt">
     <h2>Prüfungen</h2>
     <p id="startZusammenfassung">—</p>
@@ -534,11 +539,11 @@
     <div class="chips" id="themenChips"></div>
     <div class="steuer">
       <div class="feld">
-        <span class="eyebrow">Anzahl</span>
+        <label class="eyebrow" for="drillAnzahl">Anzahl</label>
         <input type="number" id="drillAnzahl" min="1" max="120" value="10">
       </div>
       <div class="feld">
-        <span class="eyebrow">Reihenfolge</span>
+        <label class="eyebrow" for="drillOrder">Reihenfolge</label>
         <select id="drillOrder">
           <option value="mix">gemischt</option>
           <option value="jahr">nach Jahrgang</option>
@@ -564,7 +569,7 @@
        „ER-Modell &amp; UML“ enthält feste Aufgaben aus echten Prüfungen.</p>
     <div class="steuer">
       <div class="feld">
-        <span class="eyebrow">Vorgänge</span>
+        <label class="eyebrow" for="netzAnzahl">Vorgänge</label>
         <input type="number" id="netzAnzahl" min="5" max="14" value="8">
       </div>
       <button class="btn primary" id="btnNetzZufall">Netzplan üben</button>
@@ -584,7 +589,7 @@
     <p id="kkZusammenfassung">—</p>
     <div class="steuer">
       <div class="feld">
-        <span class="eyebrow">Typ</span>
+        <label class="eyebrow" for="kkTyp">Typ</label>
         <select id="kkTyp">
           <option value="alle">alle</option>
           <option value="begriff">nur Begriffe</option>
@@ -601,6 +606,7 @@
     <p>Volltextsuche über alle Aufgaben und Musterlösungen.</p>
     <div class="steuer">
       <div class="feld" style="flex:1">
+        <label class="sr-only" for="sucheFeld">Aufgaben und Musterlösungen durchsuchen</label>
         <input type="search" id="sucheFeld" placeholder="z. B. Subnetzmaske, Skonto, Härtung …" style="width:100%">
       </div>
     </div>
@@ -631,6 +637,7 @@
       <button class="btn" id="btnImport">Fortschritt importieren</button>
       <button class="btn ghost" id="btnAllesLoeschen">Alles löschen</button>
     </div>
+    <label class="sr-only" for="importDatei">Fortschrittsdatei auswählen</label>
     <input type="file" id="importDatei" accept=".json,application/json" hidden>
   </div>
 </div>
@@ -721,7 +728,7 @@
     <p id="modellIntro">—</p>
     <div class="steuer">
       <div class="feld">
-        <span class="eyebrow">Aufgabe</span>
+        <label class="eyebrow" for="modellWahl">Aufgabe</label>
         <select id="modellWahl"></select>
       </div>
       <button class="btn primary" id="btnModellPruefen">Struktur prüfen</button>

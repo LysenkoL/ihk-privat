@@ -46,8 +46,16 @@ html.gesperrt body > *:not(#authLock) {
 .al-sub {
   font-size: 13.5px;
   color: var(--muted, #5E6570);
-  margin: 0 0 22px 0;
+  margin: 0 0 8px 0;
   line-height: 1.4;
+}
+
+.al-hinweis {
+  max-width: 285px;
+  margin: 0 auto 20px;
+  color: var(--muted, #5E6570);
+  font-size: 11.5px;
+  line-height: 1.45;
 }
 
 .al-pin-dots {

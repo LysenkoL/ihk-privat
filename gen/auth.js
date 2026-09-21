@@ -1,8 +1,8 @@
 /* ============================================================================
-   gen/auth.js — Zugangsschutz für den IHK AP1 Prüfungssimulator
+   gen/auth.js — lokale Gerätesperre für den IHK AP1 Prüfungssimulator
    ----------------------------------------------------------------------------
-   Aufgabe: Sicherstellen, dass nur die Eigentümerin die Anwendung nutzen kann,
-   ohne dass sie jedes Mal ein Passwort eingeben muss.
+   Aufgabe: Versehentliches Öffnen auf demselben Gerät erschweren, ohne den
+   lokalen Offline-Betrieb zu beeinträchtigen. Dies ist keine Server-Anmeldung.
 
    Funktionsweise:
    1. Einmalige Freischaltung über PIN (2026) oder geheimen Link (?key=2026).
@@ -29,10 +29,12 @@ window.GENAUTH = (function () {
   }
 
   async function pruefePin(pin) {
-    if (pin === "2026") return true;
     const h = await sha256(pin);
     return h === PIN_HASH;
   }
+
+  let vorherigerFokus = null;
+  let keydownHandler = null;
 
   function freigeschaltet() {
     try { return localStorage.getItem(SK) === "1"; } catch (e) { return false; }
@@ -48,6 +50,13 @@ window.GENAUTH = (function () {
     document.documentElement.classList.remove("gesperrt");
     const lock = document.getElementById("authLock");
     if (lock) lock.remove();
+    if (keydownHandler) {
+      document.removeEventListener("keydown", keydownHandler);
+      keydownHandler = null;
+    }
+    if (vorherigerFokus && typeof vorherigerFokus.focus === "function") {
+      try { vorherigerFokus.focus(); } catch (e) { }
+    }
     if (typeof window.renderStart === "function") {
       try { window.renderStart(); } catch (e) { }
     }
@@ -80,11 +89,16 @@ window.GENAUTH = (function () {
 
     const wrap = document.createElement("div");
     wrap.id = "authLock";
+    wrap.setAttribute("role", "dialog");
+    wrap.setAttribute("aria-modal", "true");
+    wrap.setAttribute("aria-labelledby", "alTitel");
+    wrap.setAttribute("aria-describedby", "alSub");
     wrap.innerHTML =
       '<div class="al-box" id="alBox">' +
-        '<div class="al-icon">🔒</div>' +
-        '<h2 class="al-titel">IHK AP1 Simulator</h2>' +
-        '<p class="al-sub">Geschützter Bereich · Bitte PIN eingeben</p>' +
+        '<div class="al-icon" aria-hidden="true">🔒</div>' +
+        '<h2 class="al-titel" id="alTitel">IHK AP1 Simulator</h2>' +
+        '<p class="al-sub" id="alSub">Lokale Gerätesperre · PIN eingeben</p>' +
+        '<p class="al-hinweis">Schützt vor versehentlichem Öffnen auf diesem Gerät, nicht vor technischem Zugriff.</p>' +
         '<div class="al-pin-dots" id="alDots">' +
           '<div class="al-dot"></div><div class="al-dot"></div>' +
           '<div class="al-dot"></div><div class="al-dot"></div>' +
@@ -103,9 +117,10 @@ window.GENAUTH = (function () {
           '<button type="button" class="al-key" data-k="0">0</button>' +
           '<button type="button" class="al-key al-del" data-k="B">⌫</button>' +
         '</div>' +
-        '<div class="al-fehler" id="alFehler"></div>' +
+        '<div class="al-fehler" id="alFehler" aria-live="assertive" aria-atomic="true"></div>' +
       '</div>';
 
+    vorherigerFokus = document.activeElement;
     document.body.appendChild(wrap);
 
     const dots = wrap.querySelectorAll(".al-dot");
@@ -155,13 +170,27 @@ window.GENAUTH = (function () {
       btn.addEventListener("click", () => tasteGedrueckt(btn.getAttribute("data-k")));
     });
 
-    document.addEventListener("keydown", ev => {
+    keydownHandler = ev => {
       if (document.getElementById("authLock")) {
+        if (ev.key === "Tab") {
+          const controls = Array.from(wrap.querySelectorAll("button:not([disabled])"));
+          if (!controls.length) return;
+          const first = controls[0], last = controls[controls.length - 1];
+          if (ev.shiftKey && document.activeElement === first) {
+            ev.preventDefault(); last.focus();
+          } else if (!ev.shiftKey && document.activeElement === last) {
+            ev.preventDefault(); first.focus();
+          }
+          return;
+        }
         if (/^[0-9]$/.test(ev.key)) tasteGedrueckt(ev.key);
         else if (ev.key === "Backspace") tasteGedrueckt("B");
         else if (ev.key === "Escape") tasteGedrueckt("C");
       }
-    });
+    };
+    document.addEventListener("keydown", keydownHandler);
+    const ersteTaste = wrap.querySelector(".al-key");
+    if (ersteTaste) ersteTaste.focus();
   }
 
   if (document.readyState === "loading") {
