@@ -291,6 +291,14 @@ window.GENKOMP = (function () {
       s.title = "Die Kollegin hat diese Seite selbst als „Nicht gelernt“ markiert — sie ist fast leer.";
       a.appendChild(s);
     }
+    if (window.IHKKompStatus) {
+      const katalog = IHKKompStatus.forSlug(t.id);
+      if (katalog.code !== "ap1") {
+        const s = el("span", "kp-stand ist-katalog-" + katalog.code, katalog.label);
+        s.title = katalog.text;
+        a.appendChild(s);
+      }
+    }
     a.appendChild(el("span", "kp-pfeil", "›"));
     a.onclick = () => oeffnen(t.id);
     return a;
@@ -492,6 +500,7 @@ window.GENKOMP = (function () {
 
     laden(t.id).then(h => {
       inhalt.innerHTML = h || "<p class=\"hint\">Diese Seite ist in der Sammlung noch leer.</p>";
+      if (window.IHKKompStatus) IHKKompStatus.decorate(inhalt, t.id);
       inhalt.querySelectorAll("table").forEach(tab => {
         if (tab.closest(".k-tab")) return;
         const w = el("div", "k-tab");

@@ -232,3 +232,44 @@ body.liest-runter .sp-leiste{top:0}
 .kp-gross-tab th,.kp-gross-tab td{border:1px solid var(--rule-soft);
   padding:7px 10px; text-align:left; vertical-align:top}
 .kp-gross-tab th{background:var(--field); font-weight:700; white-space:nowrap}
+/* Katalogstatus: AP2- und Vertiefungsstoff bleibt zugänglich, aber eindeutig. */
+.kp-kataloghinweis{
+  display:grid;
+  grid-template-columns:max-content 1fr;
+  gap:8px 12px;
+  align-items:start;
+  margin:0 0 22px;
+  padding:13px 15px;
+  border:1px solid var(--rule);
+  border-left:4px solid var(--pruefer);
+  border-radius:6px;
+  background:var(--pruefer-soft);
+  color:var(--ink);
+}
+.kp-kataloghinweis strong{
+  font-family:var(--display);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:12px;
+}
+.kp-kataloghinweis span{color:var(--muted); font-size:13px}
+.kp-kataloghinweis.ist-ap2{border-left-color:var(--red); background:var(--red-soft)}
+.kp-kataloghinweis.ist-vertiefung{border-left-color:var(--warn); background:var(--warn-soft)}
+.kp-antwort-fehlt{
+  margin:5px 0 16px;
+  padding:10px 12px;
+  border-left:3px solid var(--warn);
+  background:var(--warn-soft);
+  color:var(--muted);
+  font-style:italic;
+}
+.kp-quellenhinweis{
+  margin:18px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+.kp-stand.ist-katalog-ap2{color:var(--red); border-color:currentColor}
+.kp-stand.ist-katalog-vertiefung{color:var(--warn); border-color:currentColor}
+@media(max-width:560px){
+  .kp-kataloghinweis{grid-template-columns:1fr}
+}
