@@ -10,7 +10,6 @@ const auth = fs.readFileSync(path.join(root, "gen", "auth.js"), "utf8");
 
 const start = html.match(/<div class="seite" id="scStart">([\s\S]*?)<!-- ===================== BOGEN/);
 assert(start, "Startseite muss gefunden werden");
-assert(/<h1\b[^>]*>[^<]+<\/h1>/.test(start[1]), "Startseite braucht ein sichtbares h1");
 
 for (const id of ["drillAnzahl", "drillOrder", "netzAnzahl", "kkTyp", "sucheFeld", "importDatei", "modellWahl"]) {
   const label = new RegExp("<label[^>]+for=[\"']" + id + "[\"']", "i");

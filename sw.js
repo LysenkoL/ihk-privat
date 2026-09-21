@@ -25,7 +25,7 @@
 /* Bei jeder Veröffentlichung hochzählen — dann wirft der Worker den alten
    Programm-Cache weg und holt alles frisch. Die Bilder bleiben davon
    unberührt.                                                              */
-const VERSION   = "ihk-ap1-v27";
+const VERSION   = "ihk-ap1-v28";
 const CACHE_APP = VERSION + "-app";
 const CACHE_BILD = "ihk-ap1-bilder";       /* ohne Version — bleibt bestehen */
 
@@ -48,7 +48,6 @@ const GRUNDGERUEST = [
   "./gen/auth.js",
   "./gen/blatt.css",
   "./gen/blatt.js",
-  "./gen/dashboard-modern.css",
   "./gen/druck.css",
   "./gen/druck.js",
   "./gen/druckbogen.css",

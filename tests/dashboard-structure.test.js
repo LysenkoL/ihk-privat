@@ -8,10 +8,11 @@ const root = path.join(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const start = fs.readFileSync(path.join(root, "gen", "start.js"), "utf8");
 
-assert(/gen\/dashboard-modern\.css/.test(html), "современный слой стилей должен быть подключён");
-assert(/dashboard-stats/.test(start), "дашборд должен создавать группу компактных показателей");
-assert(/setAttribute\("role",\s*"list"\)/.test(start), "группа быстрых действий должна быть списком");
-assert(/st-kachel-wrap/.test(start), "каждое быстрое действие должно иметь семантический listitem");
-assert(/aria-labelledby/.test(start), "блок рекомендации должен иметь доступное название");
+assert(!/gen\/dashboard-modern\.css/.test(html), "неудачный глобальный слой дашборда должен быть удалён");
+assert(!/start-intro/.test(html), "лишний заголовок Lerncockpit не должен занимать место");
+assert(!/dashboard-stats/.test(start), "лишняя группа показателей должна быть удалена");
+assert(!/st-kachel-wrap/.test(start), "быстрые действия должны снова быть прямыми элементами сетки");
+assert(/s\.insertBefore\(k,\s*s\.firstChild\)/.test(start), "исходный дашборд должен стоять первым");
+assert(/g\.appendChild\(t\)/.test(start), "исходные быстрые действия должны рендериться напрямую");
 
-console.log("dashboard-structure: semantic dashboard shell OK");
+console.log("dashboard-structure: proven compact layout restored");
