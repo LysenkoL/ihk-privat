@@ -97,18 +97,14 @@ window.GENPWA = (function () {
     const links = el("div");
     links.appendChild(el("h3", null, "Auf dem Handy als App"));
     const p = el("p");
-    p.innerHTML = istIOS()
-      ? "In <b>Safari</b> unten auf <b>Teilen</b> tippen und <b>„Zum Home-Bildschirm“</b> wählen. " +
-        "Danach startest du den Simulator wie eine App — ohne Adressleiste und <b>ohne Netz</b>: " +
-        "alle zehn Prüfungen, alle Generatoren und die Simulation laufen offline weiter."
-      : "Einmal installieren, dann läuft der Simulator wie eine App — ohne Adressleiste und " +
-        "<b>ohne Netz</b>: alle zehn Prüfungen, alle Generatoren und die Simulation laufen offline weiter.";
+    const copy = window.IHKPwaCopy;
+    p.innerHTML = copy
+      ? copy.installDescription(istIOS())
+      : "Die App-Oberfläche und bereits geladene Inhalte funktionieren offline.";
     links.appendChild(p);
     if (istIOS()) {
-      const hin = el("p", "pwa-klein",
-        "Wichtig: die App auf dem Home-Bildschirm hat auf dem iPhone einen eigenen Speicher. " +
-        "Dein Stand aus Safari kommt nicht automatisch mit — nimm ihn über „Fortschritt exportieren“ " +
-        "als Datei mit und importiere ihn dort einmal.");
+      const hin = el("p", "pwa-klein", copy ? copy.iosStorageNote() :
+        "Die App auf dem Home-Bildschirm hat auf dem iPhone einen eigenen Speicher.");
       links.appendChild(hin);
     }
     k.appendChild(links);
