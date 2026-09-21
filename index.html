@@ -817,6 +817,7 @@
 
 <script src="exams/exams.js"></script>
 <script src="gen/abbildungen.js"></script>
+<script src="gen/storage-tools.js"></script>
 <script>
 "use strict";
 
@@ -3882,7 +3883,11 @@ function importAlsDurchgangSichern(sp){
 }
 
 $("btnExport").addEventListener("click", () => {
-  const daten = {typ:"ihk-ap1-fortschritt", version:3, exportiert:new Date().toISOString(),
+  const daten = {typ:"ihk-ap1-fortschritt", version:4,
+                 backupId:(globalThis.crypto && crypto.randomUUID
+                   ? crypto.randomUUID()
+                   : "backup-" + Date.now() + "-" + Math.random().toString(36).slice(2)),
+                 exportiert:new Date().toISOString(),
                  /* Version 2 bleibt lesbar, falls eine ältere Fassung die Datei öffnet */
                  answers:ANSWERS, scores:SCORES, timer:TIMERS, attempts:ATTEMPTS, cards:KKSTAT,
                  speicher: alleSpeicherwerte()};
@@ -3948,19 +3953,45 @@ $("importDatei").addEventListener("change", e => {
        Mal, und zwar aus dem Zustand, den die Seite gerade im Kopf hat.
        Genau daran ging beim Zusammenführen eine lokale Antwort verloren. */
     if (d.speicher && typeof d.speicher === "object"){
+      const importKennung = window.IHKStorageTools
+        ? IHKStorageTools.backupFingerprint(d)
+        : null;
+      if (zusammen && importKennung &&
+          IHKStorageTools.hasImported(localStorage, importKennung)){
+        window.__ihkImport = "abbruch";
+        alert("Diese Sicherung wurde auf diesem Gerät bereits zusammengeführt.\n\n" +
+              "Zur Sicherheit werden Statistik und Lernzeit nicht noch einmal addiert.");
+        toast("Doppelter Import verhindert.");
+        return;
+      }
       let n = 0;
       importBericht = { listen: 0, zaehler: 0, felder: 0, konflikte: 0 };
       /* Erst den fremden Stand als Durchgang wegschreiben, dann mischen —
          sonst ist er nach dem Mischen nicht mehr rekonstruierbar. */
       const durchgaenge = zusammen ? importAlsDurchgangSichern(d.speicher) : 0;
-      Object.keys(d.speicher).forEach(k => {
-        if (k.indexOf(SPEICHER_PRAEFIX) !== 0) return;
-        const roh = d.speicher[k];
-        if (typeof roh !== "string") return;
-        n++;
-        if (zusammen) werteZusammen(k, roh);
-        else { try { localStorage.setItem(k, roh); } catch (err) { } }
-      });
+      if (zusammen){
+        Object.keys(d.speicher).forEach(k => {
+          if (k.indexOf(SPEICHER_PRAEFIX) !== 0) return;
+          const roh = d.speicher[k];
+          if (typeof roh !== "string") return;
+          n++;
+          werteZusammen(k, roh);
+        });
+        if (importKennung) IHKStorageTools.markImported(localStorage, importKennung);
+      } else if (window.IHKStorageTools) {
+        n = Object.keys(d.speicher).filter(k =>
+          k.indexOf(SPEICHER_PRAEFIX) === 0 && typeof d.speicher[k] === "string"
+        ).length;
+        IHKStorageTools.replaceAppStorage(localStorage, d.speicher, SPEICHER_PRAEFIX);
+      } else {
+        Object.keys(d.speicher).forEach(k => {
+          if (k.indexOf(SPEICHER_PRAEFIX) !== 0) return;
+          const roh = d.speicher[k];
+          if (typeof roh !== "string") return;
+          n++;
+          try { localStorage.setItem(k, roh); } catch (err) { }
+        });
+      }
       if (zusammen){
         const b = importBericht;
         alert("Zusammengeführt:\n\n" +
