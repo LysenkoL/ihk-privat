@@ -21,5 +21,6 @@ for (const id of ["drillAnzahl", "drillOrder", "netzAnzahl", "kkTyp", "sucheFeld
 assert(/setAttribute\("role",\s*"dialog"\)/.test(auth), "PIN-Sperre braucht role=dialog");
 assert(/setAttribute\("aria-modal",\s*"true"\)/.test(auth), "PIN-Sperre braucht aria-modal");
 assert(/aria-live="assertive"/.test(auth), "PIN-Fehler muss angekündigt werden");
+assert(/h \? h === PIN_HASH : pin === "2026"/.test(auth), "PIN braucht einen Fallback ohne Web Crypto");
 
 console.log("accessibility-structure: headings, labels and dialog semantics OK");

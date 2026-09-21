@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -13,7 +14,7 @@ EMPTY_ANSWER = re.compile(
     re.IGNORECASE,
 )
 
-CATALOG_CLASSIFIED = {
+RUNTIME_REWRITTEN = {
     "sql-grundlagen",
     "virtualisierung",
     "cloud-modelle-iaas-paas-saas",
@@ -40,9 +41,13 @@ def empty_answer_count(html: str) -> int:
 
 
 def unclassified_ap1_claims(slug: str, html: str) -> list[str]:
-    if slug in CATALOG_CLASSIFIED:
-        return []
-    return [match.group(0)[:180] for match in OUTDATED_WITH_AP1.finditer(html or "")]
+    result = []
+    for match in OUTDATED_WITH_AP1.finditer(html or ""):
+        claim = match.group(0)[:180]
+        if re.search(r"nicht mehr|historisch|Vertiefung|AP2", claim, re.IGNORECASE):
+            continue
+        result.append(claim)
+    return result
 
 
 def scan(root: Path) -> tuple[int, int, list[tuple[str, str]]]:
@@ -54,8 +59,11 @@ def scan(root: Path) -> tuple[int, int, list[tuple[str, str]]]:
         slug = path.stem
         empty += empty_answer_count(text)
         placeholders += len(SOURCE_PLACEHOLDER.findall(text))
-        for claim in unclassified_ap1_claims(slug, text):
-            stale.append((path.name, re.sub(r"\s+", " ", claim)))
+        # Эти статьи намеренно исправляются при показе, чтобы не менять
+        # импортированный исходник. Их итоговый текст проверяет Node-тест ниже.
+        if slug not in RUNTIME_REWRITTEN:
+            for claim in unclassified_ap1_claims(slug, text):
+                stale.append((path.name, re.sub(r"\s+", " ", claim)))
     return empty, placeholders, stale
 
 
@@ -71,7 +79,18 @@ def main() -> int:
         for filename, claim in stale:
             print(f"  {filename}: {claim}")
         return 1
-    print("Kompendium: keine unklassifizierten AP1-Widersprueche")
+    rendered = subprocess.run(
+        ["node", str(root / "tests" / "kompendium-status.test.js")],
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    if rendered.returncode:
+        print("Fehler in der Laufzeit-Katalogpruefung:")
+        print(rendered.stdout)
+        print(rendered.stderr)
+        return 1
+    print("Kompendium: Laufzeit-Katalogtexte geprueft")
     return 0
 
 

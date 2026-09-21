@@ -16,5 +16,8 @@ missing = [ref for ref in shell if f'"./{ref}"' not in worker]
 
 assert not missing, "not precached: " + ", ".join(missing)
 assert 'const VERSION   = "ihk-ap1-v26"' in worker
+install = worker[worker.index('self.addEventListener("install"'):worker.index('self.addEventListener("activate"')]
+assert ".catch(" not in install
+assert "await app.match(req)" in worker
 
 print(f"pwa-shell: {len(shell)} startup resources precached")

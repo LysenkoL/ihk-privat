@@ -3803,9 +3803,21 @@ function werteZusammen(schluessel, fremdRoh){
 
   const kennung = LISTEN_SCHLUESSEL[schluessel];
   if (kennung && Array.isArray(fremd)){
-    const liste = Array.isArray(eigen) ? eigen.slice() : [];
-    const da = new Set(liste.map(x => x && x[kennung]));
-    fremd.forEach(x => { if (x && !da.has(x[kennung])) { liste.push(x); importBericht.listen++; } });
+    let liste;
+    if (window.IHKStorageTools) {
+      const merged = IHKStorageTools.mergeUniqueBy(eigen, fremd, kennung);
+      liste = merged.items;
+      importBericht.listen += merged.added;
+    } else {
+      liste = Array.isArray(eigen) ? eigen.slice() : [];
+      const da = new Set(liste.map(x => x && x[kennung]));
+      fremd.forEach(x => {
+        if (!x || da.has(x[kennung])) return;
+        da.add(x[kennung]);
+        liste.push(x);
+        importBericht.listen++;
+      });
+    }
     liste.sort((a, b) => String(b.datum || "").localeCompare(String(a.datum || "")));
     try { localStorage.setItem(schluessel, JSON.stringify(liste)); } catch (e) { }
     return;
@@ -3997,7 +4009,19 @@ $("importDatei").addEventListener("change", e => {
         n = Object.keys(d.speicher).filter(k =>
           k.indexOf(SPEICHER_PRAEFIX) === 0 && typeof d.speicher[k] === "string"
         ).length;
-        IHKStorageTools.replaceAppStorage(localStorage, d.speicher, SPEICHER_PRAEFIX);
+        try {
+          IHKStorageTools.replaceAppStorage(localStorage, d.speicher, SPEICHER_PRAEFIX);
+        } catch (err) {
+          window.__ihkImport = "abbruch";
+          const rollbackFehler = err && err.rollbackError;
+          alert(rollbackFehler
+            ? "Import abgebrochen. Auch die Wiederherstellung des bisherigen Stands ist fehlgeschlagen. " +
+              "Bitte diese Seite geöffnet lassen und den Browser-Speicher prüfen."
+            : "Import abgebrochen: Der bisherige Stand wurde wiederhergestellt. " +
+              "Möglicherweise ist der Browser-Speicher voll.");
+          toast("Import fehlgeschlagen — bisheriger Stand bleibt erhalten.");
+          return;
+        }
       } else {
         Object.keys(d.speicher).forEach(k => {
           if (k.indexOf(SPEICHER_PRAEFIX) !== 0) return;

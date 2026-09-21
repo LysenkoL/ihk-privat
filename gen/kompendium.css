@@ -255,6 +255,7 @@ body.liest-runter .sp-leiste{top:0}
 .kp-kataloghinweis span{color:var(--muted); font-size:13px}
 .kp-kataloghinweis.ist-ap2{border-left-color:var(--red); background:var(--red-soft)}
 .kp-kataloghinweis.ist-vertiefung{border-left-color:var(--warn); background:var(--warn-soft)}
+.kp-kataloghinweis.ist-historisch{border-left-color:var(--warn); background:var(--warn-soft)}
 .kp-antwort-fehlt{
   margin:5px 0 16px;
   padding:10px 12px;

@@ -19,11 +19,50 @@
   }
 
   function replaceAppStorage(storage, incoming, prefix) {
-    appKeys(storage, prefix).forEach(key => storage.removeItem(key));
-    Object.keys(incoming || {}).forEach(key => {
-      if (key.indexOf(prefix) !== 0 || typeof incoming[key] !== "string") return;
-      storage.setItem(key, incoming[key]);
+    const oldKeys = appKeys(storage, prefix);
+    const before = {};
+    oldKeys.forEach(key => { before[key] = storage.getItem(key); });
+    const entries = Object.keys(incoming || {})
+      .filter(key => key.indexOf(prefix) === 0 && typeof incoming[key] === "string")
+      .map(key => [key, incoming[key]]);
+
+    try {
+      oldKeys.forEach(key => storage.removeItem(key));
+      entries.forEach(([key, value]) => storage.setItem(key, value));
+    } catch (error) {
+      /* localStorage kennt keine Transaktionen. Ein In-Memory-Snapshot hält
+         „alles ersetzen“ trotzdem verlustfrei, falls eine einzelne
+         setItem-Operation (z. B. wegen QuotaExceeded) scheitert. */
+      appKeys(storage, prefix).forEach(key => storage.removeItem(key));
+      try {
+        Object.keys(before).forEach(key => storage.setItem(key, before[key]));
+      } catch (rollbackError) {
+        try { error.rollbackError = rollbackError; } catch (ignore) { }
+      }
+      throw error;
+    }
+    return entries.length;
+  }
+
+  function mergeUniqueBy(local, incoming, key) {
+    const items = Array.isArray(local) ? local.slice() : [];
+    const token = value => {
+      if (!value || typeof value !== "object") return "value:" + JSON.stringify(value);
+      const id = value[key];
+      return id != null && String(id) !== ""
+        ? "id:" + String(id)
+        : "value:" + JSON.stringify(value);
+    };
+    const seen = new Set(items.map(token));
+    let added = 0;
+    (Array.isArray(incoming) ? incoming : []).forEach(value => {
+      const id = token(value);
+      if (seen.has(id)) return;
+      seen.add(id);
+      items.push(value);
+      added++;
     });
+    return { items, added };
   }
 
   function backupFingerprint(data) {
@@ -63,6 +102,7 @@
   return {
     appKeys,
     replaceAppStorage,
+    mergeUniqueBy,
     backupFingerprint,
     hasImported,
     markImported,

@@ -128,9 +128,12 @@ const MAX_BILDER = 260;   /* rund fünf komplette Prüfungen */
 self.addEventListener("install", ev => {
   ev.waitUntil((async () => {
     const c = await caches.open(CACHE_APP);
-    /* einzeln, damit eine fehlende Datei nicht die ganze Installation kippt */
+    /* Atomar: ist eine Pflichtdatei nicht erreichbar, darf diese Worker-
+       Version nicht aktiv werden. Der vollständige alte Cache bleibt dann
+       weiter zuständig, statt durch einen lückenhaften neuen ersetzt zu
+       werden. */
     await Promise.all(GRUNDGERUEST.map(u =>
-      c.add(new Request(u, { cache: "reload" })).catch(() => { })));
+      c.add(new Request(u, { cache: "reload" }))));
   })());
 });
 
@@ -177,6 +180,10 @@ self.addEventListener("fetch", ev => {
   /* 2. Bilder: Cache zuerst, sonst holen und behalten */
   if (istBild(url)) {
     ev.respondWith((async () => {
+      /* Icons und andere feste Startbilder liegen im atomaren App-Cache. */
+      const app = await caches.open(CACHE_APP);
+      const ausApp = await app.match(req);
+      if (ausApp) return ausApp;
       const c = await caches.open(CACHE_BILD);
       const da = await c.match(req);
       if (da) return da;

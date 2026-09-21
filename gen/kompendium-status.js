@@ -33,13 +33,13 @@
       text: "SaaS ist für AP1 relevant; die ausführliche Abgrenzung von IaaS und PaaS dient vor allem der Vertiefung."
     },
     "algorithmen-ablaufdiagramme": {
-      code: "ap1",
-      label: "AP1 mit Kataloghinweis",
+      code: "historisch",
+      label: "AP1 + historischer Teil",
       text: "Pseudocode und UML-Aktivitätsdiagramme sind aktuell. PAP und Struktogramm sind nur noch historischer Vergleich."
     },
     "datensicherungskonzepte": {
-      code: "ap1",
-      label: "AP1 mit Kataloghinweis",
+      code: "historisch",
+      label: "AP1 + historischer Teil",
       text: "Datensicherung bleibt relevant. RAID-Level gehören nach dem aktualisierten Katalog nicht mehr zum AP1-Kern."
     },
     "bedrohungsszenarien": {
@@ -87,6 +87,48 @@
         [/AP1-Merksätze/g, "Merksätze zur Vertiefung"],
         [/Für die AP1 solltest du können/g, "Zur fachlichen Vertiefung kannst du lernen"],
         [/Allgemeine AP1-Einordnung/g, "Aktuelle Einordnung"]
+      ],
+      "cloud-modelle-iaas-paas-saas": [
+        [/Für die AP1 sind vor allem IaaS, PaaS und SaaS wichtig\./g,
+          "Für AP1 stehen SaaS und DaaS im Vordergrund; IaaS und PaaS sind Vertiefung."],
+        [/Für die AP1 sind vor allem /g,
+          "Für AP1 stehen SaaS und DaaS im Vordergrund. Zur Vertiefung werden "],
+        [/AP1-Bezug/g, "Katalogbezug"],
+        [/AP1-Kernidee/g, "Grundidee"],
+        [/AP1-Hinweis/g, "Kataloghinweis"],
+        [/Typische AP1-Aufgaben/g, "Vertiefungsaufgaben"],
+        [/In der AP1 könnten Aufgaben so formuliert sein/g, "Als Vertiefungsaufgaben sind möglich"],
+        [/IaaS, PaaS und SaaS sicher unterscheiden/g,
+          "SaaS im AP1-Kern einordnen; IaaS und PaaS als Vertiefung unterscheiden"],
+        [/Für die AP1 wichtig/g, "Für AP1 wichtig; IaaS und PaaS sind Vertiefung"]
+      ],
+      "algorithmen-ablaufdiagramme": [
+        [/Besonders wichtig sind Programmablaufplan \(PAP\), Struktogramm nach Nassi-Shneiderman, Pseudocode\./g,
+          "Aktuell wichtig sind Pseudocode und UML-Aktivitätsdiagramme; PAP und Struktogramm dienen nur als historischer Vergleich."],
+        [/Besonders wichtig sind /g,
+          "Aktuell wichtig sind Pseudocode und UML-Aktivitätsdiagramme; historisch verglichen werden "],
+        [/Algorithmen & Ablaufdiagramme in der AP1/g, "Algorithmen: aktueller AP1-Kern und historische Darstellungen"],
+        [/Typische AP1-Anforderungen/g, "Aktuelle AP1-Anforderungen und historischer Vergleich"],
+        [/PAP- oder Struktogramm-Symbole verstehen/g, "PAP und Struktogramm nur historisch einordnen"],
+        [/PAP und Struktogramme bleiben aber als Grundlagen/g,
+          "PAP und Struktogramme dienen nur noch als historischer Vergleich"],
+        [/AP1-Kernidee/g, "Kataloghinweis"]
+      ],
+      "datensicherungskonzepte": [
+        [/Für die AP1 sind Backup-Arten und RAID-Level besonders wichtig\./g,
+          "Für AP1 sind Backup-Arten besonders wichtig; RAID-Level gehören nicht mehr zum AP1-Kern."],
+        [/Für die AP1 sind Backup-Arten, 3-2-1-Regel, RTO, RPO und der Unterschied zwischen RAID und Backup besonders wichtig\./g,
+          "Für AP1 sind Backup-Arten, 3-2-1-Regel, RTO und RPO wichtig. RAID dient nur der historischen Abgrenzung zum Backup."],
+        [/RAID-Level und Datensicherung/g, "RAID als historische Vertiefung"],
+        [/Rechenaufgaben in der AP1/g, "Rechenaufgaben zur Vertiefung"],
+        [/Typische AP1-Aufgaben/g, "AP1-Aufgaben und historische RAID-Vergleiche"],
+        [/RAID-Level grob einordnen/g, "RAID-Level nur historisch als Vertiefung einordnen"],
+        [/AP1-Kernidee/g, "Kataloghinweis"],
+        [/AP1-Hinweis/g, "Vertiefungshinweis"]
+      ],
+      "bedrohungsszenarien": [
+        [/AP1-Falle:/g, "Abgrenzung (historisch):"],
+        [/RAID als Backup nennen/g, "Historische Abgrenzung: RAID als Backup bezeichnen"]
       ]
     };
     (replacements[String(slug || "")] || []).forEach(([from, to]) => {

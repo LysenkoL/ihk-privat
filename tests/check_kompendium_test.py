@@ -11,8 +11,9 @@ filled = "<h4>Aufgabe</h4><h5>Musterantwort</h5><p>Antwort</p>"
 
 assert checker.empty_answer_count(empty) == 1
 assert checker.empty_answer_count(filled) == 0
-assert checker.unclassified_ap1_claims("sql-grundlagen", "SQL in der AP1") == []
-assert checker.unclassified_ap1_claims("bedrohungsszenarien", "AP1-Falle: RAID") == []
+assert checker.unclassified_ap1_claims("sql-grundlagen", "SQL in der AP1")
+assert checker.unclassified_ap1_claims("bedrohungsszenarien", "AP1-Falle: RAID")
+assert checker.unclassified_ap1_claims("sql-grundlagen", "SQL gehört nicht mehr zum AP1-Kern") == []
 assert checker.unclassified_ap1_claims("unknown", "SQL in der AP1")
 
 print("check_kompendium: validator behavior OK")
