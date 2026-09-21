@@ -68,6 +68,9 @@ window.GENERCANVAS = (function () {
    * @param loes      Musterlösung, nur für „vorgegeben"-Markierung
    */
   function bau(daten, geaendert, loes) {
+    /* Falls eine frühere Fläche im Vollbild verlassen wurde, ohne es zu
+       beenden (Seitenwechsel, neuer Bogen): Sperre des Seitenlaufs lösen. */
+    document.body.classList.remove("ec-voll-an");
     if (!daten.geo) daten.geo = {};
     const G = daten.geo;
 
@@ -75,6 +78,7 @@ window.GENERCANVAS = (function () {
     let verbindModus = false;    /* Raute → Entität → Entität */
     let verbindRaute = null;
     let raster = G.__raster !== false;
+    let vollbild = false;
     const stapel = [];           /* Rückgängig */
 
     const wurzel = el("div", "ec-wurzel");
@@ -191,6 +195,9 @@ window.GENERCANVAS = (function () {
     const svg = sv("svg", { class: "ec-svg" });
     flaeche.appendChild(svg);
 
+    let letzteSicht = null;   /* zuletzt gezeichneter Ausschnitt */
+    let sichtFest = null;     /* während des Ziehens festgehalten */
+
     function zeichne() {
       const liste = knoten();
       while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -203,12 +210,32 @@ window.GENERCANVAS = (function () {
       });
       if (!liste.length) { minX = 0; maxX = 900; minY = 0; maxY = 520; }
       const R = 70;
-      const bx = minX - R, by = minY - R;
-      const bw = Math.max(640, maxX - minX + 2 * R), bh = Math.max(420, maxY - minY + 2 * R);
+      let bx = minX - R, by = minY - R;
+      let bw = Math.max(640, maxX - minX + 2 * R), bh = Math.max(420, maxY - minY + 2 * R);
+
+      /* Während gezogen wird, bleibt der Nullpunkt stehen.
+
+         Sonst passiert Folgendes: man zieht einen Kasten nach oben, das
+         Bild wächst nach oben mit, und weil der Nullpunkt dabei wandert,
+         rutscht alles Übrige nach unten weg. Die Zahlen stimmen zwar, es
+         sieht aber aus, als spränge die Zeichnung. Deshalb wird beim
+         Anfassen ein großzügiger Rahmen festgehalten; er darf nur noch
+         wachsen, nicht verrutschen. Beim Loslassen wird neu gemessen. */
+      if (sichtFest) {
+        bx = sichtFest.bx; by = sichtFest.by;
+        /* Auch die Größe bleibt stehen — sie ist beim Anfassen absichtlich
+           großzügig gewählt. Würde sie mitwachsen, änderte sich bei jedem
+           Bildwechsel die Breite der Fläche, der Rollbalken zuckte und das
+           Ziehen fühlte sich hakelig an. Lieber einmal zu viel leerer Rand,
+           der beim Loslassen wieder verschwindet.                       */
+        bw = Math.max(sichtFest.bw, maxX + R - bx);
+        bh = Math.max(sichtFest.bh, maxY + R - by);
+      }
 
       svg.setAttribute("viewBox", bx + " " + by + " " + bw + " " + bh);
       svg.style.width = Math.max(640, bw) + "px";
       svg.style.height = Math.max(420, bh) + "px";
+      letzteSicht = { bx: bx, by: by, bw: bw, bh: bh };
 
       /* Raster als Hintergrund — hilft beim geraden Ausrichten */
       if (raster) {
@@ -277,13 +304,23 @@ window.GENERCANVAS = (function () {
     }
 
     /* ------------------------------------------------------------ Ziehen */
-    function svgPunkt(ev) {
-      const p = svg.createSVGPoint();
-      p.x = ev.clientX; p.y = ev.clientY;
+    /* -------------------------------------------------------------------
+       Warum hier NICHT in Zeichenkoordinaten gerechnet wird.
+
+       Zuerst wurde der Mauszeiger über getScreenCTM() in Zeichenkoordinaten
+       umgerechnet und die Differenz zum Startpunkt genommen. Das geht schief,
+       sobald sich die Zeichnung beim Ziehen vergrößert: die Fläche wächst mit
+       dem Inhalt mit, der Nullpunkt der viewBox wandert dabei — und der
+       Startpunkt war mit dem ALTEN Nullpunkt gemessen. Jede Bewegung addierte
+       den Versatz noch einmal dazu, und der Kasten schoss nach oben weg.
+
+       Gerechnet wird deshalb in Bildschirmpunkten, geteilt durch den
+       Maßstab. Der Maßstab ändert sich beim Wachsen nicht (Breite in px und
+       viewBox-Breite laufen gleich), der Nullpunkt ist hier egal.
+       ------------------------------------------------------------------ */
+    function massstab() {
       const m = svg.getScreenCTM();
-      if (!m) return { x: 0, y: 0 };
-      const q = p.matrixTransform(m.inverse());
-      return { x: q.x, y: q.y };
+      return (m && m.a) ? m.a : 1;
     }
 
     function zieheAn(g, n) {
@@ -293,25 +330,39 @@ window.GENERCANVAS = (function () {
         if (verbindModus) { verbindKlick(n); return; }
         auswahl = n.id;
         const geo = G[n.id] || (G[n.id] = { x: n.x, y: n.y });
-        const start = { p: svgPunkt(ev), x: geo.x, y: geo.y };
-        let gezogen = false;
+        const start = { cx: ev.clientX, cy: ev.clientY, x: geo.x, y: geo.y, s: massstab() };
+        let gezogen = false, warte = 0;
 
         /* Die Zuhörer hängen am Fenster, nicht am Knoten: der Knoten wird
            beim Neuzeichnen ersetzt, das Fenster nicht.                  */
         const bewegen = e2 => {
-          const p = svgPunkt(e2);
-          const dx = p.x - start.p.x, dy = p.y - start.p.y;
+          const s = massstab() || start.s;
+          const dx = (e2.clientX - start.cx) / s;
+          const dy = (e2.clientY - start.cy) / s;
           if (!gezogen && Math.abs(dx) + Math.abs(dy) < 3) return;
-          if (!gezogen) { gezogen = true; merken(); }
+          if (!gezogen) {
+            gezogen = true; merken();
+            /* Rahmen festhalten, mit Luft nach oben und links, damit der
+               gezogene Kasten dort nicht am Rand abgeschnitten wird.   */
+            const s0 = letzteSicht || { bx: 0, by: 0, bw: 640, bh: 420 };
+            sichtFest = { bx: s0.bx - 400, by: s0.by - 400,
+                          bw: s0.bw + 800, bh: s0.bh + 800 };
+          }
           geo.x = raster ? Math.round((start.x + dx) / 10) * 10 : start.x + dx;
           geo.y = raster ? Math.round((start.y + dy) / 10) * 10 : start.y + dy;
-          zeichne();
+          /* Höchstens ein Neuzeichnen je Bildwechsel. Ohne das wird bei
+             jeder Mausmeldung neu gezeichnet — auf einem Trackpad sind das
+             über hundert in der Sekunde, und das Ziehen ruckelt.       */
+          if (warte) return;
+          warte = requestAnimationFrame(() => { warte = 0; zeichne(); });
         };
         const ende = () => {
           window.removeEventListener("pointermove", bewegen);
           window.removeEventListener("pointerup", ende);
           window.removeEventListener("pointercancel", ende);
-          if (gezogen) geaendert(); else zeichne();
+          if (warte) { cancelAnimationFrame(warte); warte = 0; }
+          sichtFest = null;                 /* wieder frei messen */
+          if (gezogen) { zeichne(); geaendert(); } else zeichne();
         };
         window.addEventListener("pointermove", bewegen);
         window.addEventListener("pointerup", ende);
@@ -505,6 +556,22 @@ window.GENERCANVAS = (function () {
       knopf(raster ? "Raster an" : "Raster aus",
         () => { raster = !raster; G.__raster = raster; zeichne(); geaendert(); },
         raster ? "ec-an" : null, "Beim Ziehen auf 10 px einrasten");
+      knopf(vollbild ? "⤡ Vollbild verlassen" : "⤢ Vollbild", vollbildUm,
+        vollbild ? "ec-an" : "ec-voll-k",
+        "Die Zeichenfläche über den ganzen Bildschirm (Esc oder F)");
+
+      /* Im Vollbild ist der Prüfknopf des Blocks nicht erreichbar — er steht
+         darunter auf der Seite. Also hier einer, der das Vollbild verlässt
+         und dann drückt.                                                */
+      if (vollbild) {
+        knopf("✓ prüfen", () => {
+          vollbildUm();
+          const block = wurzel.closest(".er-block");
+          const pk = block && [...block.querySelectorAll(".er-knopfe .btn")]
+            .find(x => /prüfen/i.test(x.textContent));
+          if (pk) setTimeout(() => { pk.click(); pk.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
+        }, "ec-prim", "Zeichnung bewerten lassen");
+      }
 
       if (meldung) leiste.appendChild(el("span", "ec-meldung", meldung));
     }
@@ -562,9 +629,40 @@ window.GENERCANVAS = (function () {
       }
     }
 
+    /* -------------------------------------------------------- Vollbild -- */
+    /* Ein ER-Modell mit vier Entitäten und ihren Attributen braucht mehr
+       Platz, als ein Kasten mitten in der Seite hergibt — und die Seite
+       mitzuscrollen, während man einen Knoten zieht, ist mühsam. Deshalb
+       legt sich die Zeichenfläche auf Knopfdruck über den ganzen Bildschirm.
+
+       Bewusst über CSS und nicht über die Fullscreen-API des Browsers: die
+       verlangt eine Nutzergeste, wird in manchen Einbettungen abgelehnt und
+       nimmt die Adresszeile mit. Dieser Weg tut immer dasselbe, und Esc
+       beendet ihn genauso.                                              */
+    let scrollVorher = 0;
+    function vollbildUm() {
+      vollbild = !vollbild;
+      wurzel.classList.toggle("ec-voll", vollbild);
+      if (vollbild) {
+        scrollVorher = window.scrollY || 0;
+        document.body.classList.add("ec-voll-an");
+      } else {
+        document.body.classList.remove("ec-voll-an");
+        window.scrollTo(0, scrollVorher);
+      }
+      /* Nach dem Umschalten neu messen: die Fläche ist jetzt anders groß. */
+      setTimeout(zeichne, 20);
+      zeichne();
+    }
+
     /* ------------------------------------------------------- Tastatur -- */
     function taste(ev) {
-      if (!wurzel.isConnected || wurzel.offsetParent === null) return;
+      /* „unsichtbar" hieß hier: offsetParent === null. Das stimmt für die
+         eingebettete Fläche, aber nicht im Vollbild — ein position:fixed
+         Element hat grundsätzlich keinen offsetParent. Die Folge: im
+         Vollbild kam keine einzige Taste an, auch Esc nicht, und man saß
+         fest. getClientRects() unterscheidet beides richtig.           */
+      if (!wurzel.isConnected || wurzel.getClientRects().length === 0) return;
       const ziel = ev.target;
       if (ziel && /input|textarea|select/i.test(ziel.tagName)) return;
       if (ev.key === "Delete" || ev.key === "Backspace") {
@@ -573,12 +671,20 @@ window.GENERCANVAS = (function () {
       } else if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "z") {
         ev.preventDefault(); zurueck();
       } else if (ev.key === "Escape") {
+        /* Erst das Vollbild verlassen, dann die Auswahl aufheben — sonst
+           sitzt man im Vollbild fest und drückt Esc ohne Wirkung.      */
+        if (vollbild) { ev.preventDefault(); ev.stopPropagation(); vollbildUm(); return; }
         auswahl = null; verbindModus = false; verbindRaute = null; melde(""); zeichne();
-      } else if (ev.key.toLowerCase() === "e") { neueEntitaet(); }
+      } else if (ev.key.toLowerCase() === "f") { vollbildUm(); }
+      else if (ev.key.toLowerCase() === "e") { neueEntitaet(); }
       else if (ev.key.toLowerCase() === "b") { neueBeziehung(); }
       else if (ev.key.toLowerCase() === "a") { neuesAttribut(); }
     }
-    document.addEventListener("keydown", taste);
+    /* In der Einfangphase: Esc im Vollbild gehört hierher und darf nicht
+       weiterlaufen. gen/zurueck.js versteht Esc sonst als „zurück" und
+       schließt den ganzen Bogen — die Fläche war dann zwar nicht mehr im
+       Vollbild, aber man stand wieder auf der Startseite.              */
+    document.addEventListener("keydown", taste, true);
 
     /* Klick ins Leere hebt die Auswahl auf */
     flaeche.addEventListener("pointerdown", ev => {

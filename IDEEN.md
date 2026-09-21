@@ -183,7 +183,10 @@
 - **ER-Modelle im Diagramm-Trainer & Service Worker v24** (`gen/er-gen.js`, `gen/er-uebung.js`, `index.html`, `sw.js`, 21.09):
   - прямой запуск генератора ER-модели с холстом по кнопке «ER-Modell zeichnen» прямо в блоке тренажера диаграмм (Diagramm-Trainer);
   - перенос блока тренировочных задач ER («ER-Modelle — drei Übungsaufgaben») вплотную к блоку диаграмм для логичного расположения;
-  - обновление кэша Service Worker до `ihk-ap1-v24-app`.
+- **Korrektur ER-Grafiken, Canvas-Drag & Service Worker v25** (`gen/er.js`, `gen/er-canvas.js`, `gen/er-canvas.css`, `gen/zurueck.js`, `sw.js`, 21.09):
+  - отрисовка связей ER-диаграмм, перекрывающих соседние сущности: обход снизу вместо наложения на средний блок, точный подсчет высоты холста без обрезания;
+  - исправление перетаскивания узлов на Canvas: компенсация масштаба экрана, сглаживание через `requestAnimationFrame`, полноэкранный режим (⤢ / клавиша F), изоляция клавиши Escape;
+  - обновление кэша Service Worker до `ihk-ap1-v25-app`.
 
 
 ## Чего не хватает

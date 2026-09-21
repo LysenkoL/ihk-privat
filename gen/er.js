@@ -211,11 +211,30 @@ window.GENER = (function () {
     const yE = 40 + 17 + 52 + (maxReihen - 1) * 56;   /* Grundlinie der Entitäten */
 
     reihe.forEach((e, i) => { platz[klein(e.name)] = 150 + i * SP; });
+    /* Welche Entität steht an welcher Stelle der Reihe? Gebraucht wird das
+       für Beziehungen, die nicht zwischen Nachbarn laufen.              */
+    const stelle = {};
+    reihe.forEach((e, i) => { stelle[klein(e.name)] = i; });
     const kastenBreite = {};
     reihe.forEach(e => { kastenBreite[klein(e.name)] = breiteVon(e.name, 8); });
     const breite = 150 + (reihe.length - 1) * SP + 150;
 
     /* --- Beziehungen zuerst, damit Linien hinter den Kästen liegen --- */
+    /* ---------------------------------------------------------------------
+       Beziehungen über mehrere Plätze hinweg.
+
+       Die Reihenfolge stellt verbundene Entitäten nebeneinander, aber bei
+       einem Dreieck (Mitarbeiter–Vorgang, Vorgang–Projekt, Mitarbeiter–
+       Projekt) geht das nicht auf: eine Beziehung muss über den Kasten in
+       der Mitte hinweg. Sie wurde bisher trotzdem auf der Höhe der Kästen
+       gezeichnet — Linie und Raute verschwanden hinter dem mittleren
+       Rechteck, und ihr Attribut hing scheinbar an der falschen Entität.
+
+       Solche Beziehungen laufen jetzt UNTER der Reihe entlang: senkrecht
+       aus beiden Kästen heraus, waagerecht herüber, Raute in der Mitte.
+       Mehrere davon werden gestapelt.                                   */
+    let tiefsteLinie = yE + EH + 30;
+    let umwege = 0;
     bez.forEach((b, i) => {
       const x1 = platz[klein(b.von)], x2 = platz[klein(b.nach)];
       if (x1 == null || x2 == null) return;
@@ -225,13 +244,25 @@ window.GENER = (function () {
       const doppelt = bez.filter((o, j) => j < i &&
         ((gleich(o.von, b.von) && gleich(o.nach, b.nach)) ||
          (gleich(o.von, b.nach) && gleich(o.nach, b.von)))).length;
-      const my = yE + EH / 2 + doppelt * 64;
+      const s1 = stelle[klein(b.von)], s2 = stelle[klein(b.nach)];
+      const weit = (s1 != null && s2 != null && Math.abs(s1 - s2) > 1);
+      const my = weit ? (yE + EH + 118 + umwege * 104)
+                      : (yE + EH / 2 + doppelt * 64);
+      if (weit) umwege++;
       const rw = Math.max(86, breiteVon(b.name, 6.6));
       const rh = 46;
 
       /* Linien */
-      svg.appendChild(svgEl("line", { x1: Math.min(x1, x2) + 0, y1: my, x2: mx, y2: my, class: "er-linie" }));
-      svg.appendChild(svgEl("line", { x1: mx, y1: my, x2: Math.max(x1, x2), y2: my, class: "er-linie" }));
+      if (weit) {
+        /* zwei senkrechte Stücke aus den Kästen heraus, dazwischen waagerecht */
+        const links = Math.min(x1, x2), rechts = Math.max(x1, x2);
+        svg.appendChild(svgEl("line", { x1: links, y1: yE + EH, x2: links, y2: my, class: "er-linie" }));
+        svg.appendChild(svgEl("line", { x1: rechts, y1: yE + EH, x2: rechts, y2: my, class: "er-linie" }));
+        svg.appendChild(svgEl("line", { x1: links, y1: my, x2: rechts, y2: my, class: "er-linie" }));
+      } else {
+        svg.appendChild(svgEl("line", { x1: Math.min(x1, x2) + 0, y1: my, x2: mx, y2: my, class: "er-linie" }));
+        svg.appendChild(svgEl("line", { x1: mx, y1: my, x2: Math.max(x1, x2), y2: my, class: "er-linie" }));
+      }
 
       /* Raute */
       const p = [[mx, my - rh / 2], [mx + rw / 2, my], [mx, my + rh / 2], [mx - rw / 2, my]]
@@ -249,8 +280,14 @@ window.GENER = (function () {
       const rechterName = x1 <= x2 ? b.nach : b.von;
       const halbL = (kastenBreite[klein(linkerName)] || 80) / 2;
       const halbR = (kastenBreite[klein(rechterName)] || 80) / 2;
-      if (links) svg.appendChild(text(Math.min(x1, x2) + halbL + 16, my - 14, links, "er-t-kard"));
-      if (rechts) svg.appendChild(text(Math.max(x1, x2) - halbR - 16, my - 14, rechts, "er-t-kard"));
+      if (weit) {
+        /* An den senkrechten Stücken, dicht unter dem Kasten. */
+        if (links) svg.appendChild(text(Math.min(x1, x2) + 18, yE + EH + 24, links, "er-t-kard"));
+        if (rechts) svg.appendChild(text(Math.max(x1, x2) + 18, yE + EH + 24, rechts, "er-t-kard"));
+      } else {
+        if (links) svg.appendChild(text(Math.min(x1, x2) + halbL + 16, my - 14, links, "er-t-kard"));
+        if (rechts) svg.appendChild(text(Math.max(x1, x2) - halbR - 16, my - 14, rechts, "er-t-kard"));
+      }
 
       /* Attribute an der Beziehung hängen unter der Raute */
       putz(b.attr).split(",").map(putz).filter(Boolean).forEach((a, j) => {
@@ -258,7 +295,9 @@ window.GENER = (function () {
         svg.appendChild(svgEl("line", { x1: mx, y1: my + rh / 2, x2: ax, y2: ay, class: "er-linie" }));
         svg.appendChild(svgEl("ellipse", { cx: ax, cy: ay, rx: breiteVon(a, 5.6) / 2, ry: 17, class: "er-ellipse" }));
         svg.appendChild(text(ax, ay, a, "er-t-attr"));
+        if (ay + 40 > tiefsteLinie) tiefsteLinie = ay + 40;
       });
+      if (my + rh / 2 + 30 > tiefsteLinie) tiefsteLinie = my + rh / 2 + 30;
     });
 
     /* --- Entitäten mit ihren Attributen --- */
@@ -290,13 +329,9 @@ window.GENER = (function () {
 
     /* --- Ausmaße: so hoch wie nötig, nicht wie geplant. Ein fester Wert
        ließ über der Zeichnung ein Drittel Leerraum stehen.            --- */
-    let tiefstes = yE + EH + 30;
-    bez.forEach((b, i) => {
-      if (platz[klein(b.von)] == null || platz[klein(b.nach)] == null) return;
-      const at = putz(b.attr).split(",").map(putz).filter(Boolean).length;
-      const unten = yE + EH / 2 + 86 + (at ? 30 : -30) + 30;
-      if (unten > tiefstes) tiefstes = unten;
-    });
+    /* Die Höhe steht nach dem Zeichnen fest — sie wird dort mitgezählt,
+       statt sie hier ein zweites Mal zu schätzen.                      */
+    const tiefstes = tiefsteLinie;
     svg.setAttribute("viewBox", "0 0 " + breite + " " + Math.round(tiefstes));
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     return svg;
@@ -655,8 +690,12 @@ window.GENER = (function () {
       hg.append(innen, zu);
       hg.addEventListener("click", ev => { if (ev.target === hg) hg.remove(); });
       document.addEventListener("keydown", function esc(ev) {
-        if (ev.key === "Escape") { hg.remove(); document.removeEventListener("keydown", esc); }
-      });
+        if (ev.key !== "Escape") return;
+        /* Esc gehört der Lupe — sonst schließt gen/zurueck.js dahinter noch
+           den ganzen Aufgabenbogen.                                      */
+        ev.stopPropagation();
+        hg.remove(); document.removeEventListener("keydown", esc, true);
+      }, true);
       document.body.appendChild(hg);
     };
 

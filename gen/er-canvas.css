@@ -65,6 +65,21 @@ svg.ec-svg text{font-family:var(--display); fill:var(--ink); pointer-events:none
   border:1px solid var(--rule); border-radius:4px}
 .ec-doppel{font-family:var(--data); font-weight:700}
 
+/* -------------------------------------------------------- Vollbild --- */
+/* Die Fläche legt sich über die ganze Seite: Leiste oben, Fuß unten, alles
+   dazwischen ist Zeichenfläche. Kein Rahmen, keine Ecken — je weniger
+   Rand, desto mehr Modell passt hin.                                    */
+.ec-wurzel.ec-voll{position:fixed; inset:0; z-index:200; border:0; border-radius:0;
+  display:flex; flex-direction:column; background:var(--card)}
+.ec-wurzel.ec-voll .ec-flaeche{flex:1 1 auto; max-height:none; min-height:0}
+.ec-wurzel.ec-voll .ec-leiste{flex:0 0 auto; border-bottom:1px solid var(--rule)}
+.ec-wurzel.ec-voll .ec-fuss{flex:0 0 auto}
+/* Der Knopf, der hineinführt, soll auffallen — er ist der einzige Weg zu
+   genug Platz, und danach wurde ausdrücklich gesucht.                   */
+.ec-k.ec-voll-k{color:var(--pruefer); border-color:var(--pruefer)}
+/* Die Seite darunter darf nicht mitrollen. */
+body.ec-voll-an{overflow:hidden}
+
 /* ------------------------------------------------------- Umschalter --- */
 /* Zwei Eingabearten, eine Wahl. Sie steht oben im ER-Block, damit sie beim
    Öffnen sofort sichtbar ist.                                           */

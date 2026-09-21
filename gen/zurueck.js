@@ -152,7 +152,12 @@ window.GENZURUECK = (function () {
       /* Steht eine Lupe oder ein Dialog offen, gehört Esc dorthin. Die Lupe
          wird per CSS ein- und ausgeblendet, nicht über das hidden-Attribut —
          also wird nachgesehen, ob sie wirklich auf dem Schirm steht.     */
-      const offen = [...document.querySelectorAll("dialog[open], .lupe, .modal")]
+      /* Dazu die eigenen Überlagerungen: `.ec-voll` ist die Zeichenfläche im
+         Vollbild, `.er-lupe` die vergrößerte Zeichnung, `.dk-huelle` der
+         Kasten vor dem Drucken. Alle drei fangen Esc selbst ab — ohne diesen
+         Eintrag schloss Esc zusätzlich den ganzen Bogen, und man stand nach
+         dem Zumachen der Lupe wieder auf der Startseite. */
+      const offen = [...document.querySelectorAll("dialog[open], .lupe, .modal, .ec-voll, .er-lupe, .dk-huelle")]
         .some(x => x.offsetParent !== null || x.getClientRects().length);
       if (offen) return;
       if (HOEHER[sichtbar()]) { ev.preventDefault(); zurueck(); }
