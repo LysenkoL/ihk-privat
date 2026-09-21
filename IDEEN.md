@@ -180,7 +180,10 @@
 - **ER-Canvas & Aufgaben-Generator (v23)** (`gen/er-canvas.js`, `gen/er-canvas.css`, `gen/er-gen.js`, `gen/er-gen-daten.js`, `gen/er-uebung.js`, `gen/er.js`, `gen/er.css`, `sw.js`, `index.html`, 21.09):
   - интерактивный графический холст для визуального построения ER-диаграмм (переключение «Tabellen» / «Zeichnen» с сохранением состояния);
   - генератор случайных/процедурных тренировочных задач ER-моделирования (настраиваемое число сущностей 3–4, только 1:n или с n:m, готовая стартовая сущность, генерация по сиду/Saat);
-  - обновление кэша Service Worker до `ihk-ap1-v23-app`.
+- **ER-Modelle im Diagramm-Trainer & Service Worker v24** (`gen/er-gen.js`, `gen/er-uebung.js`, `index.html`, `sw.js`, 21.09):
+  - прямой запуск генератора ER-модели с холстом по кнопке «ER-Modell zeichnen» прямо в блоке тренажера диаграмм (Diagramm-Trainer);
+  - перенос блока тренировочных задач ER («ER-Modelle — drei Übungsaufgaben») вплотную к блоку диаграмм для логичного расположения;
+  - обновление кэша Service Worker до `ihk-ap1-v24-app`.
 
 
 ## Чего не хватает

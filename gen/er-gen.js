@@ -295,9 +295,33 @@ window.GENERGEN = (function () {
     if (typeof schirm === "function") schirm("scBogen");
   }
 
-  if (document.readyState === "loading")
-    document.addEventListener("DOMContentLoaded", alleAnmelden);
-  else alleAnmelden();
+  /* ---------------------------------------------------------------------
+     Der Knopf im Diagramm-Trainer.
 
-  return { baue, neu, ausSaat, starten, anmelden, liste: lies, rng };
+     Der Übungsblock weiter unten hat die Feineinstellungen, aber gesucht
+     wird eine ER-Aufgabe dort, wo auch Netzplan, Gantt und Klassendiagramm
+     stehen — im Diagramm-Trainer. Dort steht deshalb ein Knopf, der ohne
+     Umweg würfelt: drei Entitäten, eine n:m mit Attributen, eine Entität
+     vorgegeben. Genau der Zuschnitt der echten Prüfungsaufgaben.
+     -------------------------------------------------------------------- */
+  function knopfEinhaengen() {
+    const k = document.getElementById("btnErGen");
+    if (!k || k.dataset.erg) return;
+    k.dataset.erg = "1";
+    k.title = "Würfelt einen Betrieb aus und öffnet die Zeichenfläche — " +
+              "mehr Einstellungen im Block „ER-Modelle“ weiter unten";
+    k.addEventListener("click", () => {
+      const a = neu({ entitaeten: 3, beziehungen: 3, nm: true, vorgabe: true });
+      if (!a) { if (window.toast) window.toast("Keine Aufgabe gefunden."); return; }
+      starten(a);
+    });
+  }
+
+  function start() { alleAnmelden(); knopfEinhaengen(); }
+  if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", start);
+  else start();
+  setTimeout(knopfEinhaengen, 500);
+
+  return { baue, neu, ausSaat, starten, anmelden, liste: lies, rng, knopfEinhaengen };
 })();

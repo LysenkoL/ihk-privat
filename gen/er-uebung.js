@@ -364,8 +364,18 @@ window.GENERUEBUNG = (function () {
     const s = $("scStart");
     if (!s || $("erUebungBlock")) return;
     const b = block();
-    /* Direkt hinter den Diagramm-Trainer, sonst ans Ende der Startseite. */
-    const nach = $("rechnenBlock") ||
+    /* ------------------------------------------------------------------
+       Direkt hinter den Diagramm-Trainer.
+
+       Vorher stand der Block hinter den Rechenaufgaben, also weit unten —
+       und wurde dort nicht gefunden: gesucht wird eine ER-Aufgabe dort, wo
+       Netzplan, Gantt und Klassendiagramm stehen. Erkannt wird der
+       Diagramm-Trainer an einem seiner Knöpfe; start.js klappt ihn später
+       in ein <details>, deshalb wird bis dorthin hochgegangen.
+       ------------------------------------------------------------------ */
+    const anker = $("btnNetzZufall");
+    const trainer = anker && (anker.closest("details.st-block") || anker.closest(".abschnitt"));
+    const nach = trainer || $("rechnenBlock") ||
                  [...s.querySelectorAll("details.st-block")].slice(-1)[0];
     if (nach && nach.parentNode) nach.parentNode.insertBefore(b, nach.nextSibling);
     else s.appendChild(b);
