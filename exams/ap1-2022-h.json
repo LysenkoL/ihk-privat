@@ -809,7 +809,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: RAID ausschließlich in Teil 2.",
             "themen": [
               "RAID"
             ],
@@ -910,7 +910,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Aus dem Katalog gestrichen.",
+            "grund": "In AP1 steht nur NAS. SAN, iSCSI, NFS gehören zu AP2 (Katalog S. 21), JBOD kommt gar nicht vor.",
             "themen": [
               "SAN / JBOD"
             ],
@@ -1000,7 +1000,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.; Aus dem Katalog gestrichen.",
+            "grund": "Katalog, Vorbemerkung S. 3: RAID ausschließlich in Teil 2.; In AP1 steht nur NAS. SAN, iSCSI, NFS gehören zu AP2 (Katalog S. 21), JBOD kommt gar nicht vor.",
             "themen": [
               "RAID",
               "SAN / JBOD"
@@ -1073,7 +1073,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Aus dem Katalog gestrichen.",
+            "grund": "In AP1 steht nur NAS. SAN, iSCSI, NFS gehören zu AP2 (Katalog S. 21), JBOD kommt gar nicht vor.",
             "themen": [
               "SAN / JBOD"
             ],
@@ -1739,7 +1739,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
             "themen": [
               "SQL / nicht-relationale Datenbanken"
             ],
@@ -1816,7 +1816,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
             "themen": [
               "SQL / nicht-relationale Datenbanken"
             ],
@@ -1894,7 +1894,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
             "themen": [
               "SQL / nicht-relationale Datenbanken"
             ],
@@ -1950,8 +1950,8 @@
           "placeholder": "Struktogramm: schreibe im Antwortfeld die fehlenden Zeilen von oben nach unten, mit Einrückung für den Schleifenkörper.",
           "needsReview": false,
           "katalog": {
-            "status": "veraltet",
-            "grund": "Gestrichen — geblieben ist nur Pseudocode.",
+            "status": "umformen",
+            "grund": "Struktogramm und PAP sind gestrichen (Vorbemerkung S. 3). Der Inhalt ist aber aktuell: löse die Aufgabe als Pseudocode — das verlangt AP1 (Katalog S. 13).",
             "themen": [
               "Struktogramm / PAP"
             ],
@@ -2035,7 +2035,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
             "themen": [
               "SQL / nicht-relationale Datenbanken"
             ],

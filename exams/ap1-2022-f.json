@@ -2073,8 +2073,8 @@
           "placeholder": "Struktogramm: gib im Antwortfeld die Reihenfolge der neun Anweisungen an — von oben nach unten, mit Einrückung für die Schleifen (z. B. „3, 5, 9 → 6, 7, 2 → 1, 8 …“).",
           "needsReview": false,
           "katalog": {
-            "status": "veraltet",
-            "grund": "Gestrichen — geblieben ist nur Pseudocode.",
+            "status": "umformen",
+            "grund": "Struktogramm und PAP sind gestrichen (Vorbemerkung S. 3). Der Inhalt ist aber aktuell: löse die Aufgabe als Pseudocode — das verlangt AP1 (Katalog S. 13).",
             "themen": [
               "Struktogramm / PAP"
             ],

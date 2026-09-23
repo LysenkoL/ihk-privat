@@ -42,12 +42,13 @@ window.GENZURUECK = (function () {
     scArchiv: "scStart",
     scSpick: "scStart",
     scKomp: "scStart",
+    scKatalog: "scStart",
     scGen: "scStart"
   };
   const NAMEN = {
     scStart: "Start", scBogen: "Prüfungsbogen", scAuswertung: "Auswertung",
     scNetz: "Netzplan-Trainer", scKK: "Karteikarten", scModell: "Modell-Trainer",
-    scUml: "UML-Trainer", scArchiv: "Archiv", scSpick: "Spickzettel", scKomp: "Kompendium", scGen: "Arbeitsblatt"
+    scUml: "UML-Trainer", scArchiv: "Archiv", scSpick: "Spickzettel", scKomp: "Kompendium", scKatalog: "Prüfungskatalog", scGen: "Arbeitsblatt"
   };
 
   let jetzt = "scStart";
@@ -58,7 +59,7 @@ window.GENZURUECK = (function () {
      nach den bekannten Kennungen gesucht und nicht nach der Klasse — sonst
      bleibt genau der Bildschirm unsichtbar, um den es am meisten geht.   */
   const SCHIRME = ["scStart", "scBogen", "scAuswertung", "scNetz", "scKK",
-                   "scModell", "scUml", "scArchiv", "scSpick", "scKomp", "scGen"];
+                   "scModell", "scUml", "scArchiv", "scSpick", "scKomp", "scKatalog", "scGen"];
   function sichtbar() {
     for (const id of SCHIRME) { const e = $(id); if (e && !e.hidden) return id; }
     return "scStart";
@@ -169,5 +170,10 @@ window.GENZURUECK = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
   else einhaengen();
 
-  return { zurueck, knopfPflegen };
+  /* Ein Bereich, den man von verschiedenen Stellen aus öffnet (der Katalog
+     aus dem Prüfungsbogen oder von der Startseite), führt dorthin zurück,
+     woher er kam. */
+  function hoeher(id, ziel) { if (id && ziel && ziel !== id) HOEHER[id] = ziel; knopfPflegen(); }
+
+  return { zurueck, knopfPflegen, hoeher };
 })();

@@ -201,6 +201,14 @@
   - карточки экзаменов различимы: фирма из Ausgangssituation + 3 темы с баллами, статус «neu / begonnen / bewertet», фильтр по статусу, «offline laden» в строке с кнопкой старта (список на телефоне короче на ~20 %);
   - на телефоне: таблица тем карточками (кнопка «üben» больше не обрезана), темы в Übungsmodus переносятся вместо прокрутки вбок, длинные вводные тексты свёрнуты до 3 строк, в тёмной теме читаемые кнопки;
   - обновление кэша Service Worker до `ihk-ap1-v29-app`.
+- **Prüfungskatalog AP1 — оригинал ZPA (2. Auflage 2024)** (`gen/katalog-daten.js`, `gen/katalog-kern.js`, `gen/katalog.js`, `gen/katalog.css`, `exams/katalog.json`, `tools/tag_katalog.py`, `index.html`, `gen/vorlagen-netz.js`, `gen/formeln.js`, `gen/zurueck.js`, `tests/katalog.test.js`, 23.09):
+  - весь AP1-каталог данными: 7 Fragenkomplexe, 33 Themenkreise, 167 Stichworte (дословно, с Tiefe по операторам, LF, Beispiele für betriebliche Handlungen), плюс «Nicht in AP1» (21 пункт с Fundstelle: gestrichen / nur AP2 / Grenzfall / nur Anhang) и «Notationen» из Anhang (Netzplan-Knoten, Präfixe, UML, Netzwerkplan, Rechnung, BPMN/EPK);
+  - к каждому Stichwort посчитано покрытие: задания из 10 экзаменов (и сколько из них уже по новому каталогу, 2025+), типы генератора, карточки, Kompendium, Spickzettel; 25 Stichworte без учебного материала = «Lücken»; фильтры (Lücken / seit 2025 gefragt / nie gefragt / мой стенд), поиск, сортировка по BE, свой стенд offen → unsicher → sitzt (`ihk2:katalog:stand`, едет в экспорт); из каждого Themenkreis — «Prüfungsaufgaben üben», «Arbeitsblatt», «Karten»;
+  - пометки в материалах: у каждой Teilaufgabe и карточки чип «Katalog 03.04» → открывает место в каталоге (назад возвращает в бланк); Stichworte ищутся в общем поиске; старый блок «Lücken im Katalog» (из подкаста) скрыт;
+  - `exams/katalog.json` сверен с оригиналом: Klassendiagramm 2023-f 4c → `grenzfall` (Klassendiagramm — AP1, Vererbung в Anhang; в 2026 была в Musterlösung), Struktogramm-задания 2022-h 4b и 2022-f 4d → `umformen` («als Pseudocode lösen»), IMAP/POP3 и SSH/Telnet из Frühjahr 2025 — пометка, что протоколы спрашивают; к пропуску теперь 14 заданий / 52 BE вместо 17 / 76;
+  - Netzplan-Trainer рисует узел как в каталоге (FAZ/FEZ сверху снаружи, Vorgang | Beschreibung, Dauer | GP | FP, SAZ/SEZ снизу);
+  - генератор: `netz-bandbreite`, `daten-speicherbedarf`, `daten-video` переведены на Binärpräfixe (KiB/MiB/GiB/TiB ÷ 1.024; скорости ×10⁶) — как требует каталог (S. 43) и как считают Musterlösungen 2024–2026; в Formelblatt правило первой строкой;
+  - обновление кэша Service Worker до `ihk-ap1-v30-app`.
 
 
 ## Чего не хватает

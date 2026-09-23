@@ -1,38 +1,25 @@
 {
-  "quelle": "Prüfungskatalog AP1 der IT-Berufe, gültig ab 2025 (ZPA Nord-West). Zusammenfassung: IT-Berufe-Podcast #190, https://it-berufe-podcast.de/neuer-pruefungskatalog-fuer-die-ap1-der-it-berufe-ab-2025-it-berufe-podcast-190/",
-  "stand": "2026-08",
-  "hinweis": "Правь этот файл, если каталог изменится. После правки: python tools/tag_katalog.py && python tools/build_index.py",
+  "quelle": "Prüfungskatalog Fachinformatiker/-in Anwendungsentwicklung, 2. Auflage 2024 (ZPA Nord-West, Köln 10/2024), gilt ab AP1 Frühjahr 2025. Früher: Zusammenfassung IT-Berufe-Podcast #190.",
+  "stand": "2026-09-23",
+  "hinweis": "Правь этот файл, если каталог изменится. После правки: python tools/tag_katalog.py && python tools/build_index.py. Полный каталог с поиском — gen/katalog-daten.js.",
   "veraltet": [
     {
       "key": "sql",
       "label": "SQL / nicht-relationale Datenbanken",
-      "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+      "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
       "muster": "\\bsql\\b|select\\s+.*\\s+from|group by|\\bhaving\\b|nosql|nicht-relational"
     },
     {
       "key": "raid",
       "label": "RAID",
-      "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+      "grund": "Katalog, Vorbemerkung S. 3: RAID ausschließlich in Teil 2.",
       "muster": "\\braid\\b"
     },
     {
       "key": "san",
       "label": "SAN / JBOD",
-      "grund": "Aus dem Katalog gestrichen.",
+      "grund": "In AP1 steht nur NAS. SAN, iSCSI, NFS gehören zu AP2 (Katalog S. 21), JBOD kommt gar nicht vor.",
       "muster": "\\bsan\\b(?!\\w)|storage area network|\\bjbod\\b",
-      "hinweis": ""
-    },
-    {
-      "key": "struktogramm",
-      "label": "Struktogramm / PAP",
-      "grund": "Gestrichen — geblieben ist nur Pseudocode.",
-      "muster": "struktogramm|nassi|shneiderman|programmablaufplan|\\bpap\\b|flussdiagramm"
-    },
-    {
-      "key": "vererbung",
-      "label": "Vererbung / Klassenhierarchie (OOP)",
-      "grund": "Aus dem Katalog gestrichen — geblieben sind Klassen, Methoden, Attribute. UML-Generalisierung im Use-Case-Diagramm zählt nicht dazu.",
-      "muster": "oberklasse|unterklasse|basisklasse|klassenhierarchie|erbt von|vererbungshierarchie|abgeleitete klasse|\\bextends\\b",
       "hinweis": ""
     },
     {
@@ -53,12 +40,6 @@
       "label": "ISO 2700x",
       "grund": "Aus dem Katalog gestrichen.",
       "muster": "iso\\s*2700|27001|27002"
-    },
-    {
-      "key": "swqualitaet",
-      "label": "Softwarequalitätskriterien / ISO 9126",
-      "grund": "Aus dem Katalog gestrichen.",
-      "muster": "iso\\s*9126|softwarequalit|qualitätskriterien der software"
     },
     {
       "key": "vorgehensmodelle",
@@ -91,11 +72,34 @@
       "muster": "cross-selling|crossselling|upselling|up-selling"
     }
   ],
+  "umformen": [
+    {
+      "key": "struktogramm",
+      "label": "Struktogramm / PAP",
+      "grund": "Struktogramm und PAP sind gestrichen (Vorbemerkung S. 3). Der Inhalt ist aber aktuell: löse die Aufgabe als Pseudocode — das verlangt AP1 (Katalog S. 13).",
+      "muster": "struktogramm|nassi|shneiderman|programmablaufplan|\\bpap\\b|flussdiagramm"
+    }
+  ],
+  "grenzfall": [
+    {
+      "key": "vererbung",
+      "label": "Vererbung im Klassendiagramm",
+      "grund": "Das Klassendiagramm gehört zu AP1 (S. 13), die Notation mit Vererbungspfeil steht im Anhang (S. 41). Vererbung als OOP-Konzept ist erst AP2 — trotzdem kam sie Frühjahr 2026 in der Musterlösung vor. Üben lohnt sich.",
+      "muster": "oberklasse|unterklasse|basisklasse|klassenhierarchie|erbt von|vererbungshierarchie|abgeleitete klasse|\\bextends\\b",
+      "hinweis": ""
+    },
+    {
+      "key": "swqualitaet",
+      "label": "Softwarequalitätskriterien / ISO 9126",
+      "grund": "AP1 nennt nur Anpassbarkeit, Wartbarkeit, Schnittstellen als Auswahlkriterien (S. 12). Die vollständigen Qualitätsmerkmale nach ISO 25010 sind AP2.",
+      "muster": "iso\\s*9126|softwarequalit|qualitätskriterien der software"
+    }
+  ],
   "reduziert": [
     {
       "key": "ports",
       "label": "Ports und Protokolle",
-      "grund": "Der lange Protokoll- und Portliste wurde ersetzt durch „Netzwerkprotokolle (z. B. Ethernet, IP, DNS)\" und das OSI-Modell. Portnummern auswendig lernen ist nicht mehr nötig — OSI schon.",
+      "grund": "Der Katalog nennt nur noch „Netzwerkprotokolle (z. B. Ethernet, IP, DNS) und OSI-Modell“ (S. 11). Aber Frühjahr 2025 — schon nach dem neuen Katalog — fragte IMAP gegen POP3 und SSH gegen Telnet; die Portnummern standen in einer Tabelle. Protokolle unterscheiden: ja, Portnummern auswendig: nein.",
       "muster": "portnummer|port\\s*\\d{2,5}|\\bftp\\b|\\bsmtp\\b|\\bimap\\b|\\bpop3\\b|\\btelnet\\b"
     },
     {
@@ -133,7 +137,7 @@
     {
       "key": "zahlensysteme",
       "label": "Zahlensysteme",
-      "hinweis": "Dual, Hexadezimal, Oktal",
+      "hinweis": "Nicht ausdrücklich im Katalog — gebraucht für IPv6 (hexadezimal) und Datenmengen",
       "muster": "zahlensystem|dualsystem|hexadezimal|binärzahl|oktal"
     },
     {
@@ -145,13 +149,13 @@
     {
       "key": "schadprogramme",
       "label": "Schadprogramme",
-      "hinweis": "Virus, Trojaner, Ransomware, DDoS",
+      "hinweis": "AP1 nennt Virenschutz und Sicherheitsbewusstsein; die Angriffsarten selbst stehen erst in AP2 (S. 19)",
       "muster": "\\bmalware\\b|trojaner|ransomware|\\bddos\\b|schadsoftware|schadprogramm"
     },
     {
       "key": "projektstrukturplan",
       "label": "Projektstrukturplan",
-      "hinweis": "Zusammen mit Netzplan und Gantt im Katalog",
+      "hinweis": "„Projektplanung mithilfe von Strukturplan, Netzplan und Gantt-Diagramm“ (S. 9)",
       "muster": "projektstrukturplan|\\bpsp\\b|arbeitspaket"
     },
     {

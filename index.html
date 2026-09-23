@@ -180,6 +180,8 @@
     padding:8px 12px; font-size:13px; margin:8px 0 12px; display:flex; gap:10px;
     align-items:flex-start; justify-content:space-between}
   .katalog-hinweis.reduziert{border-left-color:var(--warn); background:var(--warn-soft)}
+  .marke-katalog.umformen,.marke-katalog.grenzfall{background:var(--pruefer-soft); color:var(--pruefer); border:1px solid var(--pruefer)}
+  .katalog-hinweis.umformen,.katalog-hinweis.grenzfall{border-left-color:var(--pruefer); background:var(--pruefer-soft)}
   .katalog-hinweis button{flex:none}
   .tk.veraltet .tk-frage, .tk.veraltet textarea{opacity:.72}
 
@@ -278,6 +280,16 @@
   .knoten input:focus{background:var(--pruefer-soft); outline:none}
   .knoten input.falsch{background:var(--red-soft); color:var(--red); font-weight:700}
   .knoten input.richtig{background:var(--ok-soft); color:var(--ok)}
+  /* ZPA-Aufbau: Zeitpunkte außerhalb, im Kasten Vorgang|Beschreibung und Dauer|GP|FP */
+  .knoten.zpa{display:flex; flex-direction:column; gap:3px; border:0; background:none; width:176px}
+  .knoten.zpa > div{border:0; min-height:0; display:flex}
+  .knoten.zpa .kz-aussen{justify-content:space-between}
+  .knoten.zpa .kz-aussen input{width:54px; height:28px; border:1px dashed var(--rule); border-radius:4px; background:var(--card)}
+  .knoten.zpa .kz-box{display:grid; grid-template-columns:repeat(3,1fr); border:1.5px solid var(--ink); background:var(--card)}
+  .knoten.zpa .kz-box > div{border:.5px solid var(--rule); min-height:30px; display:flex; align-items:center; justify-content:center; text-align:center}
+  .knoten.zpa .kz-id{font-weight:700; font-family:var(--body); background:var(--field)}
+  .knoten.zpa .kz-name{grid-column:2 / -1; font-family:var(--body); font-size:12px; font-weight:600; line-height:1.2; padding:3px 5px}
+  .knoten.zpa input::placeholder{color:var(--muted); opacity:.55; font-size:10.5px}
   .netz-legende{font-size:13px; color:var(--muted); margin-bottom:12px; line-height:1.6}
   .netz-legende code{font-family:var(--data); background:var(--field); padding:1px 5px;
     border:1px solid var(--rule-soft)}
@@ -488,6 +500,7 @@
 <link rel="stylesheet" href="gen/mobil.css">
 <!-- Startseite v29: Gruppen, Symbole, Suchfeld — nur innerhalb von #scStart -->
 <link rel="stylesheet" href="gen/startseite.css">
+<link rel="stylesheet" href="gen/katalog.css">
 <!-- Zuletzt, damit die Druckregeln die Bildschirmregeln oben
      überschreiben können, ohne überall !important zu brauchen. -->
 <link rel="stylesheet" href="gen/druckbogen.css">
@@ -663,19 +676,19 @@
 
     <div class="schablone" id="netzSchablone">
       <div>
-        <div class="eyebrow" style="margin-bottom:8px">So ist ein Vorgangsknoten aufgebaut</div>
-        <svg viewBox="0 0 232 132" width="232" height="132" role="img"
-             aria-label="Vorgangsknoten: oben FAZ, Dauer, FEZ; Mitte der Name; unten SAZ, GP, SEZ; darunter FP">
+        <div class="eyebrow" style="margin-bottom:8px">Vorgangsknoten wie im Prüfungskatalog (Anhang S. 36)</div>
+        <svg viewBox="0 0 250 150" width="250" height="150" role="img"
+             aria-label="Vorgangsknoten wie im Prüfungskatalog: oben links FAZ, oben rechts FEZ; im Kasten oben Vorgang und Beschreibung, unten Dauer, GP und FP; unten links SAZ, unten rechts SEZ">
           <g fill="none" stroke="currentColor" stroke-width="1.5">
-            <rect x="1" y="1" width="230" height="130"/>
-            <path d="M1 34h230M1 68h230M1 100h230M78 1v33M154 1v33M78 68v32M154 68v32"/>
+            <rect x="12" y="26" width="226" height="94"/>
+            <path d="M12 73h226M64 26v47M87 73v47M163 73v47"/>
           </g>
-          <g font-family="ui-monospace,Consolas,monospace" font-size="13" text-anchor="middle"
-             fill="currentColor">
-            <text x="39" y="22">FAZ</text><text x="116" y="22">Dauer</text><text x="193" y="22">FEZ</text>
-            <text x="116" y="55" font-family="inherit" font-weight="700">Vorgang</text>
-            <text x="39" y="90">SAZ</text><text x="116" y="90">GP</text><text x="193" y="90">SEZ</text>
-            <text x="116" y="120">FP</text>
+          <g font-family="ui-monospace,Consolas,monospace" font-size="13" text-anchor="middle" fill="currentColor">
+            <text x="30" y="18" font-weight="700">FAZ</text><text x="220" y="18" font-weight="700">FEZ</text>
+            <text x="38" y="54" font-size="11">Vor-</text><text x="38" y="66" font-size="11">gang</text>
+            <text x="151" y="55">Beschreibung</text>
+            <text x="49" y="101">Dauer</text><text x="125" y="101" font-weight="700">GP</text><text x="200" y="101" font-weight="700">FP</text>
+            <text x="30" y="140" font-weight="700">SAZ</text><text x="220" y="140" font-weight="700">SEZ</text>
           </g>
         </svg>
       </div>
@@ -686,7 +699,7 @@
         <b>Puffer:</b> GP = SAZ − FAZ (so viel darf sich der Vorgang verschieben, ohne das
         <i>Projektende</i> zu verschieben). FP = kleinstes FAZ der Nachfolger − FEZ (so viel,
         ohne den <i>Nachfolger</i> zu verschieben). FP ist nie größer als GP.<br>
-        <b>Kritischer Pfad:</b> alle Vorgänge mit GP = 0.
+        <b>Kritischer Pfad:</b> alle Vorgänge mit GP = 0. Dauer in Arbeitstagen.
       </div>
     </div>
 
@@ -1613,7 +1626,8 @@ function karte(it, opt){
   if (kat.status){
     const b = document.createElement("span");
     b.className = "marke-katalog " + kat.status;
-    b.textContent = kat.status === "veraltet" ? "nicht mehr im Katalog" : "im Katalog reduziert";
+    b.textContent = ({veraltet:"nicht mehr im Katalog", umformen:"als Pseudocode lösen",
+                      grenzfall:"Grenzfall AP1/AP2", reduziert:"im Katalog reduziert"})[kat.status] || kat.status;
     b.title = kat.grund || "";
     nr.appendChild(b);
   }
@@ -1626,7 +1640,7 @@ function karte(it, opt){
   if (kat.status){
     card.classList.add(kat.status);
     const hw = document.createElement("div");
-    hw.className = "katalog-hinweis" + (kat.status === "reduziert" ? " reduziert" : "");
+    hw.className = "katalog-hinweis" + (kat.status !== "veraltet" ? " " + kat.status : "");
     const txt = document.createElement("div");
     txt.innerHTML = (kat.status === "veraltet" ? "<b>Kannst du überspringen.</b> " : "")
       + "<b>" + esc((kat.themen || []).join(", ")) + "</b> — " + esc(kat.grund || "");
@@ -2233,30 +2247,33 @@ function zeichneNetz(){
     }
   }
 }
+/* Vorgangsknoten wie im Prüfungskatalog (Anhang „Netzplan“, S. 36):
+   FAZ oben links, FEZ oben rechts, außerhalb des Kastens; im Kasten oben
+   Vorgang | Beschreibung, unten Dauer | GP | FP; SAZ unten links, SEZ unten
+   rechts. So sieht der Knoten in der Prüfung aus — also so üben.
+   Die Eingabefelder behalten data-feld/data-id; Prüfen und Lösung
+   arbeiten nur damit und merken vom neuen Aufbau nichts.            */
 function knotenEl(v){
-  const k = document.createElement("div"); k.className = "knoten";
+  const k = document.createElement("div"); k.className = "knoten zpa";
   const eingabe = feld => {
-    const d = document.createElement("div");
     const i = document.createElement("input");
     i.type = "text"; i.inputMode = "numeric"; i.dataset.feld = feld; i.dataset.id = v.id;
+    i.placeholder = feld.toUpperCase();
     i.setAttribute("aria-label", feld.toUpperCase() + " von " + v.id);
-    d.appendChild(i); return d;
+    return i;
   };
-  const fix = wert => { const d = document.createElement("div");
-                        d.className = "fix"; d.textContent = wert; return d; };
-  k.append(eingabe("faz"), fix(v.dauer), eingabe("fez"));
-  const name = document.createElement("div"); name.className = "name";
-  name.textContent = v.id + " · " + v.name; k.appendChild(name);
-  k.append(eingabe("saz"), eingabe("gp"), eingabe("sez"));
-  const fp = document.createElement("div"); fp.className = "name";
-  fp.style.cssText = "display:flex;gap:8px;justify-content:center;align-items:center;font-weight:400";
-  const lab = document.createElement("span");
-  lab.textContent = "FP"; lab.style.cssText = "font-family:var(--data);font-weight:700";
-  const inp = document.createElement("input");
-  inp.type = "text"; inp.inputMode = "numeric"; inp.dataset.feld = "fp"; inp.dataset.id = v.id;
-  inp.setAttribute("aria-label", "FP von " + v.id);
-  inp.style.cssText = "width:48px;border:1px solid var(--rule);background:var(--card)";
-  fp.append(lab, inp); k.appendChild(fp);
+  const zeile = (klasse, a, b) => { const d = document.createElement("div"); d.className = klasse; d.append(a, b); return d; };
+  const zelle = (klasse, inhalt) => {
+    const d = document.createElement("div"); d.className = klasse;
+    if (typeof inhalt === "string") d.textContent = inhalt; else d.appendChild(inhalt);
+    return d;
+  };
+  const box = document.createElement("div"); box.className = "kz-box";
+  box.append(zelle("kz-id", v.id), zelle("kz-name", v.name),
+             zelle("kz-dauer fix", String(v.dauer)), zelle("kz-f", eingabe("gp")), zelle("kz-f", eingabe("fp")));
+  box.title = "Dauer " + v.dauer + (v.vor && v.vor.length ? " · Vorgänger " + v.vor.join(", ") : "");
+  k.append(zeile("kz-aussen", eingabe("faz"), eingabe("fez")), box,
+           zeile("kz-aussen", eingabe("saz"), eingabe("sez")));
   return k;
 }
 
@@ -4452,6 +4469,10 @@ schirm("scStart");
 <script src="gen/ikonen.js"></script>
 <script src="gen/start.js"></script>
 <script src="gen/finder.js"></script>
+<!-- Prüfungskatalog AP1 (Original ZPA, 2. Auflage 2024) -->
+<script src="gen/katalog-daten.js"></script>
+<script src="gen/katalog-kern.js"></script>
+<script src="gen/katalog.js"></script>
 <!-- nach start.js: die „weiter wo ich war“-Karte soll ganz oben stehen,
      also zuletzt eingefügt werden. -->
 <script src="gen/rechnen.js"></script>

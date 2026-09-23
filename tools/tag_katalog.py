@@ -7,7 +7,7 @@ tag_katalog.py — помечает задания, которые ушли из
 Источник правил: exams/katalog.json — правь его, не этот скрипт.
 
 Каждой Teilaufgabe проставляется:
-  "katalog": { "status": "veraltet" | "reduziert" | null,
+  "katalog": { "status": "veraltet" | "umformen" | "grenzfall" | "reduziert" | null,
                "grund": "...", "treffer": ["raid", "san"] }
 
 Побочно пишет exams/luecken.json — новые темы каталога и сколько заданий их
@@ -41,8 +41,8 @@ def volltext(s):
 def main():
     nur_report = "--report" in sys.argv
     kat = json.loads(KATALOG.read_text(encoding="utf-8"))
-    for gruppe in ("veraltet", "reduziert", "neu"):
-        for e in kat[gruppe]:
+    for gruppe in ("veraltet", "umformen", "grenzfall", "reduziert", "neu"):
+        for e in kat.get(gruppe, []):
             e["_rx"] = re.compile(e["muster"], re.I)
 
     dateien = [p for p in sorted(EXAMS.glob("*.json"))
@@ -50,7 +50,8 @@ def main():
 
     abdeckung = {e["key"]: {"label": e["label"], "hinweis": e.get("hinweis"),
                             "n": 0, "be": 0, "beispiele": []} for e in kat["neu"]}
-    summe = {"veraltet": [0, 0], "reduziert": [0, 0], "aktuell": [0, 0]}
+    summe = {"veraltet": [0, 0], "umformen": [0, 0], "grenzfall": [0, 0],
+             "reduziert": [0, 0], "aktuell": [0, 0]}
 
     for p in dateien:
         d = json.loads(p.read_text(encoding="utf-8"))
@@ -59,24 +60,19 @@ def main():
                 txt = volltext(s)
                 be = s.get("maxPoints") or 0
 
-                alt = [e for e in kat["veraltet"] if e["_rx"].search(txt)]
-                red = [e for e in kat["reduziert"] if e["_rx"].search(txt)]
-                if alt:
-                    s["katalog"] = {
-                        "status": "veraltet",
-                        "grund": "; ".join(e["grund"] for e in alt),
-                        "themen": [e["label"] for e in alt],
-                        "treffer": [e["key"] for e in alt],
-                    }
-                elif red:
-                    s["katalog"] = {
-                        "status": "reduziert",
-                        "grund": "; ".join(e["grund"] for e in red),
-                        "themen": [e["label"] for e in red],
-                        "treffer": [e["key"] for e in red],
-                    }
-                else:
-                    s["katalog"] = {"status": None}
+                # Rangfolge: veraltet > umformen (Form gestrichen, Inhalt aktuell)
+                #            > grenzfall (AP1/AP2) > reduziert
+                s["katalog"] = {"status": None}
+                for status in ("veraltet", "umformen", "grenzfall", "reduziert"):
+                    hit = [e for e in kat.get(status, []) if e["_rx"].search(txt)]
+                    if hit:
+                        s["katalog"] = {
+                            "status": status,
+                            "grund": "; ".join(e["grund"] for e in hit),
+                            "themen": [e["label"] for e in hit],
+                            "treffer": [e["key"] for e in hit],
+                        }
+                        break
 
                 st = s["katalog"]["status"] or "aktuell"
                 summe[st][0] += 1
@@ -102,8 +98,8 @@ def main():
                        sorted(abdeckung.items(), key=lambda x: (x[1]["n"], x[1]["label"]))],
         }, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    print(f"{'aktuell':10} {summe['aktuell'][0]:3} Teilaufgaben  {summe['aktuell'][1]:4} BE")
-    print(f"{'reduziert':10} {summe['reduziert'][0]:3} Teilaufgaben  {summe['reduziert'][1]:4} BE")
+    for st in ("aktuell", "grenzfall", "umformen", "reduziert"):
+        print(f"{st:10} {summe[st][0]:3} Teilaufgaben  {summe[st][1]:4} BE")
     print(f"{'veraltet':10} {summe['veraltet'][0]:3} Teilaufgaben  {summe['veraltet'][1]:4} BE"
           "   ← можно пропускать")
     print()

@@ -777,7 +777,7 @@
           "needsReview": false,
           "katalog": {
             "status": "reduziert",
-            "grund": "Der lange Protokoll- und Portliste wurde ersetzt durch „Netzwerkprotokolle (z. B. Ethernet, IP, DNS)\" und das OSI-Modell. Portnummern auswendig lernen ist nicht mehr nötig — OSI schon.",
+            "grund": "Der Katalog nennt nur noch „Netzwerkprotokolle (z. B. Ethernet, IP, DNS) und OSI-Modell“ (S. 11). Aber Frühjahr 2025 — schon nach dem neuen Katalog — fragte IMAP gegen POP3 und SSH gegen Telnet; die Portnummern standen in einer Tabelle. Protokolle unterscheiden: ja, Portnummern auswendig: nein.",
             "themen": [
               "Ports und Protokolle"
             ],
@@ -1438,7 +1438,7 @@
           "needsReview": false,
           "katalog": {
             "status": "reduziert",
-            "grund": "Der lange Protokoll- und Portliste wurde ersetzt durch „Netzwerkprotokolle (z. B. Ethernet, IP, DNS)\" und das OSI-Modell. Portnummern auswendig lernen ist nicht mehr nötig — OSI schon.",
+            "grund": "Der Katalog nennt nur noch „Netzwerkprotokolle (z. B. Ethernet, IP, DNS) und OSI-Modell“ (S. 11). Aber Frühjahr 2025 — schon nach dem neuen Katalog — fragte IMAP gegen POP3 und SSH gegen Telnet; die Portnummern standen in einer Tabelle. Protokolle unterscheiden: ja, Portnummern auswendig: nein.",
             "themen": [
               "Ports und Protokolle"
             ],

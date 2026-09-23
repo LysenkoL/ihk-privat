@@ -229,13 +229,17 @@ Autokonfiguration (SLAAC), vereinfachter Header, IPsec von Anfang an vorgesehen.
   G.vorlage({
     id: "netz-bandbreite", thema: "netzwerk", sub: "Bandbreiten- & Übertragungsberechnung",
     titel: "Übertragungsdauer berechnen", stufe: 2,
-    merksatz: "Byte × 8 = Bit. Mbit/s ist eine Bit-Einheit — vor dem Teilen umrechnen.",
+    merksatz: "Datenmenge binär (1 GiB = 1.024³ Byte), Übertragungsrate dezimal (1 Mbit/s = 1.000.000 Bit/s). Byte × 8 = Bit — so rechnet die ZPA.",
     bau(R, c) {
-      const gb = R.stufe(4, 90, 2);
+      /* Prüfungskatalog, Anhang S. 43: Datenmengen nur mit Binärpräfixen,
+         physikalische Größen (Übertragungsrate) dezimal. So rechnen auch die
+         Musterlösungen, z. B. Frühjahr 2024, 4f: GiB × 1.024³ × 8 ÷ (Mbit/s × 10⁶). */
+      const gib = R.stufe(4, 90, 2);
       const leitung = R.waehle([50, 100, 200, 250, 400, 500, 1000]);
       const nutz = R.waehle([60, 65, 70, 75, 80]);
       const effektiv = r(leitung * nutz / 100, 2);
-      const bit = gb * 1000 * 1000 * 1000 * 8;         // 1 GB = 1.000.000.000 Byte
+      const bit = gib * 1024 * 1024 * 1024 * 8;          // 1 GiB = 1.073.741.824 Byte
+      const mbit = r(bit / 1e6, 0);
       const sekVoll = r(bit / (leitung * 1e6), 1);
       const sekEff = r(bit / (effektiv * 1e6), 1);
       const minEff = r(sekEff / 60, 1);
@@ -243,21 +247,21 @@ Autokonfiguration (SLAAC), vereinfachter Header, IPsec von Anfang an vorgesehen.
       const passt = minEff <= fenster * 60;
 
       return {
-        situation: `Die ${c.firma} sichert jede Nacht ${gb} GB Daten in ein zweites Rechenzentrum. ` +
+        situation: `Die ${c.firma} sichert jede Nacht ${gib} GiB Daten in ein zweites Rechenzentrum. ` +
           `Die Standleitung hat eine Bandbreite von ${leitung} Mbit/s, davon stehen der Sicherung ` +
           `${nutz} % zur Verfügung. Das Sicherungsfenster beträgt ${fenster} Stunden.\n` +
-          `Rechnen Sie mit 1 GB = 1.000 MB und 1 Byte = 8 Bit.`,
+          `Rechnen Sie mit 1 GiB = 1.024 MiB = 1.024 × 1.024 × 1.024 Byte, 1 Byte = 8 Bit und 1 Mbit/s = 1.000.000 Bit/s.`,
         prompt: "Berechnen Sie die Übertragungsdauer und beurteilen Sie, ob das Sicherungsfenster ausreicht.",
         felder: [
-          { typ: "zahl", label: "Zu übertragende Datenmenge", einheit: "Mbit", be: 1, dez: 0, loesung: r(bit / 1e6, 0), tolRel: 0.005 },
+          { typ: "zahl", label: "Zu übertragende Datenmenge", einheit: "Mbit", be: 1, dez: 0, loesung: mbit, tolRel: 0.005 },
           { typ: "zahl", label: "Effektiv nutzbare Bandbreite", einheit: "Mbit/s", be: 1, loesung: effektiv },
           { typ: "zahl", label: "Übertragungsdauer", einheit: "Minuten", be: 2, loesung: minEff, dez: 1, tolRel: 0.01 },
           { typ: "auswahl", label: "Reicht das Sicherungsfenster?", be: 1, optionen: ["ja", "nein"], loesung: passt ? "ja" : "nein" }
         ],
         loesung:
-`Datenmenge: ${gb} GB × 1.000 MB × 8 = ${f.zahl(r(bit / 1e6, 0), 0)} Mbit
+`Datenmenge: ${gib} GiB × 1.024 × 1.024 × 1.024 × 8 = ${f.zahl(r(bit, 0), 0)} Bit = ${f.zahl(mbit, 0)} Mbit
 Effektive Bandbreite: ${leitung} Mbit/s × ${nutz} % = ${f.kurz(effektiv)} Mbit/s
-Dauer: ${f.zahl(r(bit / 1e6, 0), 0)} Mbit ÷ ${f.kurz(effektiv)} Mbit/s = ${f.kurz(sekEff)} s = ${f.kurz(minEff)} Minuten
+Dauer: ${f.zahl(mbit, 0)} Mbit ÷ ${f.kurz(effektiv)} Mbit/s = ${f.kurz(sekEff)} s = ${f.kurz(minEff)} Minuten
 (bei voller Leitung wären es ${f.kurz(sekVoll)} s)
 Das Fenster von ${fenster} Stunden = ${fenster * 60} Minuten ${passt ? "reicht aus." : "reicht NICHT aus — Datenmenge reduzieren (inkrementell, Komprimierung, Deduplizierung) oder Bandbreite erhöhen."}`
       };
@@ -268,40 +272,47 @@ Das Fenster von ${fenster} Stunden = ${fenster * 60} Minuten ${passt ? "reicht a
   G.vorlage({
     id: "daten-speicherbedarf", thema: "daten", sub: "Speicherbedarfsberechnung",
     titel: "Speicherbedarf eines Archivs", stufe: 2,
+    merksatz: "Datenmengen in KiB/MiB/GiB (÷ 1.024). Festplatten verkaufen Hersteller in TB = 10¹² Byte — erst in GiB umrechnen, dann teilen.",
     bau(R, c) {
+      /* Wie Herbst 2025, 2c: KiB × Scans ÷ 1.024 ÷ 1.024 … (Katalog, Anhang S. 43) */
       const proTag = R.stufe(120, 1800, 20);
-      const groesseKB = R.stufe(180, 2600, 20);
+      const groesseKiB = R.stufe(180, 2600, 20);
       const tage = R.waehle([220, 230, 250, 260]);
       const jahre = R.waehle([5, 7, 10]);
       const reserve = R.waehle([15, 20, 25, 30]);
 
-      const proJahrMB = r(proTag * tage * groesseKB / 1000, 2);
-      const proJahrGB = r(proJahrMB / 1000, 2);
-      const gesamtGB = r(proJahrGB * jahre, 2);
-      const mitReserve = r(gesamtGB * (1 + reserve / 100), 2);
+      const proJahrKiB = proTag * tage * groesseKiB;
+      const proJahrMiB = r(proJahrKiB / 1024, 2);
+      const proJahrGiB = r(proJahrKiB / 1024 / 1024, 2);
+      const gesamtGiB = r(proJahrGiB * jahre, 2);
+      const mitReserve = r(gesamtGiB * (1 + reserve / 100), 2);
       const platten = R.waehle([2, 4, 6, 8]);
-      const anzahlPlatten = Math.ceil(mitReserve / (platten * 1000));
+      const platteGiB = r(platten * 1e12 / 1024 / 1024 / 1024, 2);   // Herstellerangabe TB → GiB
+      const anzahlPlatten = Math.ceil(mitReserve / platteGiB);
 
       return {
         situation: `Die ${c.firma} digitalisiert eingehende Belege. Täglich fallen ${f.zahl(proTag, 0)} Dokumente ` +
-          `mit durchschnittlich ${f.zahl(groesseKB, 0)} KB an, gerechnet wird mit ${tage} Arbeitstagen im Jahr. ` +
+          `mit durchschnittlich ${f.zahl(groesseKiB, 0)} KiB an, gerechnet wird mit ${tage} Arbeitstagen im Jahr. ` +
           `Die gesetzliche Aufbewahrungsfrist beträgt ${jahre} Jahre. Für Wachstum und Verwaltungsdaten sind ` +
-          `zusätzlich ${reserve} % Reserve einzuplanen.\n` +
-          `Rechnen Sie mit 1 MB = 1.000 KB und 1 GB = 1.000 MB.`,
+          `zusätzlich ${reserve} % Reserve einzuplanen. Gespeichert wird auf Festplatten mit ${platten} TB ` +
+          `(Herstellerangabe, 1 TB = 10¹² Byte).\n` +
+          `Rechnen Sie mit 1 MiB = 1.024 KiB und 1 GiB = 1.024 MiB.`,
         prompt: "Berechnen Sie den Speicherbedarf und die Anzahl benötigter Festplatten.",
         felder: [
-          { typ: "zahl", label: "Datenmenge pro Jahr", einheit: "GB", be: 1.5, loesung: proJahrGB, dez: 2, tolRel: 0.01 },
-          { typ: "zahl", label: `Datenmenge über ${jahre} Jahre`, einheit: "GB", be: 1, loesung: gesamtGB, dez: 2, tolRel: 0.01 },
-          { typ: "zahl", label: "Speicherbedarf inklusive Reserve", einheit: "GB", be: 1.5, loesung: mitReserve, dez: 2, tolRel: 0.01 },
+          { typ: "zahl", label: "Datenmenge pro Jahr", einheit: "GiB", be: 1.5, loesung: proJahrGiB, dez: 2, tolRel: 0.01 },
+          { typ: "zahl", label: `Datenmenge über ${jahre} Jahre`, einheit: "GiB", be: 1, loesung: gesamtGiB, dez: 2, tolRel: 0.01 },
+          { typ: "zahl", label: "Speicherbedarf inklusive Reserve", einheit: "GiB", be: 1.5, loesung: mitReserve, dez: 2, tolRel: 0.01 },
+          { typ: "zahl", label: `Nutzbare Kapazität einer ${platten}-TB-Platte`, einheit: "GiB", be: 1, loesung: platteGiB, dez: 2, tolRel: 0.01 },
           { typ: "zahl", label: `Benötigte Festplatten à ${platten} TB (aufgerundet)`, einheit: "Stück",
             be: 1, dez: 0, loesung: anzahlPlatten, tolAbs: 0 }
         ],
         loesung:
-`Pro Jahr: ${f.zahl(proTag, 0)} Dok. × ${tage} Tage × ${f.zahl(groesseKB, 0)} KB = ${f.zahl(r(proTag * tage * groesseKB, 0), 0)} KB
-        = ${f.kurz(proJahrMB)} MB = ${f.kurz(proJahrGB)} GB
-Über ${jahre} Jahre: ${f.kurz(proJahrGB)} GB × ${jahre} = ${f.kurz(gesamtGB)} GB
-+ ${reserve} % Reserve: ${f.kurz(gesamtGB)} × ${f.kurz(1 + reserve / 100)} = ${f.kurz(mitReserve)} GB
-Festplatten: ${f.kurz(mitReserve)} GB ÷ ${f.zahl(platten * 1000, 0)} GB = ${f.kurz(r(mitReserve / (platten * 1000), 2))} → ${anzahlPlatten} Platten (aufrunden)`
+`Pro Jahr: ${f.zahl(proTag, 0)} Dok. × ${tage} Tage × ${f.zahl(groesseKiB, 0)} KiB = ${f.zahl(proJahrKiB, 0)} KiB
+        ÷ 1.024 = ${f.kurz(proJahrMiB)} MiB ÷ 1.024 = ${f.kurz(proJahrGiB)} GiB
+Über ${jahre} Jahre: ${f.kurz(proJahrGiB)} GiB × ${jahre} = ${f.kurz(gesamtGiB)} GiB
++ ${reserve} % Reserve: ${f.kurz(gesamtGiB)} × ${f.kurz(1 + reserve / 100)} = ${f.kurz(mitReserve)} GiB
+Eine Platte: ${platten} TB = ${platten} × 10¹² Byte ÷ 1.024³ = ${f.kurz(platteGiB)} GiB
+Festplatten: ${f.kurz(mitReserve)} GiB ÷ ${f.kurz(platteGiB)} GiB = ${f.kurz(r(mitReserve / platteGiB, 2))} → ${anzahlPlatten} Platten (aufrunden)`
       };
     }
   });
@@ -310,33 +321,36 @@ Festplatten: ${f.kurz(mitReserve)} GB ÷ ${f.zahl(platten * 1000, 0)} GB = ${f.k
   G.vorlage({
     id: "daten-video", thema: "daten", sub: "Speicherbedarfsberechnung",
     titel: "Speicherbedarf einer Videoaufzeichnung", stufe: 2,
+    merksatz: "Videostrom in Mbit/s ist eine Rate (× 10⁶), der Speicherbedarf eine Datenmenge (÷ 1.024³ für GiB).",
     bau(R, c) {
+      /* Wie Frühjahr 2026, 1b: Kameras × Mbit/s × 10⁶ × Sekunden ÷ 8 ÷ 1.024⁴ = TiB */
       const kameras = R.stufe(4, 24, 2);
       const mbits = R.waehle([2, 3, 4, 6, 8]);
       const stunden = R.waehle([10, 12, 16, 24]);
       const tage = R.waehle([7, 10, 14, 30]);
 
-      const proKameraStundeGB = r(mbits * 3600 / 8 / 1000, 4);           // Mbit/s → MB → GB
-      const gesamtGB = r(proKameraStundeGB * stunden * tage * kameras, 2);
-      const tb = r(gesamtGB / 1000, 2);
+      const byteProStunde = mbits * 1e6 * 3600 / 8;
+      const proKameraStundeGiB = r(byteProStunde / 1024 / 1024 / 1024, 4);
+      const gesamtGiB = r(byteProStunde * stunden * tage * kameras / 1024 / 1024 / 1024, 2);
+      const tib = r(gesamtGiB / 1024, 2);
 
       return {
         situation: `Die ${c.firma} betreibt ${kameras} Überwachungskameras. Jede Kamera erzeugt einen ` +
           `Videostrom von ${mbits} Mbit/s und zeichnet ${stunden} Stunden pro Tag auf. ` +
           `Die Aufzeichnungen müssen ${tage} Tage vorgehalten werden.\n` +
-          `Rechnen Sie mit 1 Byte = 8 Bit, 1 GB = 1.000 MB.`,
+          `Rechnen Sie mit 1 Mbit/s = 1.000.000 Bit/s, 1 Byte = 8 Bit und 1 GiB = 1.024³ Byte.`,
         prompt: "Berechnen Sie den benötigten Speicherplatz.",
         felder: [
-          { typ: "zahl", label: "Datenmenge je Kamera und Stunde", einheit: "GB", be: 1.5, loesung: proKameraStundeGB, dez: 3, tolRel: 0.01 },
-          { typ: "zahl", label: "Gesamter Speicherbedarf", einheit: "GB", be: 2, loesung: gesamtGB, dez: 2, tolRel: 0.01 },
-          { typ: "zahl", label: "Gesamter Speicherbedarf", einheit: "TB", be: 1, loesung: tb, dez: 2, tolRel: 0.01 },
+          { typ: "zahl", label: "Datenmenge je Kamera und Stunde", einheit: "GiB", be: 1.5, loesung: proKameraStundeGiB, dez: 3, tolRel: 0.01 },
+          { typ: "zahl", label: "Gesamter Speicherbedarf", einheit: "GiB", be: 2, loesung: gesamtGiB, dez: 2, tolRel: 0.01 },
+          { typ: "zahl", label: "Gesamter Speicherbedarf", einheit: "TiB", be: 1, loesung: tib, dez: 2, tolRel: 0.01 },
           { typ: "text", label: "Nennen Sie eine Maßnahme, die den Speicherbedarf senkt", be: 1, zeilen: 2,
             erwartet: [["stärkere Komprimierung", "H.265", "geringere Auflösung", "niedrigere Bildrate",
               "bewegungsgesteuerte Aufzeichnung", "Motion Detection", "kürzere Aufbewahrung", "weniger fps"]] }
         ],
         loesung:
-`Je Kamera und Stunde: ${mbits} Mbit/s × 3.600 s = ${f.zahl(mbits * 3600, 0)} Mbit ÷ 8 = ${f.zahl(mbits * 3600 / 8, 0)} MB = ${f.kurz(proKameraStundeGB)} GB
-Gesamt: ${f.kurz(proKameraStundeGB)} GB × ${stunden} h × ${tage} Tage × ${kameras} Kameras = ${f.kurz(gesamtGB)} GB ≈ ${f.kurz(tb)} TB
+`Je Kamera und Stunde: ${mbits} × 1.000.000 Bit/s × 3.600 s ÷ 8 = ${f.zahl(byteProStunde, 0)} Byte ÷ 1.024³ = ${f.kurz(proKameraStundeGiB)} GiB
+Gesamt: ${f.kurz(proKameraStundeGiB)} GiB × ${stunden} h × ${tage} Tage × ${kameras} Kameras = ${f.kurz(gesamtGiB)} GiB ÷ 1.024 = ${f.kurz(tib)} TiB
 Senken lässt sich der Bedarf durch stärkere Komprimierung (H.265 statt H.264), geringere Auflösung
 oder Bildrate, bewegungsgesteuerte Aufzeichnung und eine kürzere Aufbewahrungsfrist.`
       };

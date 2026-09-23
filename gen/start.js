@@ -100,6 +100,9 @@ window.GENSTART = (function () {
       name: "Satzbau, Formeln, Operatoren", info: "Antworten richtig formulieren, Formelblatt zum Drucken",
       worte: "satzbau formulieren erläutern begründen nennen operator formel formelblatt merkblatt" },
 
+    { key: "katalog", id: "katalogBox", gruppe: "nachschlagen", ikon: "katalog",
+      name: "Prüfungskatalog AP1", info: "Das Original der ZPA: 167 Stichworte, Lücken, eigener Stand",
+      worte: "katalog pruefungskatalog zpa stichwort themenkreis fragenkomplex luecken ap2 gestrichen notation anhang" },
     { key: "spick", id: "spickBox", gruppe: "nachschlagen", ikon: "spick",
       name: "Spickzettel", info: "Der ganze Stoff in 20 Kapiteln",
       worte: "spickzettel stoff kapitel nachschlagen zusammenfassung" },
@@ -116,7 +119,9 @@ window.GENSTART = (function () {
     { key: "themen", titel: /^Themen:/, gruppe: "auswerten", ikon: "themen",
       name: "Themen: Stärken und Prioritäten", info: "Welches Thema dich die meisten Punkte kostet",
       worte: "themen stärken schwächen priorität gewicht verlust" },
-    { key: "luecken", titel: /^Lücken im Katalog$/, gruppe: "auswerten", ikon: "luecken",
+    /* Kurzliste aus dem Podcast — seit v30 ersetzt durch den vollständigen
+       Prüfungskatalog (gen/katalog.js). Bleibt im DOM, ist aber verborgen. */
+    { key: "luecken", titel: /^Lücken im Katalog$/, gruppe: "auswerten", ikon: "luecken", versteckt: true,
       name: "Lücken im Katalog", info: "Katalogthemen, die in keiner Prüfung vorkommen",
       worte: "lücken katalog prüfungskatalog fehlende themen" },
     { key: "plan", id: "planBox", gruppe: "auswerten", ikon: "plan",
@@ -317,6 +322,7 @@ window.GENSTART = (function () {
      (er-uebung.js, rechnen.js schreiben ihren Stand dort hinein).        */
   function dekorieren(d, b) {
     d.dataset.gruppe = b.gruppe;
+    if (b.versteckt) d.hidden = true;
     const sum = d.querySelector(":scope > summary");
     if (!sum || sum.dataset.deko === "1") return;
     const zahl = sum.querySelector(".st-zahl") || el("span", "st-zahl");

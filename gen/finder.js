@@ -125,6 +125,9 @@ window.GENFINDER = (function () {
       ["Kompendium öffnen", "Verzeichnis der 52 Themen", "komp", () => {
         if (window.GENKOMP) { window.GENKOMP.verzeichnis(); window.GENKOMP.zeigen(); }
       }, "kompendium"],
+      ["Prüfungskatalog öffnen", "Original der ZPA · Lücken · eigener Stand", "katalog", () => {
+        if (window.GENKATALOG) window.GENKATALOG.oeffnen(null, { filter: "alle" });
+      }, "katalog pruefungskatalog zpa themen stichworte"],
       ["Fortschritt exportieren", "Datei zum Sichern oder Umziehen", "daten", klick("btnExport"), "export sichern backup datei"],
       ["Fortschritt importieren", "Datei von einem anderen Gerät", "daten", klick("btnImport"), "import laden datei"],
       ["Hell / Dunkel umschalten", "Farbschema", "werkzeug", klick("btnTheme"), "dunkel hell dark theme nacht"],
@@ -211,10 +214,22 @@ window.GENFINDER = (function () {
     });
   }
 
+  /* Stichworte des Prüfungskatalogs — Tipp öffnet die Stelle im Katalog */
+  function katalog() {
+    const d = window.GENKATALOG && window.GENKATALOG.daten();
+    if (!d) return [];
+    return d.A.punkte.map(p => ({
+      typ: "katalog", titel: p.text, ikon: "katalog",
+      unter: "Katalog " + p.id + " · " + (d.kreisVon[p.kreis] || {}).titel,
+      worte: (p.gruppe || "") + " " + p.id,
+      tun: () => window.GENKATALOG.oeffnen(p.id)
+    }));
+  }
+
   let INDEX = null;
   function index() {
     if (INDEX) return INDEX;
-    INDEX = [].concat(bereiche(), werkzeuge(), pruefungen(), kompendium(), spickzettel(), aufgabentypen());
+    INDEX = [].concat(bereiche(), werkzeuge(), pruefungen(), katalog(), kompendium(), spickzettel(), aufgabentypen());
     INDEX.forEach(e => { e._t = norm(e.titel); e._u = norm(e.unter); e._w = norm(e.worte); });
     return INDEX;
   }
@@ -242,11 +257,12 @@ window.GENFINDER = (function () {
   const GRUPPEN = [
     { typen: ["bereich", "werkzeug"], name: "Bereiche & Werkzeuge", max: 5 },
     { typen: ["pruefung"], name: "Prüfungen", max: 4 },
+    { typen: ["katalog"], name: "Prüfungskatalog", max: 3 },
     { typen: ["komp"], name: "Kompendium", max: 4 },
     { typen: ["spick"], name: "Spickzettel", max: 4 },
     { typen: ["vorlage"], name: "Aufgabentypen — neu würfeln", max: 4 }
   ];
-  const TYPNAME = { bereich: "Bereich", werkzeug: "Werkzeug", pruefung: "Prüfung", komp: "Kompendium",
+  const TYPNAME = { bereich: "Bereich", werkzeug: "Werkzeug", pruefung: "Prüfung", katalog: "Katalog", komp: "Kompendium",
                     spick: "Spickzettel", vorlage: "Generator" };
 
   function suchen(q) {
@@ -333,7 +349,7 @@ window.GENFINDER = (function () {
         const ico = el("span", "fd-ico fd-aufgabe"); ico.innerHTML = ik("pruefung", 17);
         b.appendChild(ico);
         const tx = el("span", "fd-txt");
-        tx.appendChild(el("span", "fd-t", m.season + " " + m.year + " · " + (it.fullLabel || it.label || "") +
+        tx.appendChild(el("span", "fd-t", m.season + " " + m.year + " · " + (/^\d/.test(String(it.fullLabel || it.label || "")) ? (it.fullLabel || it.label) : ((it.task && it.task.number) || "") + " " + (it.fullLabel || it.label || "")) +
                                           " · " + (it.maxPoints || 0) + " BE"));
         const sn = ausschnitt(a.roh, q) || (it.prompt || "").slice(0, 110) + " …";
         const u = el("span", "fd-u fd-schnipsel"); u.appendChild(markiert(sn, q));

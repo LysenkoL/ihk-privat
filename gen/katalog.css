@@ -1,0 +1,209 @@
+/* ============================================================================
+   gen/katalog.css — Prüfungskatalog AP1 (gen/katalog.js)
+   Gleiche Formensprache wie die Startseite v29: runde Karten, normale
+   Schreibweise, Farben aus dem Thema (hell/dunkel).
+   ========================================================================== */
+
+.kt-seite{max-width:980px}
+.kt-wrap{display:flex; flex-direction:column; gap:14px}
+.kt-seite .ik{display:block; flex:0 0 auto}
+.kt-seite .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* ---------------------------------------------------------------- Kopf -- */
+.kt-kopf{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:16px 18px;
+  box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06)}
+.kt-titel h2{font-family:var(--body); font-size:22px; font-weight:800; letter-spacing:-.01em; margin:0; color:var(--pruefer)}
+.kt-quelle{margin:3px 0 0; font-size:13px; color:var(--muted)}
+.kt-fakten{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:12px}
+.kt-fakt{background:var(--field); border-radius:9px; padding:8px 10px; display:flex; flex-direction:column; min-width:0}
+.kt-fakt b{font-size:14px}
+.kt-fakt span{font-size:11.5px; color:var(--muted)}
+.kt-stand{margin-top:12px}
+.kt-bar{height:8px; background:var(--rule-soft); border-radius:99px; overflow:hidden; display:flex}
+.kt-bar i{display:block; height:100%}
+.kt-bar i.s2{background:var(--ok)}
+.kt-bar i.s1{background:var(--warn)}
+.kt-standtxt{font-size:12.5px; color:var(--muted); margin-top:5px}
+
+/* -------------------------------------------------------------- Reiter -- */
+.kt-reiter{display:flex; gap:4px; background:var(--field); border-radius:11px; padding:4px; position:sticky; top:62px; z-index:5}
+.kt-reiter button{flex:1 1 0; border:0; background:none; font:inherit; font-size:14px; font-weight:600; color:var(--muted);
+  padding:9px 8px; border-radius:8px; cursor:pointer; min-height:40px}
+.kt-reiter button[aria-selected="true"]{background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.kt-reiter .n, .kt-chip .n{font-family:var(--data); font-size:11px; opacity:.7}
+
+.kt-info{font-size:13px; color:var(--muted); margin:2px 2px 8px; line-height:1.5}
+
+/* --------------------------------------------------- Fragenkomplexe ---- */
+.kt-komplexe{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:6px; margin-bottom:10px}
+.kt-kx{display:flex; gap:10px; align-items:flex-start; text-align:left; border:1px solid var(--rule-soft); background:var(--card);
+  border-radius:10px; padding:9px 10px; font:inherit; color:inherit; cursor:pointer; min-height:56px}
+.kt-kx:hover{border-color:var(--pruefer)}
+.kt-kx.an{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.kt-kxnr{font-family:var(--data); font-weight:700; font-size:13px; color:var(--pruefer); background:var(--pruefer-soft);
+  border-radius:7px; padding:3px 6px; flex:0 0 auto}
+.kt-kx.an .kt-kxnr{background:var(--card)}
+.kt-kxtxt{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto}
+.kt-kxname{font-size:13.5px; font-weight:700; line-height:1.25}
+.kt-kxinfo{font-size:11.5px; color:var(--muted)}
+.kt-kxbar{height:4px; background:var(--rule-soft); border-radius:99px; overflow:hidden; margin-top:3px}
+.kt-kxbar i{display:block; height:100%; background:var(--ok)}
+
+/* ------------------------------------------------------- Suche/Filter -- */
+.kt-leiste{display:flex; flex-direction:column; gap:8px; margin-bottom:6px}
+.kt-sfeld{display:flex; align-items:center; gap:4px; background:var(--card); border:1px solid var(--rule);
+  border-radius:11px; padding:0 10px}
+.kt-sfeld:focus-within{border-color:var(--pruefer)}
+.kt-slupe{color:var(--muted); display:flex}
+#ktSuche{flex:1 1 auto; min-width:0; border:0; background:transparent; outline:none; font-size:16px; padding:11px 6px; color:var(--ink)}
+.kt-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.kt-chip{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:99px; padding:5px 11px;
+  font:inherit; font-size:13px; cursor:pointer; min-height:34px}
+.kt-chip.an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+[data-theme="dunkel"] .kt-chip.an{color:#0B1522}
+.kt-sort{margin-left:auto; border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:8px;
+  padding:6px 8px; font:inherit; font-size:13px; min-height:34px}
+
+/* ---------------------------------------------------------------- Liste -- */
+.kt-kx-sek{margin:18px 0 6px}
+.kt-kx-titel{font-family:var(--body); font-size:16px; font-weight:800; line-height:1.3; margin:0; display:flex; gap:8px; align-items:baseline}
+.kt-nr{font-family:var(--data); font-size:12px; font-weight:700; color:var(--pruefer); flex:0 0 auto}
+.kt-kx-meta{font-size:12px; color:var(--muted); margin:2px 0 6px}
+.kt-handl{margin:0 0 8px; font-size:13px}
+.kt-handl summary{cursor:pointer; color:var(--muted); font-size:12.5px; padding:3px 0}
+.kt-handl ul{margin:4px 0 0; padding-left:18px; color:var(--muted); line-height:1.5}
+
+.kt-kreis{background:var(--card); border:1px solid var(--rule-soft); border-radius:12px; padding:10px 12px 6px; margin:8px 0}
+.kt-kreis-kopf{display:flex; gap:8px; align-items:flex-start}
+.kt-kreis-t{display:flex; flex-wrap:wrap; gap:4px 8px; align-items:baseline; min-width:0}
+.kt-kreis-titel{font-weight:700; font-size:14.5px; line-height:1.35}
+.kt-tiefe{font-size:11px; font-weight:700; border-radius:99px; padding:1px 8px; background:var(--field); color:var(--muted)}
+.kt-tiefe.t3{background:var(--warn-soft); color:var(--warn)}
+.kt-tiefe.t4{background:var(--ok-soft); color:var(--ok)}
+.kt-kreis-akt{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px}
+.kt-knopf{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--rule); background:var(--paper); color:var(--ink);
+  border-radius:8px; padding:6px 10px; font:inherit; font-size:12.5px; font-weight:600; cursor:pointer; min-height:34px}
+.kt-knopf:hover{border-color:var(--pruefer); color:var(--pruefer)}
+.kt-knopf.voll{margin-top:6px}
+
+.kt-pl{list-style:none; margin:4px 0 0; padding:0}
+.kt-gruppe{font-size:11.5px; font-weight:700; letter-spacing:.04em; color:var(--muted); padding:8px 0 2px 40px}
+.kt-p{display:grid; grid-template-columns:auto 1fr; column-gap:10px; border-top:1px solid var(--rule-soft); padding:6px 0}
+.kt-p:first-child{border-top:0}
+.kt-hak{grid-row:1; width:28px; height:28px; margin-top:4px; border-radius:50%; border:2px solid var(--rule); background:var(--card);
+  cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; padding:0}
+.kt-hak.s1{border-color:var(--warn); background:linear-gradient(90deg,var(--warn) 50%,var(--card) 50%)}
+.kt-hak.s2{border-color:var(--ok); background:var(--ok)}
+.kt-p-kopf{grid-column:2; display:flex; flex-direction:column; gap:4px; text-align:left; border:0; background:none; font:inherit;
+  color:inherit; cursor:pointer; padding:4px 0; min-width:0}
+.kt-p-t{font-size:14px; line-height:1.4}
+.kt-p-id{font-family:var(--data); font-size:11px; color:var(--muted)}
+.kt-p-kreis{font-size:11.5px; color:var(--muted)}
+.kt-zaehler{display:flex; flex-wrap:wrap; gap:4px}
+.kt-z{font-family:var(--data); font-size:11px; border-radius:6px; padding:1px 6px; background:var(--field); color:var(--muted); white-space:nowrap}
+.kt-z.z-p{background:var(--pruefer-soft); color:var(--pruefer); font-weight:700}
+.kt-z.z-neu{background:var(--ok-soft); color:var(--ok); font-weight:700}
+.kt-z.z-luecke{background:var(--red-soft); color:var(--red); font-weight:700}
+.kt-p.luecke .kt-p-t{color:var(--ink)}
+.kt-det{grid-column:2}
+.kt-p.auf{background:linear-gradient(var(--paper),var(--paper)) padding-box}
+.kt-blink{animation:ktBlink 1.6s ease}
+@keyframes ktBlink{0%,40%{box-shadow:0 0 0 3px color-mix(in srgb,var(--pruefer) 40%,transparent)}100%{box-shadow:none}}
+
+.kt-det-in{display:flex; flex-direction:column; gap:10px; padding:6px 0 10px}
+.kt-sek-t{font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+  display:flex; gap:6px; align-items:center; margin-bottom:4px}
+.kt-sek-t .n{font-family:var(--data); background:var(--field); border-radius:99px; padding:0 7px; letter-spacing:0}
+.kt-mat{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px}
+.kt-m{display:flex; flex-direction:column; gap:1px; width:100%; text-align:left; border:1px solid var(--rule-soft);
+  background:var(--card); border-radius:8px; padding:7px 10px; font:inherit; color:inherit; cursor:pointer}
+.kt-m:hover{border-color:var(--pruefer)}
+.kt-m-t{font-size:13px; font-weight:600; display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.kt-m-u{font-size:12px; color:var(--muted); line-height:1.4}
+.kt-m-neu{font-size:10.5px; font-weight:700; background:var(--ok-soft); color:var(--ok); border-radius:99px; padding:0 7px}
+.kt-luecke-hinweis{border-left:3px solid var(--red); background:var(--red-soft); border-radius:0 8px 8px 0; padding:8px 12px; font-size:13px}
+.kt-luecke-hinweis p{margin:0 0 6px}
+.kt-leer{padding:16px; color:var(--muted); font-size:14px}
+
+/* ---------------------------------------------------------- Nicht AP1 -- */
+.kt-nicht{display:flex; flex-direction:column; gap:8px}
+.kt-nk{background:var(--card); border:1px solid var(--rule-soft); border-left:4px solid var(--rule); border-radius:10px; padding:10px 12px}
+.kt-nk.a-gestrichen{border-left-color:var(--red)}
+.kt-nk.a-ap2{border-left-color:var(--muted)}
+.kt-nk.a-grenzfall{border-left-color:var(--warn)}
+.kt-nk.a-anhang{border-left-color:var(--pruefer)}
+.kt-nk-kopf{display:flex; gap:8px; align-items:baseline; flex-wrap:wrap}
+.kt-nk-kopf b{font-size:14.5px}
+.kt-art{font-size:11px; font-weight:700; border-radius:99px; padding:1px 8px; background:var(--field); color:var(--muted); white-space:nowrap}
+.kt-art.a-gestrichen{background:var(--red-soft); color:var(--red)}
+.kt-art.a-grenzfall{background:var(--warn-soft); color:var(--warn)}
+.kt-art.a-anhang{background:var(--pruefer-soft); color:var(--pruefer)}
+.kt-nk p{margin:5px 0 0; font-size:12.5px; line-height:1.5}
+.kt-nk-wo{color:var(--muted)}
+.kt-nk-zahl{font-weight:600}
+.kt-nk-neu{color:var(--warn); font-weight:600}
+.kt-nk-det{margin-top:6px; font-size:13px}
+.kt-nk-det summary{cursor:pointer; color:var(--pruefer); font-weight:600; padding:3px 0}
+.kt-nk-vorl{color:var(--muted)}
+
+/* --------------------------------------------------------- Notationen -- */
+.kt-notation{display:flex; flex-direction:column; gap:8px}
+.kt-an{background:var(--card); border:1px solid var(--rule-soft); border-radius:12px; padding:12px 14px}
+.kt-an.wichtig{border-color:var(--warn); box-shadow:0 0 0 1px var(--warn) inset}
+.kt-an.nicht{opacity:.8}
+.kt-an-kopf{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.kt-an-kopf b{font-size:15px}
+.kt-an-s{margin-left:auto; font-size:11.5px; color:var(--muted)}
+.kt-an-ref{border:1px solid var(--pruefer); background:var(--pruefer-soft); color:var(--pruefer); border-radius:99px;
+  padding:1px 9px; font:inherit; font-size:11.5px; font-weight:700; cursor:pointer}
+.kt-an ul{margin:8px 0 0; padding-left:18px; font-size:13.5px; line-height:1.55}
+.kt-an-bild{margin:10px 0 0; color:var(--ink); overflow-x:auto}
+.kt-np{max-width:100%; height:auto}
+.kt-tabwrap{overflow-x:auto; margin-top:8px}
+.kt-tab{border-collapse:collapse; font-size:12.5px; width:100%}
+.kt-tab th,.kt-tab td{border-bottom:1px solid var(--rule-soft); padding:5px 8px; text-align:left}
+.kt-tab th{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em}
+
+/* ------------------------------------------------ Etiketten + Start ---- */
+.kt-etikett{border:1px solid color-mix(in srgb,var(--pruefer) 45%,transparent); background:var(--pruefer-soft);
+  color:var(--pruefer); border-radius:99px; font:inherit; font-family:var(--data); font-size:10.5px; font-weight:700;
+  padding:1px 8px; cursor:pointer; white-space:nowrap; letter-spacing:0; text-transform:none}
+.kt-etikett:hover{background:var(--pruefer); color:#fff}
+.kt-kk-etiketten{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px}
+
+.kt-start{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:4px 0 12px}
+.kt-start-k{display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:1px solid var(--rule-soft);
+  background:var(--paper); border-radius:9px; padding:8px 10px; font:inherit; color:inherit; cursor:pointer; text-align:left}
+.kt-start-k b{font-size:20px; font-weight:800; line-height:1.1}
+.kt-start-k span{font-size:11.5px; color:var(--muted); line-height:1.3}
+.kt-start-k.rot b{color:var(--red)}
+.kt-start-k.gruen b{color:var(--ok)}
+.kt-start-k:hover{border-color:var(--pruefer)}
+
+@media (max-width:700px){
+  .kt-seite{padding:12px 12px 90px}
+  .kt-kopf{padding:13px 13px}
+  .kt-titel h2{font-size:19px}
+  .kt-fakten{grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px}
+  .kt-fakt{padding:6px 7px}
+  .kt-fakt b{font-size:12.5px}
+  .kt-fakt span{font-size:10.5px; line-height:1.25}
+  .kt-tab th,.kt-tab td{padding:4px 5px}
+  .kt-reiter{top:52px}
+  .kt-reiter button{font-size:13px; padding:8px 4px}
+  .kt-komplexe{grid-template-columns:1fr 1fr}
+  .kt-kx{padding:8px; gap:7px}
+  .kt-kxname{font-size:12.5px}
+  .kt-sort{margin-left:0; width:100%}
+  .kt-kreis{padding:9px 10px 4px}
+  .kt-gruppe{padding-left:38px}
+  .kt-start{grid-template-columns:1fr 1fr 1fr; gap:5px}
+  .kt-start-k{padding:7px 8px}
+  .kt-start-k b{font-size:18px}
+}
+@media (max-width:380px){ .kt-komplexe{grid-template-columns:1fr} }
+
+@media print{
+  .kt-reiter, .kt-leiste, .kt-kreis-akt, .kt-komplexe{display:none !important}
+  .kt-kreis{break-inside:avoid; box-shadow:none}
+}

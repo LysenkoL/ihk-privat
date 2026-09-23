@@ -1616,10 +1616,10 @@
           "placeholder": "Klassendiagramm: gib im Antwortfeld je Klasse Name, Attribute und Methoden an und beschreibe die Vererbung (z. B. „KFZ erbt von Versicherungsobjekt“).",
           "needsReview": false,
           "katalog": {
-            "status": "veraltet",
-            "grund": "Aus dem Katalog gestrichen — geblieben sind Klassen, Methoden, Attribute. UML-Generalisierung im Use-Case-Diagramm zählt nicht dazu.",
+            "status": "grenzfall",
+            "grund": "Das Klassendiagramm gehört zu AP1 (S. 13), die Notation mit Vererbungspfeil steht im Anhang (S. 41). Vererbung als OOP-Konzept ist erst AP2 — trotzdem kam sie Frühjahr 2026 in der Musterlösung vor. Üben lohnt sich.",
             "themen": [
-              "Vererbung / Klassenhierarchie (OOP)"
+              "Vererbung im Klassendiagramm"
             ],
             "treffer": [
               "vererbung"
@@ -1687,7 +1687,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
             "themen": [
               "SQL / nicht-relationale Datenbanken"
             ],
@@ -1746,7 +1746,7 @@
           "needsReview": false,
           "katalog": {
             "status": "veraltet",
-            "grund": "Laut Vorwort des Katalogs ausschließlich in AP2 geprüft.",
+            "grund": "Katalog, Vorbemerkung S. 3: SQL ausschließlich in Teil 2. In AP1 bleiben einfache ER-Modelle.",
             "themen": [
               "SQL / nicht-relationale Datenbanken"
             ],

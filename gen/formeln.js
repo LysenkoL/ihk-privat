@@ -18,6 +18,7 @@ window.GENFORMELN = (function () {
     {
       titel: "Daten, Einheiten, Übertragung",
       zeilen: [
+        { f: "Datenmengen binär: KiB → MiB → GiB → TiB je ÷ 1.024 · Raten, Strom, Leistung dezimal: ÷ 1.000", h: "Katalog S. 43: „Angaben zu Datenmengen sind nur mit Binärpräfixen richtig!“" },
         { f: "MB → Mbit: × 8   ·   Mbit → MB: ÷ 8", h: "Datenraten sind Bit, Speicher ist Byte." },
         { f: "Dauer = Datenmenge (Mbit) ÷ Datenrate (Mbit/s)", h: "72 MB × 8 = 576 Mbit ÷ 48 = 12 s" },
         { f: "1 GB = 10⁹ Byte · 1 GiB = 1.073.741.824 Byte", h: "Bei GiB nicht mit 8 multiplizieren, außer es geht um bit/s." },
@@ -29,7 +30,7 @@ window.GENFORMELN = (function () {
       titel: "Speicher und Reichweite",
       zeilen: [
         { f: "Zuwachs/Jahr = Menge je Vorgang × Vorgänge je Jahr", h: "" },
-        { f: "Frei = Gesamtkapazität − Füllstand", h: "12 TB = 12.000 GB" },
+        { f: "Frei = Gesamtkapazität − Füllstand", h: "Herstellerangabe 12 TB = 12 × 10¹² Byte ≈ 10,91 TiB" },
         { f: "Reichweite = Frei ÷ Zuwachs   → abrunden", h: "6,888 Jahre → 6, nicht 7." },
         { f: "Video: Mbit/s × 3600 ÷ 8 = MB je Stunde", h: "× Stunden × Tage × Kameras" },
         { f: "Reserve aufschlagen: Bedarf × (1 + Reserve %)", h: "Reserve kommt zum Schluss, nicht auf den Jahreswert." }
