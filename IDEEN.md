@@ -209,6 +209,14 @@
   - Netzplan-Trainer рисует узел как в каталоге (FAZ/FEZ сверху снаружи, Vorgang | Beschreibung, Dauer | GP | FP, SAZ/SEZ снизу);
   - генератор: `netz-bandbreite`, `daten-speicherbedarf`, `daten-video` переведены на Binärpräfixe (KiB/MiB/GiB/TiB ÷ 1.024; скорости ×10⁶) — как требует каталог (S. 43) и как считают Musterlösungen 2024–2026; в Formelblatt правило первой строкой;
   - обновление кэша Service Worker до `ihk-ap1-v30-app`.
+- **Azubi-Navigator (u-form) — свой раздел с сохранением** (`gen/azubi.js`, `gen/azubi.css`, `tools/azubi_import.py`, `gen/katalog.js`, `gen/finder.js`, `gen/start.js`, `gen/zurueck.js`, `gen/ikonen.js`, `index.html`, `sw.js`, `.gitignore`, `tests/azubi.test.js`, 23.09):
+  - все 13 модулей из своего аккаунта Azubi-Navigator (10 Prüfungssimulationen, 3 Vertiefende Übungen; 276 Teilaufgaben, Musterlösungen, Bewertungshinweise, 72 картинки) — в приложении, потому что на ausbildung.io незаконченная попытка не сохраняется;
+  - **сохраняется каждый ввод** (`ihk2:azubi:<modul>`, едет в обычный экспорт); закрыла — вернулась точно к той же Teilaufgabe; два режима: **Übung** (Lösung после каждой Teilaufgabe) и **Prüfung** (часы 90 мин., решения только после «Abgeben»);
+  - закрытые задания проверяются сами — числа (запятая/точка/тысячи), таблицы-расчёты, Zuordnung, Richtig/Falsch, Mehrfachauswahl — и предлагают баллы; открытые оцениваешь сама по Musterlösung кнопками 0…max; Auswertung с IHK-Note, баллами по Aufgaben, «где потеряла баллы», «Nur die mit Punktverlust nochmal», архив попыток;
+  - порядок = рекомендация: начатые → ни разу не решённые (P02, P04, P05, P08, VÜ1) → слабые (VÜ3, P07, VÜ2) → остальные; оценки из Azubi-Navigator видны на карточках;
+  - связь с каталогом: у каждой Teilaufgabe чипы «Katalog 03.04» и предупреждение, если тема по каталогу AP2; в каталоге у Stichworte счётчик «Az» и список Azubi-заданий с переходом — **Lücken 25 → 8**; Azubi-задания находятся общим поиском;
+  - **материал лицензионный**: данные лежат в `privat/` (в `.gitignore`, на GitHub Pages не попадают); на телефон — кнопкой «Paket laden» (файл `privat/azubi-daten.js`, хранится в IndexedDB устройства);
+  - обновление кэша Service Worker до `ihk-ap1-v31-app`.
 
 
 ## Чего не хватает

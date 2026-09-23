@@ -13,7 +13,9 @@
      K   Karteikarten
      Ko  Kompendium-Seiten      S  Spickzettel-Kapitel
 
-   Stichworte ohne P, G und K sind „Lücken“: dazu kann man hier nicht üben,
+     Az  Aufgaben aus dem Azubi-Navigator (nur, wenn das private Paket da ist)
+
+   Stichworte ohne P, G, K und Az sind „Lücken“: dazu kann man hier nicht üben,
    nur lesen. Jedes Stichwort lässt sich abhaken (offen → unsicher → sitzt);
    der Stand wandert mit dem Export auf andere Geräte (ihk2:katalog:stand).
 
@@ -75,7 +77,16 @@ window.GENKATALOG = (function () {
     const spick = (window.SPICK_KAPITEL || []).map(k => ({ key: k.id, k: k,
       text: k.titel + " " + (k.unter || "") + " " + strip(k.html) }));
 
-    const A = Kern.abdeckung(Kat, { aufg, karten, vorl, komp, spick });
+    /* Azubi-Navigator (u-form): nur, wenn das private Paket geladen ist */
+    const azubi = [];
+    try {
+      const PA = window.GENAZUBI && window.GENAZUBI.paket();
+      if (PA) PA.module.forEach(m => (m.aufgaben || []).forEach(a => (a.teile || []).forEach(t => azubi.push({
+        key: m.id + ":" + t.id, m: m, t: t, be: t.punkte || 0,
+        text: strip(t.titel + " " + t.text + " " + t.loesung) }))));
+    } catch (e) { }
+
+    const A = Kern.abdeckung(Kat, { aufg, karten, vorl, komp, spick, azubi });
     const kreise = Kern.kreise(Kat);
     const kreisVon = {}; kreise.forEach(k => { kreisVon[k.id] = k; });
     const komplexVon = {}; Kat.komplexe.forEach(k => { komplexVon[k.nr] = k; });
@@ -91,7 +102,8 @@ window.GENKATALOG = (function () {
       p.nKarten = (j.karten || []).length;
       p.nKomp = (j.komp || []).length;
       p.nSpick = (j.spick || []).length;
-      p.luecke = !p.nAufg && !p.nVorl && !p.nKarten;
+      p.nAz = (j.azubi || []).length;
+      p.luecke = !p.nAufg && !p.nVorl && !p.nKarten && !p.nAz;
       p.suchtext = Kern.norm(p.text + " " + (p.gruppe || "") + " " + kreisVon[p.kreis].titel + " " + p.id);
     });
 
@@ -110,7 +122,7 @@ window.GENKATALOG = (function () {
       keys.forEach(k => { const z = nicht.find(x => x.e.key === k); if (z) z.vorl.push(v); });
     });
 
-    D = { A, kreise, kreisVon, komplexVon, nicht, ab, punktVon: id => A.punkte.find(p => p.id === id) };
+    D = { A, kreise, kreisVon, komplexVon, nicht, ab, mitAzubi: azubi.length > 0, punktVon: id => A.punkte.find(p => p.id === id) };
     return D;
   }
 
@@ -148,7 +160,7 @@ window.GENKATALOG = (function () {
   let herkunft = "scStart";
   function zeigen() {
     seite();
-    const vorher = ["scBogen", "scAuswertung"].find(id => $(id) && !$(id).hidden) || "scStart";
+    const vorher = ["scBogen", "scAuswertung", "scAzubi"].find(id => $(id) && !$(id).hidden) || "scStart";
     herkunft = vorher;
     document.querySelectorAll("div.seite[id^='sc'], #scBogen").forEach(e => {
       if (e.id !== "scKatalog") e.hidden = true;
@@ -363,7 +375,7 @@ window.GENKATALOG = (function () {
 
     const luecken = P.filter(p => p.luecke).length;
     info.textContent = P.length + " Stichworte" + (luecken ? " · " + luecken + " ohne Übungsmaterial" : "") +
-      (UI.filter === "luecke" ? " — dazu gibt es hier keine Aufgabe, keinen Generator-Typ und keine Karte. Lesen im Kompendium/Spickzettel, dann selbst abhaken." : "") +
+      (UI.filter === "luecke" ? " — dazu gibt es hier keine Aufgabe, keinen Generator-Typ, keine Karte" + (d.mitAzubi ? " und keine Azubi-Navigator-Aufgabe" : "") + ". Lesen im Kompendium/Spickzettel, dann selbst abhaken." : "") +
       (UI.filter === "neu" ? " — kamen in Frühjahr 2025, Herbst 2025 oder Frühjahr 2026 vor, also schon nach diesem Katalog." : "") +
       (UI.filter === "nie" ? " — in keiner der zehn Prüfungen gefragt. Erlaubt sind sie trotzdem." : "");
 
@@ -488,9 +500,10 @@ window.GENKATALOG = (function () {
     if (p.nNeu) { const s = el("span", "kt-z z-neu", "2025+ " + p.nNeu); s.title = p.nNeu + "× in Prüfungen nach dem neuen Katalog"; z.appendChild(s); }
     zahl(p.nVorl, "G", "z-g", "Aufgabentypen im Generator");
     zahl(p.nKarten, "K", "z-k", "Karteikarten");
+    zahl(p.nAz, "Az", "z-az", "Aufgaben im Azubi-Navigator");
     zahl(p.nKomp, "Ko", "z-ko", "Kompendium-Seiten");
     zahl(p.nSpick, "S", "z-s", "Spickzettel-Kapitel");
-    if (p.luecke) { const s = el("span", "kt-z z-luecke", "Lücke"); s.title = "Keine Prüfungsaufgabe, kein Generator-Typ, keine Karte"; z.appendChild(s); }
+    if (p.luecke) { const s = el("span", "kt-z z-luecke", "Lücke"); s.title = "Keine Prüfungsaufgabe, kein Generator-Typ, keine Karte, keine Azubi-Aufgabe"; z.appendChild(s); }
     kopfZ.appendChild(z);
     li.appendChild(kopfZ);
 
@@ -546,6 +559,21 @@ window.GENKATALOG = (function () {
       s.appendChild(ul);
     }
 
+    const az = (j.azubi || []).slice().sort((a, b) => (a.m.art === b.m.art ? 0 : a.m.art === "pruefung" ? -1 : 1) || a.m.nr - b.m.nr);
+    if (az.length) {
+      const s = sektion(box, "Azubi-Navigator", az.length);
+      const ul = el("ul", "kt-mat");
+      az.slice(0, 12).forEach(a => {
+        const b = el("button", "kt-m");
+        b.type = "button";
+        b.appendChild(el("span", "kt-m-t", a.m.kurz + " · " + a.t.nr + " " + a.t.label + " · " + (a.t.punkte || 0) + " P."));
+        b.appendChild(el("span", "kt-m-u", strip(a.t.titel).replace(/\s+/g, " ").trim() + " — " + a.m.titel));
+        b.onclick = () => window.GENAZUBI && window.GENAZUBI.oeffnen(a.m.id, { ziel: a.t.id });
+        const li = el("li"); li.appendChild(b); ul.appendChild(li);
+      });
+      s.appendChild(ul);
+    }
+
     const karten = j.karten || [];
     if (karten.length) {
       const s = sektion(box, "Karteikarten", karten.length);
@@ -575,7 +603,7 @@ window.GENKATALOG = (function () {
       s.appendChild(ul);
     }
 
-    if (!aufg.length && !vorl.length && !karten.length) {
+    if (!aufg.length && !vorl.length && !karten.length && !az.length) {
       const w = suchwort(p.text);
       const hin = el("div", "kt-luecke-hinweis");
       hin.appendChild(el("p", null, "Dazu gibt es in dieser Anwendung keine Aufgabe. " +
@@ -891,6 +919,14 @@ window.GENKATALOG = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
   else einhaengen();
 
-  return { oeffnen, zeigen, daten, codesFuer, kreiseAus, block, standVon,
+  /** Daten neu berechnen — z. B. wenn das Azubi-Paket nachträglich geladen wurde */
+  function neu() {
+    D = null;
+    try { block(); } catch (e) { }
+    const s = $("scKatalog");
+    if (s && !s.hidden) zeichnen();
+  }
+
+  return { oeffnen, zeigen, daten, neu, codesFuer, kreiseAus, block, standVon,
            netzplanSvg, suchwort, get UI() { return UI; } };
 })();

@@ -79,7 +79,7 @@
 .fd-ico{flex:0 0 32px; height:32px; border-radius:8px; display:flex; align-items:center;
   justify-content:center; background:var(--field); color:var(--muted)}
 .fd-bereich,.fd-werkzeug{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
-.fd-pruefung,.fd-aufgabe{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
+.fd-pruefung,.fd-aufgabe,.fd-azubi{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
 .fd-komp,.fd-spick,.fd-katalog{background:var(--gr-nachschlagen-soft); color:var(--gr-nachschlagen)}
 .fd-vorlage{background:var(--gr-ueben-soft); color:var(--gr-ueben)}
 .fd-txt{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:1px}

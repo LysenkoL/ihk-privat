@@ -1,0 +1,263 @@
+/* ============================================================================
+   gen/azubi.css — Azubi-Navigator (gen/azubi.js)
+   Gleiche Formensprache wie Startseite und Katalog: runde Karten, Farben
+   aus dem Thema (hell/dunkel), große Tippflächen fürs Handy.
+   ========================================================================== */
+
+.az-seite{max-width:980px}
+.az-wrap{display:flex; flex-direction:column; gap:14px}
+.az-seite .ik{display:block; flex:0 0 auto}
+
+.az-karte{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:16px 18px;
+  box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06)}
+.az-karte h2{font-family:var(--body); font-size:22px; font-weight:800; letter-spacing:-.01em; margin:0; color:var(--pruefer)}
+.az-karte h3{font-family:var(--body); font-size:16px; font-weight:800; margin:0 0 8px}
+.az-eyebrow{display:block; font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:4px}
+.az-quelle{margin:3px 0 0; font-size:13px; color:var(--muted)}
+.az-info{font-size:13px; color:var(--muted); margin:8px 2px 0; line-height:1.5}
+.az-seite .steuer{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.az-seite .btn{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:14px; font-weight:650;
+  border-radius:9px; padding:9px 15px; min-height:40px}
+.az-seite .btn.klein{min-height:32px; padding:4px 10px; font-size:13px}
+.az-seite .btn.warn{background:var(--red); border-color:var(--red); color:#fff}
+
+/* ------------------------------------------------------------ Übersicht -- */
+.az-fakten{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:12px}
+.az-fakt{background:var(--field); border-radius:9px; padding:8px 10px; display:flex; flex-direction:column; min-width:0}
+.az-fakt b{font-size:20px; font-family:var(--data); line-height:1.1}
+.az-fakt span{font-size:11.5px; color:var(--muted)}
+.az-naechste{display:flex; align-items:center; gap:8px; width:100%; justify-content:center; margin-top:12px; min-height:46px; text-align:left}
+.az-naechste span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+.az-gruppe h3{display:flex; align-items:center; gap:8px; font-size:15px; font-weight:800; margin:6px 2px 0}
+.az-gruppe h3 .n{font-family:var(--data); font-size:12px; background:var(--field); border-radius:99px; padding:1px 8px; color:var(--muted)}
+.az-gruppe .az-info{margin:2px 2px 8px}
+.az-gitter{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:10px}
+.az-mk{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:9px;
+  border-left:4px solid var(--rule)}
+.az-mk.g-weiter{border-left-color:var(--pruefer)}
+.az-mk.g-neu{border-left-color:var(--red)}
+.az-mk.g-schwach{border-left-color:var(--warn)}
+.az-mk.g-gemacht{border-left-color:var(--ok)}
+.az-mk-kopf{display:flex; gap:10px; align-items:flex-start}
+.az-mk-nr{font-family:var(--data); font-weight:800; font-size:13px; border-radius:8px; padding:5px 7px; flex:0 0 auto;
+  background:var(--pruefer-soft); color:var(--pruefer)}
+.az-mk-nr.v{background:var(--field); color:var(--ink)}
+.az-mk-titel{display:flex; flex-direction:column; gap:2px; min-width:0}
+.az-mk-titel b{font-size:15px; line-height:1.3}
+.az-mk-titel span{font-size:12px; color:var(--muted)}
+.az-mk-status{display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:13px}
+.az-mk-knoepfe{display:flex; gap:8px; flex-wrap:wrap}
+.az-mk-knoepfe .btn{min-height:40px; flex:1 1 auto}
+
+.az-bar{display:block; height:6px; background:var(--rule-soft); border-radius:99px; overflow:hidden}
+.az-bar i{display:block; height:100%; background:var(--pruefer)}
+.az-bar i.gut{background:var(--ok)} .az-bar i.mittel{background:var(--warn)} .az-bar i.schwach{background:var(--red)}
+
+.az-chip{display:inline-flex; align-items:center; font-size:11.5px; font-weight:700; border-radius:99px; padding:2px 8px;
+  background:var(--field); color:var(--muted); white-space:nowrap}
+.az-chip.neu{background:var(--red-soft); color:var(--red)}
+.az-chip.warn{background:var(--warn-soft); color:var(--warn); white-space:normal; max-width:100%; line-height:1.35; padding:3px 9px; border-radius:9px}
+.az-chip.uhr{font-family:var(--data)}
+.az-chip.n-mangelhaft, .az-chip.n-ungenuegend{background:var(--red-soft); color:var(--red)}
+.az-chip.n-ausreichend{background:var(--warn-soft); color:var(--warn)}
+.az-chip.n-befriedigend, .az-chip.n-gut, .az-chip.n-sehrgut{background:var(--ok-soft); color:var(--ok)}
+
+.az-paket{background:var(--card); border:1px solid var(--rule-soft); border-radius:12px; padding:10px 14px}
+.az-paket summary{cursor:pointer; font-size:13.5px; font-weight:700; color:var(--muted)}
+.az-paket-in p{font-size:13px; color:var(--muted); line-height:1.5}
+.az-datei{position:relative; overflow:hidden; cursor:pointer}
+.az-datei input{position:absolute; inset:0; opacity:0; cursor:pointer; font-size:0}
+.az-datei.laedt{opacity:.6; pointer-events:none}
+.az-leer ol{padding-left:20px; line-height:1.55; font-size:14px}
+.az-frage{display:inline-flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:13px; background:var(--warn-soft);
+  border-radius:9px; padding:5px 8px}
+
+/* ------------------------------------------------------------ Start ------ */
+.az-start .az-intro{margin-top:10px}
+.az-modi{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px}
+.az-modus{display:flex; flex-direction:column; gap:4px; text-align:left; border:1px solid var(--rule); background:var(--card);
+  border-radius:11px; padding:12px 14px; font:inherit; color:inherit; cursor:pointer; min-height:88px}
+.az-modus:hover, .az-modus:focus-visible{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.az-modus b{font-size:15.5px; color:var(--pruefer)}
+.az-modus span{font-size:13px; color:var(--muted); line-height:1.45}
+
+/* ------------------------------------------------------------ Leiste ----- */
+.az-leiste{position:sticky; top:62px; z-index:6; background:var(--card); border:1px solid var(--rule); border-radius:12px;
+  padding:8px 10px; box-shadow:0 4px 14px rgba(18,40,70,.08); display:flex; flex-direction:column; gap:6px}
+.az-leiste-oben{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.az-leiste-titel{display:flex; flex-direction:column; min-width:0}
+.az-leiste-titel b{font-size:14px; color:var(--pruefer)}
+.az-leiste-titel span{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.az-leiste-werte{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end}
+.az-wert{font-family:var(--data); font-size:12px; background:var(--field); border-radius:7px; padding:3px 7px; white-space:nowrap}
+.az-wert.uhr{background:var(--pruefer-soft); color:var(--pruefer); font-weight:700}
+.az-wert.uhr.knapp{background:var(--warn-soft); color:var(--warn)}
+.az-wert.uhr.vorbei{background:var(--red-soft); color:var(--red)}
+.az-nav{display:flex; gap:5px; overflow-x:auto; scrollbar-width:none; align-items:center}
+.az-nav::-webkit-scrollbar{display:none}
+.az-navk{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:99px; padding:4px 10px; font:inherit;
+  font-size:12.5px; font-weight:600; white-space:nowrap; cursor:pointer; min-height:32px}
+.az-navk.fertig{border-color:var(--ok); color:var(--ok)}
+.az-wert.gesp{background:none; color:var(--muted); padding-left:0; padding-right:0}
+.az-wert.gesp.fehler{color:var(--red); font-weight:700}
+
+.az-situation{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:10px 16px}
+.az-situation > summary{cursor:pointer; font-weight:800; font-size:15px; color:var(--pruefer); padding:4px 0}
+.az-hinweisbox{background:var(--warn-soft); border-radius:10px; padding:10px 14px; font-size:14px; line-height:1.5}
+
+/* ------------------------------------------------------------ Aufgaben --- */
+.az-aufgabe{display:flex; flex-direction:column; gap:10px; scroll-margin-top:130px}
+.az-aufgabe-kopf{display:flex; justify-content:space-between; align-items:baseline; font-size:18px; font-weight:800; margin:8px 2px 0;
+  border-bottom:2px solid var(--pruefer); padding-bottom:4px}
+.az-aufgabe-kopf .n{font-family:var(--data); font-size:13px; color:var(--muted)}
+
+.az-teil{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; border-left:4px solid var(--rule);
+  scroll-margin-top:130px; transition:box-shadow .3s}
+.az-teil.bearbeitet{border-left-color:var(--pruefer)}
+.az-teil.bewertet.voll{border-left-color:var(--ok)}
+.az-teil.bewertet.teils{border-left-color:var(--warn)}
+.az-teil.bewertet.null{border-left-color:var(--red)}
+.az-teil.az-blink{box-shadow:0 0 0 3px var(--pruefer)}
+.az-teil-kopf{display:flex; align-items:baseline; gap:8px}
+.az-teil-kopf h4{margin:0; font-size:15.5px; font-weight:800; flex:1 1 auto; line-height:1.3}
+.az-nr{font-family:var(--data); font-weight:800; font-size:13px; color:var(--pruefer); white-space:nowrap}
+.az-p{font-family:var(--data); font-size:12.5px; font-weight:700; background:var(--field); border-radius:7px; padding:2px 7px; white-space:nowrap}
+.az-teil.bewertet .az-p{background:var(--ok-soft); color:var(--ok)}
+.az-teil.bewertet.null .az-p{background:var(--red-soft); color:var(--red)}
+.az-meta{display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:6px}
+.az-min{font-size:12px; color:var(--muted)}
+
+.az-text{font-size:15px; line-height:1.6; margin-top:8px; overflow-wrap:break-word; hyphens:auto; -webkit-hyphens:auto}
+.az-text ul, .az-text ol{padding-left:22px; margin:6px 0}
+.az-text h4{margin:10px 0 4px; font-size:14.5px}
+.az-tabelle{overflow-x:auto; margin:8px 0; -webkit-overflow-scrolling:touch}
+.az-tabelle table{border-collapse:collapse; font-size:14px; min-width:100%}
+.az-tabelle td, .az-tabelle th{border:1px solid var(--rule); padding:6px 8px; vertical-align:top; text-align:left}
+.az-tabelle tr:first-child td{background:var(--field)}
+.az-bild{display:block; max-width:100%; height:auto; margin:10px 0; border-radius:8px; border:1px solid var(--rule-soft);
+  background:#fff; cursor:zoom-in}
+.az-bild-fehlt{display:block; font-size:12.5px; color:var(--muted); font-style:italic; margin:6px 0}
+.az-anlage{margin-top:10px; border:1px solid var(--rule-soft); border-radius:10px; padding:6px 12px; background:var(--field)}
+.az-anlage summary{cursor:pointer; font-weight:700; font-size:14px; padding:4px 0}
+
+/* ------------------------------------------------------------ Eingaben --- */
+.az-eingabe{margin-top:12px; display:flex; flex-direction:column; gap:10px}
+.az-zeile{display:flex; flex-direction:column; gap:6px}
+.az-zeile-text{font-size:14.5px; line-height:1.55}
+.az-frei{width:100%; font-size:16px; line-height:1.55; min-height:90px}
+.az-rechenweg{min-height:60px; font-size:15px}
+.az-felder{display:flex; flex-wrap:wrap; gap:8px}
+.az-feld{display:inline-flex; align-items:center; gap:5px; flex-wrap:wrap}
+.az-zelle{display:flex; align-items:center; gap:4px; flex-wrap:wrap; min-width:7em}
+.az-f{font:inherit; font-size:16px; font-family:var(--data); width:9.5em; max-width:100%; padding:8px 10px; border:1px solid var(--rule);
+  border-radius:8px; background:var(--field); color:var(--ink)}
+.az-zelle .az-f{width:6.6em; padding:6px 7px; font-size:15px}
+.az-f:focus, .az-sel:focus, .az-frei:focus{outline:none; border-color:var(--pruefer); box-shadow:0 0 0 3px var(--pruefer-soft); background:var(--card)}
+.az-einheit{font-size:13px; color:var(--muted)}
+.az-raster td, .az-raster th{padding:5px 6px}
+.az-f.ok, .az-sel.ok{border-color:var(--ok); background:var(--ok-soft)}
+.az-f.falsch, .az-sel.falsch{border-color:var(--red); background:var(--red-soft)}
+.az-soll{font-size:12.5px; font-family:var(--data); color:var(--ok); font-weight:700}
+
+.az-optionen{background:var(--field); border-radius:10px; padding:8px 12px; font-size:14px}
+.az-optionen ol{margin:4px 0 0; padding-left:22px}
+.az-zuo{display:flex; flex-direction:column; gap:6px; padding:8px 0; border-top:1px solid var(--rule-soft)}
+.az-zuo-text{font-size:14.5px; line-height:1.5}
+.az-sel{font:inherit; font-size:16px; padding:8px 10px; border:1px solid var(--rule); border-radius:8px; background:var(--field); color:var(--ink); max-width:100%}
+
+.az-mehr{border:0; padding:0; margin:0; min-width:0}
+.az-mehr legend{font-weight:700; color:var(--muted); font-size:13px; padding:0; margin-bottom:6px}
+.az-wahl-titel{font-size:12px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--muted)}
+.az-wahl{background:var(--field); border:1px solid transparent; border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:8px}
+.az-wahl.ok{border-color:var(--ok)}
+.az-wahl.falsch{border-color:var(--red)}
+.az-wahl-text{font-size:14.5px; line-height:1.5}
+.az-wahl-reihe{display:flex; flex-wrap:wrap; gap:6px}
+.az-opt{display:flex; align-items:center; gap:8px; border:1px solid var(--rule); border-radius:10px; padding:8px 12px;
+  background:var(--card); cursor:pointer; font-size:14.5px; line-height:1.4; min-height:40px}
+.az-mehr .az-opt{margin-bottom:6px}
+.az-opt input{width:18px; height:18px; flex:0 0 auto; accent-color:var(--pruefer)}
+.az-opt:has(input:checked){border-color:var(--pruefer); background:var(--pruefer-soft)}
+.az-opt.soll, .az-opt.soll:has(input:checked){border-color:var(--ok); background:var(--ok-soft); border-width:2px}
+.az-opt.falsch, .az-opt.falsch:has(input:checked){border-color:var(--red); background:var(--red-soft); border-width:2px}
+
+.az-aktionen{margin-top:12px; display:flex; gap:8px}
+.az-aktionen .btn{min-height:42px}
+
+/* ------------------------------------------------------------ Lösung ----- */
+.az-loesung{margin-top:14px; border-top:1px dashed var(--rule); padding-top:10px}
+.az-loesung h5{margin:6px 0 0; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ok)}
+.az-loesung > .az-text{background:var(--ok-soft); border-radius:10px; padding:10px 12px; margin-top:6px}
+.az-auto{font-size:13.5px; font-weight:700; margin:0 0 8px; color:var(--pruefer)}
+.az-hinweis{font-size:13.5px; line-height:1.5; margin-top:8px; background:var(--field); border-radius:10px; padding:8px 12px}
+.az-bewerten{margin-top:12px}
+.az-bew-kopf{display:flex; gap:8px; align-items:center; margin-bottom:6px; font-size:14px}
+.az-pwahl{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.az-pk{min-width:40px; height:40px; padding:0 8px; font:inherit; font-family:var(--data); font-size:15px; font-weight:700;
+  border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:9px; cursor:pointer; display:inline-flex;
+  align-items:center; justify-content:center}
+.az-pk.breit{font-family:var(--body); font-size:13px}
+.az-pk.vorschlag{border-style:dashed; border-color:var(--pruefer)}
+.az-pk.an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.az-pwert{font-family:var(--data); font-size:17px; font-weight:800; min-width:44px; text-align:center}
+.az-nochmal{margin-top:10px}
+
+.az-bogen-fuss{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:10px 0 20px}
+.az-bogen-fuss .btn{min-height:44px}
+
+/* ------------------------------------------------------------ Auswertung - */
+.az-erg-gross{display:flex; gap:10px; margin-top:14px}
+.az-erg-zahl, .az-erg-note{flex:1 1 0; background:var(--field); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column}
+.az-erg-zahl b{font-size:34px; font-family:var(--data); line-height:1}
+.az-erg-note b{font-size:22px; line-height:1.15}
+.az-erg-zahl span, .az-erg-note span{font-size:13px; color:var(--muted); margin-top:4px}
+.az-erg-note.n1, .az-erg-note.n2, .az-erg-note.n3{background:var(--ok-soft)}
+.az-erg-note.n4{background:var(--warn-soft)}
+.az-erg-note.n5, .az-erg-note.n6{background:var(--red-soft)}
+.az-je{display:flex; flex-direction:column; gap:6px; margin-top:14px}
+.az-je-z{display:grid; grid-template-columns:34px 1fr 64px; gap:8px; align-items:center; border:0; background:none; font:inherit;
+  color:inherit; padding:4px 0; cursor:pointer; text-align:left}
+.az-je-n{font-family:var(--data); font-weight:800; color:var(--pruefer)}
+.az-je-z .az-bar{height:10px}
+.az-je-p{font-family:var(--data); font-size:13px; text-align:right}
+.az-verloren{list-style:none; margin:0; padding:0}
+.az-verloren li{border-top:1px solid var(--rule-soft)}
+.az-link{display:flex; gap:8px; align-items:baseline; width:100%; border:0; background:none; font:inherit; color:inherit;
+  text-align:left; padding:9px 2px; cursor:pointer}
+.az-link span:nth-child(2){flex:1 1 auto}
+.az-weg{font-family:var(--data); font-weight:700; color:var(--red); white-space:nowrap}
+.az-erg-knoepfe{margin-top:0}
+.az-versuche{width:100%; border-collapse:collapse; font-size:13.5px}
+.az-versuche th, .az-versuche td{text-align:left; padding:6px 4px; border-bottom:1px solid var(--rule-soft)}
+
+/* ------------------------------------------------------------ Start-Block */
+.az-start-reihe{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:10px}
+.az-start-k{background:var(--field); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column}
+.az-start-k b{font-size:20px; font-family:var(--data); line-height:1.1}
+.az-start-k span{font-size:12px; color:var(--muted)}
+.az-start-k.rot b{color:var(--red)}
+.az-start-k.gruen b{color:var(--ok)}
+
+.az-meldung{position:fixed; left:50%; bottom:22px; transform:translate(-50%, 30px); background:var(--ink); color:var(--card);
+  padding:10px 16px; border-radius:10px; font-size:14px; max-width:min(92vw,520px); opacity:0; pointer-events:none;
+  transition:opacity .2s, transform .2s; z-index:90}
+.az-meldung.an{opacity:1; transform:translate(-50%, 0)}
+.az-meldung.fehler{background:var(--red); color:#fff}
+
+/* ------------------------------------------------------------ Handy ------ */
+@media (max-width:640px){
+  .az-karte{padding:14px}
+  .az-karte h2{font-size:20px}
+  .az-leiste{top:52px; border-radius:10px}
+  .az-gitter{grid-template-columns:1fr}
+  .az-teil{padding:12px}
+  .az-modi{grid-template-columns:1fr}
+  .az-fakt b{font-size:17px}
+  .az-leiste-werte .az-wert:first-child{display:none}
+  .az-text{font-size:15px}
+}
+
+@media print{
+  .az-leiste, .az-bogen-fuss, .az-aktionen, .az-bewerten, .az-nochmal{display:none !important}
+}

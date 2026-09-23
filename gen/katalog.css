@@ -104,6 +104,7 @@
 .kt-z.z-p{background:var(--pruefer-soft); color:var(--pruefer); font-weight:700}
 .kt-z.z-neu{background:var(--ok-soft); color:var(--ok); font-weight:700}
 .kt-z.z-luecke{background:var(--red-soft); color:var(--red); font-weight:700}
+.kt-z.z-az{background:var(--card); color:var(--ink); font-weight:700; box-shadow:inset 0 0 0 1px var(--rule)}
 .kt-p.luecke .kt-p-t{color:var(--ink)}
 .kt-det{grid-column:2}
 .kt-p.auf{background:linear-gradient(var(--paper),var(--paper)) padding-box}

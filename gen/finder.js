@@ -226,10 +226,34 @@ window.GENFINDER = (function () {
     }));
   }
 
+  /* Azubi-Navigator: Simulationen und Teilaufgaben — nur mit privatem Paket */
+  function azubi() {
+    const P = window.GENAZUBI && window.GENAZUBI.paket();
+    if (!P) return [];
+    const out = [];
+    P.module.forEach(m => {
+      out.push({
+        typ: "azubi", titel: m.kurz + " — " + m.titel, ikon: "azubi", bonus: 3,
+        unter: "Azubi-Navigator · " + (m.aufgaben || []).length + " Aufgaben · " + m.punkte + " P.",
+        worte: "azubi navigator u-form " + text(m.intro).slice(0, 400),
+        tun: () => window.GENAZUBI.oeffnen(m.id)
+      });
+      (m.aufgaben || []).forEach(a => (a.teile || []).forEach(t => out.push({
+        typ: "azubi", titel: text(t.titel), ikon: "azubi",
+        unter: m.kurz + " · " + t.nr + " " + t.label + " · " + t.punkte + " P.",
+        worte: text(t.text).slice(0, 500),
+        tun: () => window.GENAZUBI.oeffnen(m.id, { ziel: t.id })
+      })));
+    });
+    return out;
+  }
+
   let INDEX = null;
   function index() {
-    if (INDEX) return INDEX;
-    INDEX = [].concat(bereiche(), werkzeuge(), pruefungen(), katalog(), kompendium(), spickzettel(), aufgabentypen());
+    const mitAz = !!(window.GENAZUBI && window.GENAZUBI.paket());
+    if (INDEX && INDEX._az === mitAz) return INDEX;
+    INDEX = [].concat(bereiche(), werkzeuge(), pruefungen(), katalog(), kompendium(), spickzettel(), aufgabentypen(), azubi());
+    INDEX._az = mitAz;
     INDEX.forEach(e => { e._t = norm(e.titel); e._u = norm(e.unter); e._w = norm(e.worte); });
     return INDEX;
   }
@@ -257,12 +281,13 @@ window.GENFINDER = (function () {
   const GRUPPEN = [
     { typen: ["bereich", "werkzeug"], name: "Bereiche & Werkzeuge", max: 5 },
     { typen: ["pruefung"], name: "Prüfungen", max: 4 },
+    { typen: ["azubi"], name: "Azubi-Navigator", max: 4 },
     { typen: ["katalog"], name: "Prüfungskatalog", max: 3 },
     { typen: ["komp"], name: "Kompendium", max: 4 },
     { typen: ["spick"], name: "Spickzettel", max: 4 },
     { typen: ["vorlage"], name: "Aufgabentypen — neu würfeln", max: 4 }
   ];
-  const TYPNAME = { bereich: "Bereich", werkzeug: "Werkzeug", pruefung: "Prüfung", katalog: "Katalog", komp: "Kompendium",
+  const TYPNAME = { bereich: "Bereich", werkzeug: "Werkzeug", pruefung: "Prüfung", azubi: "Azubi-Navigator", katalog: "Katalog", komp: "Kompendium",
                     spick: "Spickzettel", vorlage: "Generator" };
 
   function suchen(q) {
