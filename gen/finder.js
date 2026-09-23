@@ -116,6 +116,8 @@ window.GENFINDER = (function () {
       ["Rechenaufgaben üben", "alle Rechenaufgaben aus allen Prüfungen", "rechnen", () => {
         if (window.GENRECHNEN) window.GENRECHNEN.starte(window.GENRECHNEN.alle(), "alle Prüfungen");
       }, "rechnen rechenaufgaben kalkulation"],
+      ["Fehler wiederholen", "alle Punktverluste · heute fällige zuerst", "wieder",
+        () => window.GENWIEDER && window.GENWIEDER.starten(), "fehler wiederholen wiederholung nochmal falsch"],
       ["Fehlerjournal", "Fehler einordnen", "journal", () => {
         G() && G().oeffneBlock("blatt", "fehlerBox");
       }, "fehler journal fehlerjournal"],
@@ -248,11 +250,24 @@ window.GENFINDER = (function () {
     return out;
   }
 
+  /* Fachbegriffe: deutsch oder russisch suchen, Tipp öffnet das Glossar */
+  function glossar() {
+    const G = window.GENGLOSSAR && window.GENGLOSSAR.daten();
+    if (!G) return [];
+    const AP = { "1": "AP1", "2": "AP2", "1+2": "AP1+2" };
+    return G.liste.map(e => ({
+      typ: "glossar", titel: e.wort + " — " + e.ru, ikon: "glossar",
+      unter: AP[e.ap] + " · " + e.einfach,
+      worte: e.formen.join(" ") + " " + e.ru,
+      tun: () => window.GENGLOSSAR.oeffnen(e.id)
+    }));
+  }
+
   let INDEX = null;
   function index() {
     const mitAz = !!(window.GENAZUBI && window.GENAZUBI.paket());
     if (INDEX && INDEX._az === mitAz) return INDEX;
-    INDEX = [].concat(bereiche(), werkzeuge(), pruefungen(), katalog(), kompendium(), spickzettel(), aufgabentypen(), azubi());
+    INDEX = [].concat(bereiche(), werkzeuge(), pruefungen(), katalog(), kompendium(), spickzettel(), aufgabentypen(), azubi(), glossar());
     INDEX._az = mitAz;
     INDEX.forEach(e => { e._t = norm(e.titel); e._u = norm(e.unter); e._w = norm(e.worte); });
     return INDEX;
@@ -283,11 +298,12 @@ window.GENFINDER = (function () {
     { typen: ["pruefung"], name: "Prüfungen", max: 4 },
     { typen: ["azubi"], name: "Azubi-Navigator", max: 4 },
     { typen: ["katalog"], name: "Prüfungskatalog", max: 3 },
+    { typen: ["glossar"], name: "Fachbegriffe DE → RU", max: 3 },
     { typen: ["komp"], name: "Kompendium", max: 4 },
     { typen: ["spick"], name: "Spickzettel", max: 4 },
     { typen: ["vorlage"], name: "Aufgabentypen — neu würfeln", max: 4 }
   ];
-  const TYPNAME = { bereich: "Bereich", werkzeug: "Werkzeug", pruefung: "Prüfung", azubi: "Azubi-Navigator", katalog: "Katalog", komp: "Kompendium",
+  const TYPNAME = { bereich: "Bereich", werkzeug: "Werkzeug", pruefung: "Prüfung", azubi: "Azubi-Navigator", glossar: "Glossar", katalog: "Katalog", komp: "Kompendium",
                     spick: "Spickzettel", vorlage: "Generator" };
 
   function suchen(q) {

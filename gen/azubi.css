@@ -81,6 +81,8 @@
 .az-modus:hover, .az-modus:focus-visible{border-color:var(--pruefer); background:var(--pruefer-soft)}
 .az-modus b{font-size:15.5px; color:var(--pruefer)}
 .az-modus span{font-size:13px; color:var(--muted); line-height:1.45}
+.az-modus.empf{border-color:var(--pruefer); border-width:2px; background:var(--pruefer-soft)}
+.az-modus .az-chip.az-empf{align-self:flex-start; background:var(--pruefer); color:#fff; font-size:11px}
 
 /* ------------------------------------------------------------ Leiste ----- */
 .az-leiste{position:sticky; top:62px; z-index:6; background:var(--card); border:1px solid var(--rule); border-radius:12px;

@@ -1,0 +1,89 @@
+/* ============================================================================
+   gen/glossar.css — Fachbegriffe DE → RU (gen/glossar.js)
+   ========================================================================== */
+
+/* im Text: dezent unterstrichen, Farbe nach AP */
+.gl-w{text-decoration:underline dotted; text-decoration-thickness:1.5px; text-underline-offset:3px;
+  text-decoration-color:var(--pruefer); cursor:help; border-radius:3px}
+.gl-w.ap2{text-decoration-color:var(--warn)}
+.gl-w.ap12{text-decoration-color:var(--ok)}
+.gl-w:hover, .gl-w:focus-visible{background:var(--pruefer-soft); outline:none}
+
+/* Kärtchen: unten am Rand, auch auf dem Handy gut lesbar */
+.gl-blase{position:fixed; left:50%; bottom:14px; transform:translate(-50%, 140%); width:min(94vw, 460px); z-index:95;
+  background:var(--card); color:var(--ink); border:1px solid var(--rule); border-radius:14px; padding:14px 16px 12px;
+  box-shadow:0 12px 34px rgba(10,20,40,.28); transition:transform .18s ease; visibility:hidden}
+.gl-blase.an{transform:translate(-50%, 0); visibility:visible}
+.gl-b-kopf{display:flex; align-items:center; gap:8px}
+.gl-b-t{flex:1 1 auto; font-size:18px; line-height:1.25}
+.gl-art{color:var(--muted); font-weight:500}
+.gl-zu{border:0; background:var(--field); color:var(--ink); width:32px; height:32px; border-radius:99px; font-size:20px; line-height:1; cursor:pointer}
+.gl-ap{font-family:var(--data); font-size:11px; font-weight:800; border-radius:99px; padding:2px 8px; white-space:nowrap;
+  background:var(--pruefer-soft); color:var(--pruefer)}
+.gl-ap.ap2{background:var(--warn-soft); color:var(--warn)}
+.gl-ap.ap12{background:var(--ok-soft); color:var(--ok)}
+.gl-ru{font-size:16px; font-weight:700; margin:8px 0 0; line-height:1.4}
+.gl-ru.gross{font-size:20px}
+.gl-einfach{font-size:14.5px; line-height:1.5; margin:6px 0 0}
+.gl-meta{font-size:12px; color:var(--muted); margin:8px 0 0}
+.gl-b-knoepfe{display:flex; gap:8px; margin-top:10px}
+.gl-b-knoepfe .btn{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:13.5px; border-radius:9px; min-height:36px; padding:6px 12px}
+.gl-b-knoepfe .btn.an{background:var(--ok-soft); border-color:var(--ok); color:var(--ok)}
+
+/* ------------------------------------------------------------ Seite ----- */
+.gl-seite{max-width:860px}
+.gl-wrap{display:flex; flex-direction:column; gap:12px}
+.gl-seite .steuer{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.gl-seite .btn{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:14px; font-weight:650; border-radius:9px; padding:9px 15px; min-height:40px}
+.gl-karte{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:16px 18px;
+  box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06)}
+.gl-karte h2{font-family:var(--body); font-size:21px; font-weight:800; margin:0; color:var(--pruefer)}
+.gl-info{font-size:13px; color:var(--muted); line-height:1.5; margin:6px 2px 0}
+.gl-fakten{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:12px}
+.gl-fakt{background:var(--field); border-radius:9px; padding:8px 10px; display:flex; flex-direction:column}
+.gl-fakt b{font-size:19px; font-family:var(--data)}
+.gl-fakt span{font-size:11.5px; color:var(--muted)}
+.gl-fakt.ap1 b{color:var(--pruefer)} .gl-fakt.ap2 b{color:var(--warn)} .gl-fakt.ap12 b{color:var(--ok)}
+.gl-schalter{display:flex; align-items:center; gap:8px; margin-top:12px; font-size:14px; cursor:pointer}
+.gl-schalter input{width:18px; height:18px; accent-color:var(--pruefer)}
+
+.gl-leiste{display:flex; flex-direction:column; gap:8px; position:sticky; top:62px; z-index:5; background:var(--paper, var(--card));
+  padding:6px 0}
+.gl-sfeld{display:flex; align-items:center; background:var(--card); border:1px solid var(--rule); border-radius:11px; padding:0 10px}
+.gl-sfeld:focus-within{border-color:var(--pruefer)}
+#glSuche{flex:1 1 auto; min-width:0; border:0; background:transparent; outline:none; font-size:16px; padding:11px 4px; color:var(--ink)}
+.gl-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.gl-chip{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:99px; padding:5px 11px;
+  font:inherit; font-size:13px; cursor:pointer; min-height:34px}
+.gl-chip.an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.gl-sel{font:inherit; font-size:14px; padding:6px 8px; border:1px solid var(--rule); border-radius:9px; background:var(--card); color:var(--ink); min-height:34px; max-width:100%}
+
+.gl-liste{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:8px}
+.gl-e{background:var(--card); border:1px solid var(--rule); border-radius:11px; padding:10px 12px; display:flex; flex-direction:column; gap:2px}
+.gl-e.kann{opacity:.72}
+.gl-e.gl-blink{box-shadow:0 0 0 3px var(--pruefer)}
+.gl-e-kopf{display:flex; align-items:flex-start; gap:8px}
+.gl-e-t{flex:1 1 auto; font-size:15.5px; line-height:1.3}
+.gl-e .gl-ru{font-size:14.5px; margin-top:4px}
+.gl-e .gl-einfach{font-size:13.5px; color:var(--ink); margin-top:2px}
+.gl-e-fuss{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:6px}
+.gl-geb{font-size:11.5px; color:var(--muted)}
+.gl-kann{border:1px solid var(--rule); background:var(--card); color:var(--muted); border-radius:99px; padding:3px 10px; font:inherit; font-size:12px; cursor:pointer; min-height:30px}
+.gl-kann.an{border-color:var(--ok); color:var(--ok); background:var(--ok-soft)}
+
+.gl-kleiste{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:9px 12px}
+.gl-kleiste b{color:var(--pruefer)}
+.gl-kleiste span{font-family:var(--data); font-size:12.5px; flex:1 1 auto}
+.gl-link{border:0; background:none; font:inherit; font-size:13px; color:var(--pruefer); cursor:pointer; text-decoration:underline}
+.gl-lernkarte{display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-height:260px}
+.gl-lk-t{font-size:26px; line-height:1.25; margin-top:8px}
+.gl-umdrehen{width:100%; margin-top:auto; min-height:48px}
+.gl-lk-knoepfe{display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%; margin-top:auto; padding-top:12px}
+.gl-lk-knoepfe .wd-b{min-height:52px; font-weight:700; font-size:15px}
+
+@media (max-width:640px){
+  .gl-leiste{top:52px}
+  .gl-fakt b{font-size:17px}
+  .gl-liste{grid-template-columns:1fr}
+}
+@media print{ .gl-w{text-decoration:none} .gl-blase{display:none} }

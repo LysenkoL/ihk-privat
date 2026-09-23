@@ -1,0 +1,86 @@
+/* ============================================================================
+   gen/wiederholen.css — Fehler wiederholen (gen/wiederholen.js)
+   ========================================================================== */
+
+.wd-seite{max-width:760px}
+.wd-wrap{display:flex; flex-direction:column; gap:12px}
+.wd-seite .steuer{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.wd-seite .btn{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:14px; font-weight:650;
+  border-radius:9px; padding:9px 15px; min-height:40px}
+.wd-seite .btn.klein{min-height:34px; padding:5px 11px; font-size:13px}
+
+.wd-leiste{position:sticky; top:62px; z-index:6; display:flex; align-items:center; gap:10px; background:var(--card);
+  border:1px solid var(--rule); border-radius:12px; padding:9px 12px; box-shadow:0 4px 14px rgba(18,40,70,.08)}
+.wd-leiste b{font-size:14px; color:var(--pruefer); white-space:nowrap}
+.wd-zahl{font-family:var(--data); font-size:12.5px; white-space:nowrap}
+.wd-bar{flex:1 1 auto; height:6px; background:var(--rule-soft); border-radius:99px; overflow:hidden}
+.wd-bar i{display:block; height:100%; background:var(--pruefer)}
+
+.wd-karte{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:16px 18px;
+  box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06); border-left:4px solid var(--pruefer)}
+.wd-karte.q-azubi{border-left-color:var(--warn)}
+.wd-karte.q-gen{border-left-color:var(--gr-ueben, var(--ok))}
+.wd-karte.q-katalog, .wd-karte.q-karte{border-left-color:var(--gr-nachschlagen, var(--muted))}
+.wd-karte h2{font-family:var(--body); font-size:21px; font-weight:800; margin:0; color:var(--pruefer)}
+.wd-kopf{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.wd-quelle{font-size:11.5px; font-weight:800; border-radius:99px; padding:2px 9px; background:var(--pruefer-soft); color:var(--pruefer)}
+.wd-quelle.q-azubi{background:var(--warn-soft); color:var(--warn)}
+.wd-quelle.q-gen{background:var(--gr-ueben-soft, var(--ok-soft)); color:var(--gr-ueben, var(--ok))}
+.wd-quelle.q-katalog, .wd-quelle.q-karte{background:var(--field); color:var(--ink)}
+.wd-wo{font-family:var(--data); font-size:12.5px; color:var(--muted); flex:1 1 auto}
+.wd-verlust{font-family:var(--data); font-size:12.5px; font-weight:700; color:var(--red); white-space:nowrap}
+.wd-titel{font-size:16px; font-weight:800; margin:8px 0 0}
+.wd-intro{font-size:13.5px; color:var(--muted); line-height:1.5; margin:8px 0 0; white-space:pre-wrap}
+.wd-text{font-size:15px; line-height:1.6; margin-top:8px; white-space:pre-wrap; overflow-wrap:break-word}
+.wd-frage .az-text, .wd-loesung .az-text{white-space:normal}
+.wd-sub{font-size:13.5px; color:var(--muted); line-height:1.5; margin:6px 0 0}
+.wd-bild{display:block; max-width:100%; height:auto; margin:10px 0; border-radius:8px; border:1px solid var(--rule-soft); background:#fff; cursor:zoom-in}
+.wd-antwort{width:100%; margin-top:12px; font-size:16px; line-height:1.5; min-height:70px}
+.wd-zeig{width:100%; margin-top:10px; min-height:46px}
+.wd-loesung{margin-top:12px; background:var(--ok-soft); border-radius:10px; padding:10px 12px}
+.wd-loesung h5{margin:0; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ok)}
+.wd-loesung .az-text{margin-top:6px}
+.wd-frage-satz{font-size:14px; font-weight:700; margin:14px 0 6px}
+.wd-bewerten{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px}
+.wd-b{display:flex; flex-direction:column; align-items:center; gap:2px; border:1px solid var(--rule); background:var(--card); color:var(--ink);
+  border-radius:11px; padding:10px 6px; font:inherit; cursor:pointer; min-height:62px; justify-content:center}
+.wd-b b{font-size:14.5px}
+.wd-b span{font-size:11.5px; color:var(--muted)}
+.wd-b.b-nicht{border-color:var(--red); background:var(--red-soft)}
+.wd-b.b-halb{border-color:var(--warn); background:var(--warn-soft)}
+.wd-b.b-gut{border-color:var(--ok); background:var(--ok-soft)}
+.wd-kfuss{display:flex; flex-wrap:wrap; gap:4px 14px; margin-top:14px; padding-top:10px; border-top:1px solid var(--rule-soft)}
+.wd-link{border:0; background:none; font:inherit; font-size:13px; color:var(--pruefer); padding:6px 0; cursor:pointer; text-decoration:underline; text-underline-offset:2px}
+
+.wd-ende .wd-fakten{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:12px}
+.wd-fakt{background:var(--field); border-radius:9px; padding:8px 10px; display:flex; flex-direction:column}
+.wd-fakt b{font-size:22px; font-family:var(--data)}
+.wd-fakt span{font-size:12px; color:var(--muted)}
+.wd-fakt.gut b{color:var(--ok)} .wd-fakt.halb b{color:var(--warn)} .wd-fakt.nicht b{color:var(--red)}
+
+.wd-gruppe h3{display:flex; align-items:center; gap:8px; font-size:15px; font-weight:800; margin:6px 2px 6px}
+.wd-gruppe h3 .n{font-family:var(--data); font-size:12px; background:var(--field); border-radius:99px; padding:1px 8px; color:var(--muted)}
+.wd-liste{list-style:none; margin:0; padding:0; background:var(--card); border:1px solid var(--rule); border-radius:12px; overflow:hidden}
+.wd-liste li + li{border-top:1px solid var(--rule-soft)}
+.wd-zeile{display:flex; gap:10px; align-items:center; width:100%; border:0; background:none; font:inherit; color:inherit;
+  text-align:left; padding:10px 12px; cursor:pointer}
+.wd-zeile:hover{background:var(--pruefer-soft)}
+.wd-z-t{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto}
+.wd-z-t b{font-family:var(--data); font-size:12px; color:var(--pruefer)}
+.wd-z-t span{font-size:13.5px; line-height:1.35; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+.wd-z-r{display:flex; flex-direction:column; align-items:flex-end; gap:2px}
+.wd-faellig{font-size:11.5px; color:var(--muted); white-space:nowrap}
+.wd-faellig.heute{color:var(--red); font-weight:700}
+
+.wd-start-reihe{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:10px}
+.wd-start-k{background:var(--field); border-radius:10px; padding:8px 10px; display:flex; flex-direction:column}
+.wd-start-k b{font-size:20px; font-family:var(--data); line-height:1.1}
+.wd-start-k span{font-size:12px; color:var(--muted)}
+.wd-start-k.rot b{color:var(--red)}
+.wd-start-k.gruen b{color:var(--ok)}
+
+@media (max-width:640px){
+  .wd-leiste{top:52px}
+  .wd-karte{padding:14px}
+  .wd-bewerten{gap:6px}
+}

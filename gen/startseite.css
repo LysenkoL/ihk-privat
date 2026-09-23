@@ -80,7 +80,7 @@
   justify-content:center; background:var(--field); color:var(--muted)}
 .fd-bereich,.fd-werkzeug{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
 .fd-pruefung,.fd-aufgabe,.fd-azubi{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
-.fd-komp,.fd-spick,.fd-katalog{background:var(--gr-nachschlagen-soft); color:var(--gr-nachschlagen)}
+.fd-komp,.fd-spick,.fd-katalog,.fd-glossar{background:var(--gr-nachschlagen-soft); color:var(--gr-nachschlagen)}
 .fd-vorlage{background:var(--gr-ueben-soft); color:var(--gr-ueben)}
 .fd-txt{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:1px}
 .fd-t{font-size:14.5px; font-weight:600; line-height:1.3}

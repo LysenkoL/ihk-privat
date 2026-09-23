@@ -36,6 +36,20 @@
 
    Was jetzt noch nicht sitzt, sitzt auch nicht mehr; was man am letzten Abend
    neu anfängt, verdrängt eher etwas, das schon saß.
+
+   Seit v31 (Azubi-Navigator + Fehler wiederholen) sieht die letzte Woche so aus:
+
+       heute           Azubi-Prüfung, die angefangen oder noch nie gemacht ist —
+                       als Übung, Aufgabe für Aufgabe
+       danach im Wechsel
+                       Azubi-Prüfung im Prüfungsmodus (90 Min. + Auswertung)
+                       Schwachstelle: die schwächste Vertiefende Übung + Fehler
+       3 Tage vorher   Generalprobe: neueste IHK-Prüfung auf Papier
+       2 Tage vorher   alle Fehler der Woche wiederholen, Rechenaufgaben
+       1 Tag  vorher   Formelblatt, Tasche, 15 Minuten Fehler
+       Prüfungstag     Checkliste
+
+   Ohne Azubi-Paket bleibt es beim alten Wechsel aus IHK-Prüfung und Thema.
    ========================================================================== */
 "use strict";
 
@@ -54,8 +68,11 @@ window.GENENDSPURT = (function () {
   function tageBis() { return Math.max(0, Math.round((tag0(TERMIN) - tag0(new Date())) / 864e5)); }
 
   /* ------------------------------------------------------------ Speicher */
+  const PLAN_VERSION = 2;
   let S = { gebaut: null, tage: [], erledigt: {}, planOffen: false };
   try { Object.assign(S, JSON.parse(localStorage.getItem(SK)) || {}); } catch (e) { }
+  /* Plan aus einer älteren Fassung: einmal neu bauen, Haken bleiben */
+  if (S.v !== PLAN_VERSION) S.tage = [];
   function sichern() { try { localStorage.setItem(SK, JSON.stringify(S)); } catch (e) { } }
 
   /* --------------------------------------------------------- Bausteine --- */
@@ -107,6 +124,35 @@ window.GENENDSPURT = (function () {
                          quote: x.quote == null ? null : Math.round(x.quote * 100) }));
   }
 
+  /* Azubi-Navigator: Prüfungen (angefangen → nie gemacht → schwach) und
+     Vertiefende Übungen (schwächste zuerst). Fertige fallen heraus.      */
+  function azubiListen() {
+    const A = window.GENAZUBI, P = A && A.paket && A.paket();
+    if (!P) return null;
+    const L = A.sortiert(P.module, A.zustand, P.bisher);
+    const sims = L.filter(e => e.m.art === "pruefung" && e.g !== "gemacht" && !e.s.fertig);
+    const rang = { schwach: 0, weiter: 1, neu: 2, gemacht: 3 };
+    const vert = L.filter(e => e.m.art === "vertiefung" && !e.s.fertig)
+      .sort((a, b) => rang[a.g] - rang[b.g] || (a.pr != null && b.pr != null ? a.pr - b.pr : 0) || a.m.nr - b.m.nr);
+    return { sims, vert, alle: L, bisher: P.bisher || {} };
+  }
+  const azName = m => (m.art === "pruefung" ? "Azubi P" + String(m.nr).padStart(2, "0") : "Azubi VÜ " + m.nr);
+
+  /* Generalprobe: die neueste IHK-Prüfung, die noch nie bewertet wurde —
+     sie liegt am nächsten an dem, was am 30.09. kommt.                   */
+  function generalprobe() {
+    if (typeof EXAMS === "undefined" || !EXAMS.length) return null;
+    const versuche = (typeof ATTEMPTS === "undefined") ? [] : ATTEMPTS;
+    const gemacht = new Set(versuche.filter(a => a && a.examId).map(a => a.examId));
+    const rang = ex => ((ex.meta || {}).year || 0) * 2 + (/herbst/i.test((ex.meta || {}).season || "") ? 1 : 0);
+    const frisch = EXAMS.filter(ex => !gemacht.has(ex.examId)).sort((a, b) => rang(b) - rang(a));
+    if (frisch.length) return frisch[0].examId;
+    const q = warteschlange();
+    return q.length ? q[0] : null;
+  }
+
+  const FEHLER = { art: "fehler", titel: "15 Min. Fehler wiederholen" };
+
   /* -------------------------------------------------------------- Bauen --- */
   function bauen() {
     const n = tageBis();
@@ -115,11 +161,65 @@ window.GENENDSPURT = (function () {
     const schwach = schwachstellen();
     const tage = [];
     let qi = 0, ti = 0, zyklus = 0, letzteSim = null;
+    const AZ = azubiListen();
+    let si = 0, vi = 0;
+    const gp = generalprobe();
 
     for (let i = 0; i <= n; i++) {
       const d = new Date(heute.getTime() + i * 864e5);
       const rest = n - i;
       const e = { key: iso(d), rest: rest };
+
+      if (AZ && rest >= 4) {
+        /* Azubi-Woche: heute üben, dann Prüfung ↔ Schwachstelle im Wechsel */
+        const sim = AZ.sims[si], vert = AZ.vert[vi];
+        const erster = i === 0;
+        if ((erster || i % 2 === 1) && sim) {
+          si++;
+          const m = sim.m;
+          const alsUebung = erster && !(sim.z && sim.z.modus === "pruefung");
+          e.art = "azubi"; e.azId = m.id; e.modus = alsUebung ? "uebung" : "pruefung";
+          e.minuten = alsUebung ? 100 : 135;
+          const b = AZ.bisher[m.id];
+          const woher = sim.g === "weiter" ? "Angefangen — genau dort weitermachen. " :
+            (b ? "Im Azubi-Navigator bisher " + b + ". " : "Noch nie gemacht. ");
+          if (alsUebung) {
+            e.titel = azName(m) + " als Übung — " + m.titel;
+            e.text = woher + "Aufgabe für Aufgabe: antworten, „Lösung zeigen“, ehrlich bewerten. " +
+                     "Alles wird gespeichert — du kannst in Etappen arbeiten.";
+          } else {
+            e.titel = azName(m) + " als Prüfung — 90 Min. + Auswertung";
+            e.text = woher + m.titel + ". Uhr läuft, keine Lösungen. Danach abgeben und die Textantworten " +
+                     "mit der Musterlösung bewerten. Jeder Punktverlust landet automatisch in „Fehler wiederholen“.";
+            e.zusatz = { art: "azErg", azId: m.id, titel: "Auswertung" };
+          }
+          tage.push(e);
+          continue;
+        }
+        if (vert) {
+          vi++;
+          const m = vert.m, b = AZ.bisher[m.id];
+          e.art = "azubi"; e.azId = m.id; e.modus = "uebung";
+          e.minuten = (m.minuten || 45) + 15;
+          e.titel = "Schwachstelle: " + azName(m) + " — " + m.titel;
+          e.text = (b ? "Im Azubi-Navigator " + b + ". " : "") + "Als Übung, " + (m.minuten || 45) +
+                   " Minuten. Danach 15 Minuten „Fehler wiederholen“ — die Fehler der letzten Tage sind dann fällig.";
+          e.zusatz = FEHLER;
+          tage.push(e);
+          continue;
+        }
+        /* Azubi erschöpft: weiter mit dem alten Wechsel unten */
+      }
+
+      if (AZ && rest === 3 && gp) {
+        e.art = "sim"; e.minuten = 135; e.examId = gp;
+        e.titel = "Generalprobe: " + examName(gp) + " auf Papier — 90 Min. + Auswertung";
+        e.text = "So wie am 30.09.: Bogen drucken, Uhr stellen, keine Lösungen, keine App. " +
+                 "Direkt danach Punkte eintragen — was fehlt, geht automatisch in „Fehler wiederholen“.";
+        e.zusatz = { art: "nach", examId: gp, titel: "Auswertung" };
+        tage.push(e);
+        continue;
+      }
 
       if (rest === 0) {
         e.art = "pruefungstag"; e.minuten = 90;
@@ -129,17 +229,18 @@ window.GENENDSPURT = (function () {
                  "einmal durchblättern, dann mit der Aufgabe anfangen, die am leichtesten " +
                  "aussieht — nicht mit Nummer 1.";
       } else if (rest === 1) {
-        e.art = "ruhe"; e.minuten = 30;
-        e.titel = "Formelblatt und Tasche";
-        e.text = "Einmal das Formelblatt laut durchgehen, Merkblatt danebenlegen, Tasche " +
-                 "packen, Wecker stellen. Danach Schluss — der Abend vorher bringt keine " +
-                 "Punkte mehr, aber schlechter Schlaf kostet welche.";
+        e.art = "ruhe"; e.minuten = 45;
+        e.titel = "Formelblatt, Tasche, 15 Min. Fehler";
+        e.text = "Einmal das Formelblatt laut durchgehen, Merkblatt danebenlegen, die heute fälligen " +
+                 "Fehler wiederholen, Tasche packen, Wecker stellen. Danach Schluss — der Abend vorher " +
+                 "bringt keine Punkte mehr, aber schlechter Schlaf kostet welche.";
+        e.zusatz = FEHLER;
       } else if (rest === 2) {
-        e.art = "wiederholen"; e.minuten = 45;
-        e.titel = "Merkblatt, Satzbau, Fehlerjournal";
-        e.text = "Nichts Neues mehr. Das eigene Merkblatt lesen, zehn Satzbau-Karten, " +
-                 "die offenen Fehler im Journal einordnen. Das ist die letzte Stelle, " +
-                 "an der noch Punkte umsonst zu holen sind.";
+        e.art = "fehler"; e.minuten = 45;
+        e.titel = "Alle Fehler der Woche wiederholen";
+        e.text = "Nichts Neues mehr. „Fehler wiederholen“ abarbeiten, bis für heute nichts mehr fällig ist — " +
+                 "das sind genau die Punkte, die du in dieser Woche liegen gelassen hast. Danach Rechenaufgaben quer.";
+        e.zusatz = { art: "rechnen", titel: "Rechenaufgaben quer" };
       } else if (rest === 3) {
         e.art = "rechnen"; e.minuten = 45;
         e.titel = "Rechenaufgaben quer durch alle Prüfungen";
@@ -166,12 +267,17 @@ window.GENENDSPURT = (function () {
             ? (s.quote == null ? "Noch nie bewertet" : s.quote + " % erreicht") +
               " bei " + s.gewicht + " BE Prüfungsgewicht — das ist der teuerste offene Punkt."
             : "Acht Aufgaben aus dem Generator.";
+          e.zusatz = FEHLER;
         }
       }
       tage.push(e);
     }
     S.gebaut = iso(heute);
     S.tage = tage;
+    S.v = PLAN_VERSION;
+    S.mitAzubi = !!AZ;
+    /* „Wenn Zeit bleibt“: nur, was noch nie gemacht oder schwach ist */
+    S.extra = AZ ? AZ.alle.filter(e => !e.s.fertig && e.g !== "gemacht" && !tage.some(t => t.azId === e.m.id)).map(e => e.m.id) : [];
     sichern();
     return tage;
   }
@@ -186,6 +292,18 @@ window.GENENDSPURT = (function () {
 
   /* ------------------------------------------------------------ Starten --- */
   function starte(t) {
+    if (t.art === "azubi") {
+      if (window.GENAZUBI) window.GENAZUBI.oeffnen(t.azId, { modus: t.modus });
+      return;
+    }
+    if (t.art === "azErg") {
+      if (window.GENAZUBI) window.GENAZUBI.oeffnen(t.azId, { ergebnis: true });
+      return;
+    }
+    if (t.art === "fehler") {
+      if (window.GENWIEDER) window.GENWIEDER.starten();
+      return;
+    }
     if (t.art === "sim") {
       const ex = examVon(t.examId);
       if (ex && typeof oeffnePruefung === "function") {
@@ -253,7 +371,7 @@ window.GENENDSPURT = (function () {
 
     const kopf = el("div", "es-kopf");
     kopf.appendChild(el("h2", null, $("stKopf") ? "Endspurt · nächste Tage" : "Endspurt"));
-    const fertig = tage.filter(t => S.erledigt[t.key]).length;
+    const fertig = tage.filter(t => erledigt(t.key)).length;
     kopf.appendChild(el("span", "es-stand", fertig + " von " + tage.length + " erledigt"));
     kopf.appendChild(el("span", "es-zahl", n === 0 ? "heute" : n === 1 ? "noch 1 Tag" : "noch " + n + " Tage"));
     b.appendChild(kopf);
@@ -276,6 +394,23 @@ window.GENENDSPURT = (function () {
     const offen = b.dataset.alle === "1";
     (offen ? rest : rest.slice(0, 4)).forEach(t => liste.appendChild(tagEl(t, t === tage[0])));
     if (rest.length) b.appendChild(liste);
+
+    /* Azubi-Module, die im Plan keinen eigenen Tag haben */
+    const A = window.GENAZUBI;
+    const extra = (S.extra || []).map(id => A && A.modul && A.modul(id)).filter(Boolean)
+      .filter(m => !A.auswertung(m, A.zustand(m.id)).fertig);
+    if (extra.length) {
+      const x = el("div", "es-extra");
+      x.appendChild(el("span", "es-extra-t", "Wenn Zeit bleibt:"));
+      extra.slice(0, 6).forEach(m => {
+        const c = el("button", "es-extra-k", azName(m).replace("Azubi ", ""));
+        c.type = "button";
+        c.title = m.titel;
+        c.onclick = () => A.oeffnen(m.id);
+        x.appendChild(c);
+      });
+      b.appendChild(x);
+    }
 
     const fuss = el("div", "es-fuss");
     if (rest.length > 4) {
@@ -303,7 +438,31 @@ window.GENENDSPURT = (function () {
     try { window.GENSTART && window.GENSTART.kopfAktualisieren(); } catch (e) { }
   }
 
-  function erledigt(key) { return !!S.erledigt[key]; }
+  /* Erledigt heißt: abgehakt — oder die Sache ist tatsächlich fertig
+     (Azubi-Prüfung vollständig bewertet, heutige Fehler durch).        */
+  function autoFertig(t) {
+    if (!t) return false;
+    try {
+      if (t.art === "azubi" && window.GENAZUBI) {
+        const A = window.GENAZUBI, m = A.modul(t.azId);
+        return !!m && A.auswertung(m, A.zustand(t.azId)).fertig;
+      }
+      if (t.art === "fehler" && window.GENWIEDER) {
+        return t.key === iso(tag0(new Date())) && window.GENWIEDER.heuteGeschafft() > 0 && window.GENWIEDER.heuteErledigt();
+      }
+    } catch (e) { }
+    return false;
+  }
+  function erledigt(key) {
+    if (S.erledigt[key]) return true;
+    return autoFertig((S.tage || []).find(x => x.key === key));
+  }
+  /** Das Azubi-Paket ist nachträglich da (Handy: „Paket laden“) — einmal neu planen */
+  function azubiDa() {
+    if (S.mitAzubi || !aktiv()) return;
+    bauen();
+    try { box(); kopfNeu(); } catch (e) { }
+  }
   function abhaken(key) {
     const t = (S.tage || []).find(x => x.key === key);
     if (S.erledigt[key]) delete S.erledigt[key];
@@ -317,7 +476,7 @@ window.GENENDSPURT = (function () {
      nach einem Tipp auf die Zeile — der heutige Tag steht ohnehin
      ausführlich oben unter „Heute“.                                     */
   function tagEl(t, heute) {
-    const fertig = !!S.erledigt[t.key];
+    const fertig = erledigt(t.key);
     const z = el("li", "es-tag es-" + t.art + (heute ? " heute" : "") + (fertig ? " fertig" : ""));
 
     const hak = el("button", "es-hak" + (fertig ? " an" : ""));
@@ -387,5 +546,5 @@ window.GENENDSPURT = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
   else einhaengen();
 
-  return { plan, bauen, box, starte, tageBis, aktiv, warteschlange, schwachstellen, erledigt, abhaken };
+  return { plan, bauen, box, starte, tageBis, aktiv, warteschlange, schwachstellen, erledigt, abhaken, azubiDa, generalprobe };
 })();

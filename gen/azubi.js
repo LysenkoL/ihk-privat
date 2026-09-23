@@ -248,6 +248,8 @@
   function paketGeaendert() {
     Object.keys(KAT).forEach(k => delete KAT[k]);
     try { if (root.GENKATALOG && root.GENKATALOG.neu) root.GENKATALOG.neu(); } catch (e) { console.error("Azubi/Katalog:", e); }
+    try { if (root.GENENDSPURT && root.GENENDSPURT.azubiDa) root.GENENDSPURT.azubiDa(); } catch (e) { console.error("Azubi/Endspurt:", e); }
+    try { if (root.GENWIEDER && root.GENWIEDER.block) root.GENWIEDER.block(); } catch (e) { }
   }
 
   /* ======================================================================
@@ -348,7 +350,7 @@
 
   function zeigen() {
     const s = seite();
-    const vorher = ["scBogen", "scAuswertung", "scKatalog"].find(id => $(id) && !$(id).hidden) || "scStart";
+    const vorher = ["scBogen", "scAuswertung", "scKatalog", "scWieder"].find(id => $(id) && !$(id).hidden) || "scStart";
     if (vorher !== "scAzubi") herkunft = vorher;
     document.querySelectorAll("div.seite[id^='sc'], #scBogen").forEach(e => { if (e.id !== "scAzubi") e.hidden = true; });
     s.hidden = false;
@@ -357,7 +359,7 @@
     if ($("kTitel")) $("kTitel").textContent = "Azubi-Navigator";
     if ($("kEyebrow")) $("kEyebrow").textContent = "u-form · Prüfungstraining AP1";
     if (root.GENZURUECK) {
-      try { root.GENZURUECK.hoeher && root.GENZURUECK.hoeher("scAzubi", herkunft === "scKatalog" ? "scStart" : herkunft); } catch (e) { }
+      try { root.GENZURUECK.hoeher && root.GENZURUECK.hoeher("scAzubi", (herkunft === "scKatalog" || herkunft === "scWieder") ? "scStart" : herkunft); } catch (e) { }
       try { root.GENZURUECK.knopfPflegen(); } catch (e) { }
     }
   }
@@ -379,7 +381,7 @@
     laden().then(() => {
       if (id && !modul(id)) id = null;
       lauffStop();
-      VIEW = id ? { art: (opt && opt.ergebnis) ? "ergebnis" : "modul", id, ziel: opt && opt.ziel } : { art: "liste" };
+      VIEW = id ? { art: (opt && opt.ergebnis) ? "ergebnis" : "modul", id, ziel: opt && opt.ziel, modus: opt && opt.modus } : { art: "liste" };
       zeichnen();
       zeigen();
       verlauf();
@@ -644,9 +646,15 @@
     const z = zustand(m.id);
     LAUF = { m, z, uhr: null, tick: Date.now() };
     if (!z.start) z.start = Date.now();
-    /* Sprung aus Katalog/Suche auf eine bestimmte Teilaufgabe: gleich üben */
-    if (!z.modus && VIEW.ziel) { z.modus = "uebung"; sichern(true); }
-    if (!z.modus) { startKarte(box, m, z); return; }
+    /* Sprung aus Katalog/Suche auf eine bestimmte Teilaufgabe: gleich üben.
+       Aus dem Endspurt kommt nur eine Empfehlung — die Uhr startet erst,
+       wenn man selbst „Als Prüfung“ tippt. */
+    if (!z.modus && VIEW.ziel) {
+      z.modus = "uebung"; z.start = Date.now(); z.zeit = 0; z.abgegeben = false;
+      sichern(true);
+    }
+    const empfohlen = VIEW.modus; VIEW.modus = null;
+    if (!z.modus) { startKarte(box, m, z, empfohlen); return; }
 
     box.appendChild(leiste(m, z));
 
@@ -716,7 +724,7 @@
     if (blinken) { c.classList.add("az-blink"); setTimeout(() => c.classList.remove("az-blink"), 1600); }
   }
 
-  function startKarte(box, m, z) {
+  function startKarte(box, m, z, empfohlen) {
     const P = paket();
     const k = el("div", "az-karte az-start");
     k.appendChild(el("span", "az-eyebrow", m.kurz + (m.art === "vertiefung" ? " · Vertiefende Übung" : " · Prüfungssimulation")));
@@ -732,8 +740,9 @@
     }
     const wahl = el("div", "az-modi");
     const modus = (art, titel, text) => {
-      const c = el("button", "az-modus");
+      const c = el("button", "az-modus" + (empfohlen === art ? " empf" : ""));
       c.type = "button";
+      if (empfohlen === art) c.appendChild(el("span", "az-chip az-empf", "laut Plan"));
       c.appendChild(el("b", null, titel));
       c.appendChild(el("span", null, text));
       c.onclick = () => { z.modus = art; z.start = Date.now(); z.zeit = 0; z.abgegeben = false; LAUF = { m, z }; sichern(true); zeichnen(); root.scrollTo(0, 0); };
@@ -1445,8 +1454,31 @@
     }), 250);
   }
 
+  /** Eine Teilaufgabe als Frage und Lösung — für „Fehler wiederholen“ */
+  function ansicht(mid, tid) {
+    const m = modul(mid);
+    if (!m || !hatDom) return null;
+    let t = null, a = null;
+    (m.aufgaben || []).forEach(x => (x.teile || []).forEach(y => { if (y.id === tid) { t = y; a = x; } }));
+    if (!t) return null;
+    const frage = document.createDocumentFragment();
+    const tx = el("div", "az-text"); htmlIn(tx, t.text); frage.appendChild(tx);
+    (t.anlagen || []).forEach(an => frage.appendChild(anlage(an)));
+    const loesung = document.createDocumentFragment();
+    const l = el("div", "az-text");
+    if (t.loesung) htmlIn(l, t.loesung); else l.textContent = "Keine Musterlösung hinterlegt.";
+    loesung.appendChild(l);
+    if (t.hinweis) {
+      const h = el("div", "az-hinweis");
+      h.appendChild(el("b", null, "So wird bewertet: "));
+      h.appendChild(sicher(t.hinweis));
+      loesung.appendChild(h);
+    }
+    return { m, t, aufgabe: a, titel: textAus(t.titel), frage, loesung };
+  }
+
   const api = {
-    oeffnen, zeigen, block, laden, importieren, paket, modul, zustand,
+    oeffnen, zeigen, block, laden, importieren, paket, modul, zustand, ansicht, teileVon,
     normText, zahlen, feldRichtig, pruefe, stellen, hatAntwort, note, auswertung, einordnen, sortiert, paketAusText,
     get VIEW() { return VIEW; }
   };

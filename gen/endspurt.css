@@ -64,3 +64,10 @@
 }
 
 @media print{ .es-box{display:none !important} }
+
+/* Azubi-Module ohne eigenen Tag im Plan */
+.es-extra{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:10px 0 4px}
+.es-extra-t{font-size:12.5px; color:var(--muted); font-weight:700}
+.es-extra-k{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:99px; padding:4px 11px;
+  font:inherit; font-size:12.5px; font-weight:700; font-family:var(--data); cursor:pointer; min-height:32px}
+.es-extra-k:hover{border-color:var(--pruefer); color:var(--pruefer)}
