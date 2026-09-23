@@ -486,6 +486,8 @@
   }
 </style>
 <link rel="stylesheet" href="gen/mobil.css">
+<!-- Startseite v29: Gruppen, Symbole, Suchfeld — nur innerhalb von #scStart -->
+<link rel="stylesheet" href="gen/startseite.css">
 <!-- Zuletzt, damit die Druckregeln die Bildschirmregeln oben
      überschreiben können, ohne überall !important zu brauchen. -->
 <link rel="stylesheet" href="gen/druckbogen.css">
@@ -910,32 +912,95 @@ function examFortschritt(ex){
                          .reduce((b,a) => (!b || a.prozent > b.prozent ? a : b), null);
   return {subs, be, veraltetBe, done, bester};
 }
+/* Betrieb aus der Ausgangssituation — alle zehn Bögen heißen „Einrichten
+   eines IT-gestützten Arbeitsplatzes“, unterscheiden sich aber am Betrieb. */
+function examBetrieb(ex){
+  const t = ((ex.situation || {}).text || "");
+  let m = /((?:[A-ZÄÖÜ0-9][\w.\-äöüß]*\s){0,3}(?:GmbH|AG|OHG|KG|GbR))(?![\wäöü])/.exec(t);
+  if (m) return m[1].trim();
+  m = /\b(Apothekengruppe|Gemeinschaftskanzlei|Kanzlei|Stadtverwaltung|Klinikum|Praxis)(\s+[A-ZÄÖÜ][\wäöü-]+)?/.exec(t);
+  return m ? (m[1] + (m[2] || "")).trim() : "";
+}
+/* Schwerpunkte nach BE; mehrfach getaggte Aufgaben teilen ihre Punkte. */
+function examSchwerpunkte(ex, n){
+  const m = {};
+  ex.tasks.forEach(t => t.subtasks.forEach(s => {
+    const tp = s.topics && s.topics.length ? s.topics : ["sonstiges"];
+    tp.forEach(k => { m[k] = (m[k] || 0) + (s.maxPoints || 0) / tp.length; });
+  }));
+  return Object.keys(m).filter(k => k !== "sonstiges").sort((a,b) => m[b] - m[a]).slice(0, n || 3)
+    .map(k => ({key:k, label:TLABEL[k] || k, be:Math.round(m[k])}));
+}
+let EXFILTER = ls.get("ihk2:start:exfilter", "alle");
 function renderStart(){
   const box = $("examKarten");
   box.innerHTML = "";
   if (!EXAMS.length)
     box.innerHTML = '<div class="leer-hinweis">Keine Prüfungen gefunden — ' +
                     'starte <code>python tools/build_index.py</code>.</div>';
-  EXAMS.forEach(ex => {
-    const f = examFortschritt(ex), m = ex.meta || {};
+  const status = f => f.bester ? "bewertet" : (f.done ? "begonnen" : "neu");
+  const alleF = EXAMS.map(ex => ({ex, f:examFortschritt(ex)}));
+
+  /* Filter: welche Prüfung habe ich noch nicht angefasst? */
+  let fl = $("exFilter");
+  if (!fl){
+    fl = document.createElement("div");
+    fl.id = "exFilter"; fl.className = "ex-filter";
+    fl.setAttribute("role", "group"); fl.setAttribute("aria-label", "Prüfungen filtern");
+    box.parentNode.insertBefore(fl, box);
+  }
+  fl.innerHTML = "";
+  const zahl = st => alleF.filter(x => st === "alle" || status(x.f) === st).length;
+  if (EXFILTER !== "alle" && !zahl(EXFILTER)) EXFILTER = "alle";
+  [["alle","alle"],["neu","neu"],["begonnen","begonnen"],["bewertet","bewertet"]].forEach(([st, name]) => {
+    const n = zahl(st);
+    if (st !== "alle" && !n) return;
+    const c = document.createElement("button");
+    c.type = "button";
+    c.className = "ex-fchip" + (EXFILTER === st ? " an" : "");
+    c.setAttribute("aria-pressed", EXFILTER === st ? "true" : "false");
+    c.innerHTML = esc(name) + ' <span class="n">' + n + '</span>';
+    c.onclick = () => { EXFILTER = st; ls.set("ihk2:start:exfilter", st); renderStart(); };
+    fl.appendChild(c);
+  });
+
+  alleF.forEach(({ex, f}) => {
+    const m = ex.meta || {};
+    const st = status(f);
+    if (EXFILTER !== "alle" && st !== EXFILTER) return;
     const el = document.createElement("div");
     el.className = "ekarte" + (f.bester ? " fertig" : (f.done ? " laufend" : ""));
+    el.dataset.exam = ex.examId;
+    el.dataset.status = st;
+    const kopfZeile = document.createElement("div");
+    kopfZeile.className = "ek-kopf";
     const kopf = document.createElement("h3");
     kopf.textContent = (m.season || "") + " " + (m.year || "");
+    const badge = document.createElement("span");
+    badge.className = "ek-status s-" + st;
+    badge.textContent = st === "bewertet" ? "bewertet" : st === "begonnen" ? "begonnen" : "neu";
+    kopfZeile.append(kopf, badge);
     const unter = document.createElement("div");
-    unter.style.cssText = "font-size:13px;color:var(--muted);margin-top:-4px";
-    unter.textContent = m.title || ex.examId;
-    const z1 = document.createElement("div");
-    z1.className = "zeile";
-    z1.innerHTML = "<span>" + f.subs.length + " Teilaufgaben</span><span>" +
-                   (f.veraltetBe && !VERSTECKEN ? (f.be - f.veraltetBe) + " von " + f.be : f.be) + " BE</span>";
+    unter.className = "ek-unter";
+    unter.textContent = examBetrieb(ex) || m.title || ex.examId;
+    unter.title = m.title || "";
+    const tags = document.createElement("div");
+    tags.className = "ek-tags";
+    tags.title = "Schwerpunkte dieser Prüfung nach Punkten";
+    examSchwerpunkte(ex, 3).forEach(sp => {
+      const t = document.createElement("span");
+      t.innerHTML = esc(sp.label) + " <b>" + sp.be + "</b>";
+      tags.appendChild(t);
+    });
     const bar = document.createElement("div");
     bar.className = "balken";
     bar.innerHTML = '<i style="width:' + (f.subs.length ? f.done/f.subs.length*100 : 0) + '%"></i>';
+    /* eine Zeile statt zwei: „0/27 beantwortet“ sagt schon, wie viele es sind */
     const z2 = document.createElement("div");
     z2.className = "zeile";
     const links = document.createElement("span");
-    links.textContent = f.done + "/" + f.subs.length + " beantwortet";
+    links.textContent = f.done + "/" + f.subs.length + " beantwortet · " +
+      (f.veraltetBe && !VERSTECKEN ? (f.be - f.veraltetBe) + " von " + f.be : f.be) + " BE";
     z2.appendChild(links);
     if (f.bester){
       const n = note(f.bester.prozent);
@@ -944,12 +1009,11 @@ function renderStart(){
       chip.textContent = "beste " + n.note + " · " + f.bester.punkte + " BE";
       z2.appendChild(chip);
     }
-    el.append(kopf, unter, z1, bar, z2);
+    el.append(kopfZeile, unter, tags, bar, z2);
     if (f.veraltetBe){
       const w = document.createElement("div");
-      w.className = "zeile";
-      w.innerHTML = '<span style="color:var(--red)">davon ' + f.veraltetBe +
-                    ' BE nicht mehr im Katalog</span>';
+      w.className = "zeile ek-veraltet";
+      w.innerHTML = '<span>davon ' + f.veraltetBe + ' BE nicht mehr im Katalog</span>';
       el.appendChild(w);
     }
     const akt = document.createElement("div");
@@ -4385,7 +4449,9 @@ schirm("scStart");
 <script src="gen/kompendium.js"></script>
 <script src="gen/archiv.js"></script>
 <script src="gen/zurueck.js"></script>
+<script src="gen/ikonen.js"></script>
 <script src="gen/start.js"></script>
+<script src="gen/finder.js"></script>
 <!-- nach start.js: die „weiter wo ich war“-Karte soll ganz oben stehen,
      also zuletzt eingefügt werden. -->
 <script src="gen/rechnen.js"></script>

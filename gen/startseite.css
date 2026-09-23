@@ -1,0 +1,399 @@
+/* ============================================================================
+   gen/startseite.css — Aussehen der Startseite (v29, 23.09.)
+   ----------------------------------------------------------------------------
+   Gilt NUR innerhalb von #scStart. Prüfungsbogen, Arbeitsblätter und
+   Druckansichten behalten ihren strengen Papier-Stil.
+
+   Ziele:
+   • Finden vor Lesen: jede Zeile hat ein Symbol in der Farbe ihrer Gruppe,
+     einen Namen in normaler Schreibweise und eine Zeile Erklärung.
+   • Eine Sache fällt auf — „Heute“. Alles andere ist ruhiger.
+   • Auf dem Telefon (390 px) keine Zeile, die seitwärts rutscht, und
+     Tippziele mindestens 44 px hoch.
+   Wird nach mobil.css geladen und überschreibt dessen Startseiten-Regeln.
+   ========================================================================== */
+
+:root{
+  --st-r:12px; --st-r-s:9px;
+  --st-schatten:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06);
+  --gr-pruefen:#12457E;      --gr-pruefen-soft:#EAF0F7;
+  --gr-ueben:#1D6B4A;        --gr-ueben-soft:#E7F4EE;
+  --gr-nachschlagen:#98590A; --gr-nachschlagen-soft:#FCF1DF;
+  --gr-auswerten:#6B3FA0;    --gr-auswerten-soft:#F2ECFA;
+  --gr-daten:#5E6570;        --gr-daten-soft:#EEF0F3;
+}
+[data-theme="dunkel"]{
+  --st-schatten:0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.22);
+  --gr-pruefen:#7DB2EE;      --gr-pruefen-soft:#1D2A3A;
+  --gr-ueben:#6CC99D;        --gr-ueben-soft:#18291F;
+  --gr-nachschlagen:#E6B266; --gr-nachschlagen-soft:#2E2618;
+  --gr-auswerten:#B99AE6;    --gr-auswerten-soft:#261E33;
+  --gr-daten:#A3ABB7;        --gr-daten-soft:#232830;
+}
+
+#scStart{max-width:980px; padding-top:18px}
+#scStart .ik{display:block; flex:0 0 auto}
+#scStart .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* Knöpfe auf der Startseite: normale Schreibweise statt Versalien —
+   liest sich schneller, wenn viele nebeneinanderstehen.               */
+#scStart .btn{font-family:var(--body); text-transform:none; letter-spacing:0;
+  font-size:13.5px; font-weight:600; border-radius:8px; padding:8px 14px}
+#scStart .btn.klein{font-size:13px; padding:6px 11px}
+#scStart .btn.primary{box-shadow:0 1px 0 rgba(0,0,0,.04)}
+
+/* ================================================================ Suche == */
+.st-suche{position:relative; margin:0 0 14px}
+.st-sfeld{display:flex; align-items:center; gap:4px; background:var(--card);
+  border:1px solid var(--rule); border-radius:var(--st-r); padding:0 6px 0 12px;
+  box-shadow:var(--st-schatten); transition:border-color .12s, box-shadow .12s}
+.st-sfeld:focus-within{border-color:var(--pruefer);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--pruefer) 18%,transparent)}
+.st-slupe{color:var(--muted); display:flex}
+#stSucheFeld{flex:1 1 auto; min-width:0; border:0; background:transparent; outline:none;
+  font-size:16px; padding:13px 6px; color:var(--ink)}
+#stSucheFeld::-webkit-search-cancel-button{display:none}
+#stSucheFeld::placeholder{color:var(--muted); opacity:.85}
+.st-sx{border:0; background:none; color:var(--muted); cursor:pointer; padding:10px;
+  border-radius:8px; display:flex}
+.st-sx:hover{background:var(--field); color:var(--ink)}
+
+.st-svor{display:flex; flex-wrap:wrap; gap:6px; margin:9px 2px 0}
+.st-schip{border:1px solid var(--rule); background:var(--card); color:var(--ink);
+  border-radius:999px; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; min-height:34px}
+.st-schip:hover{border-color:var(--pruefer); color:var(--pruefer)}
+
+.st-streffer{margin-top:8px; background:var(--card); border:1px solid var(--rule);
+  border-radius:var(--st-r); box-shadow:var(--st-schatten); padding:6px 0; overflow:hidden}
+.fd-gruppe + .fd-gruppe{border-top:1px solid var(--rule-soft); margin-top:4px; padding-top:4px}
+.fd-gkopf{display:flex; justify-content:space-between; align-items:center;
+  padding:8px 14px 4px; font-size:11px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted)}
+.fd-gzahl{font-family:var(--data); font-size:11px; letter-spacing:0; background:var(--field);
+  border-radius:999px; padding:1px 8px}
+.fd-liste{display:flex; flex-direction:column}
+.fd-treffer{display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+  background:none; border:0; font:inherit; color:inherit; cursor:pointer;
+  padding:9px 14px; min-height:48px}
+.fd-treffer:hover, .fd-treffer:focus-visible{background:var(--pruefer-soft); outline:none}
+.fd-ico{flex:0 0 32px; height:32px; border-radius:8px; display:flex; align-items:center;
+  justify-content:center; background:var(--field); color:var(--muted)}
+.fd-bereich,.fd-werkzeug{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
+.fd-pruefung,.fd-aufgabe{background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
+.fd-komp,.fd-spick{background:var(--gr-nachschlagen-soft); color:var(--gr-nachschlagen)}
+.fd-vorlage{background:var(--gr-ueben-soft); color:var(--gr-ueben)}
+.fd-txt{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:1px}
+.fd-t{font-size:14.5px; font-weight:600; line-height:1.3}
+.fd-u{font-size:12.5px; color:var(--muted); line-height:1.4;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.fd-schnipsel{white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+.fd-typ{flex:0 0 auto; font-size:11px; color:var(--muted); border:1px solid var(--rule-soft);
+  border-radius:999px; padding:1px 8px}
+mark.fd-mark{background:color-mix(in srgb,var(--warn) 28%,transparent); color:inherit;
+  border-radius:3px; padding:0 1px}
+.fd-mehr{display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:none;
+  border:0; font:inherit; font-size:13px; font-weight:600; color:var(--pruefer); cursor:pointer;
+  padding:9px 14px 9px 57px; min-height:40px}
+.fd-mehr:hover, .fd-mehr:focus-visible{background:var(--pruefer-soft); outline:none}
+.fd-voll{border-top:1px solid var(--rule-soft); margin-top:4px; padding-left:14px}
+.fd-leer{padding:14px; font-size:13.5px; color:var(--muted)}
+
+/* ================================================================= Kopf == */
+#scStart .st-kopf{border:1px solid var(--rule); border-radius:var(--st-r); background:var(--card);
+  box-shadow:var(--st-schatten); padding:16px 18px 18px; margin:0 0 14px}
+#scStart .st-count{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px;
+  padding-bottom:12px; border-bottom:1px solid var(--rule-soft)}
+#scStart .st-tage{font-family:var(--body); font-size:28px; font-weight:800; letter-spacing:-.02em; color:var(--pruefer)}
+#scStart .st-bis{font-size:13.5px; color:var(--muted)}
+#scStart .st-prog{margin-left:auto}
+
+/* Heute: die EINE Sache, die ins Auge fallen soll */
+#scStart .st-heute{display:block; margin-top:14px; padding:14px 16px 14px;
+  border-radius:var(--st-r-s); background:var(--pruefer-soft);
+  border:1px solid color-mix(in srgb,var(--pruefer) 22%,transparent)}
+#scStart .st-heute.fertig{background:var(--ok-soft); border-color:color-mix(in srgb,var(--ok) 25%,transparent)}
+#scStart .st-hkopf{display:flex; align-items:center; gap:8px; margin-bottom:4px}
+#scStart .st-hlabel{font-family:var(--body); font-size:11.5px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--pruefer); margin:0}
+#scStart .st-heute.fertig .st-hlabel{color:var(--ok)}
+#scStart .st-hmin{margin-left:auto; font-family:var(--data); font-size:12px; font-weight:700;
+  color:var(--pruefer); background:var(--card); border-radius:999px; padding:2px 9px}
+#scStart .st-htitel{font-size:17px; font-weight:700; line-height:1.3; display:flex; align-items:center; gap:7px}
+#scStart .st-hok{color:var(--ok); display:flex}
+#scStart .st-hwarum{font-size:13px; color:var(--muted); line-height:1.5; margin-top:4px}
+#scStart .st-hwarum.kurz{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden; cursor:pointer}
+#scStart .st-haktion{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px}
+#scStart .st-hknopf{display:inline-flex; align-items:center; gap:7px; min-height:42px; padding:9px 20px; font-size:14.5px}
+#scStart .st-hzusatz{min-height:42px; background:var(--card)}
+#scStart .st-bico{display:flex}
+#scStart .st-hhak{margin-left:auto; display:inline-flex; align-items:center; gap:6px; min-height:42px;
+  padding:6px 12px; border-radius:8px; border:1px solid var(--rule); background:var(--card);
+  color:var(--muted); font:inherit; font-size:13px; font-weight:600; cursor:pointer}
+#scStart .st-hhak:hover{border-color:var(--ok); color:var(--ok)}
+#scStart .st-hhak.an{border-color:var(--ok); background:var(--ok-soft); color:var(--ok)}
+
+/* Kacheln */
+#scStart .st-kacheln{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:14px}
+#scStart .st-kachel{flex-direction:row; align-items:center; gap:10px; padding:10px 12px;
+  border:1px solid var(--rule-soft); border-radius:var(--st-r-s); background:var(--paper); min-height:56px}
+#scStart .st-kachel:hover{border-color:var(--pruefer); background:var(--pruefer-soft)}
+#scStart .st-kico{flex:0 0 34px; height:34px; border-radius:8px; display:flex; align-items:center;
+  justify-content:center; background:var(--gr-pruefen-soft); color:var(--gr-pruefen)}
+#scStart .st-kachel.warn .st-kico{background:var(--warn-soft); color:var(--warn)}
+#scStart .st-ktxt{display:flex; flex-direction:column; min-width:0}
+#scStart .st-kn{font-size:14px; font-weight:700; line-height:1.25}
+#scStart .st-ku{font-size:12px; color:var(--muted); line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* „Weiter, wo ich war“ (handgriffe.js) im selben Kartenstil */
+#scStart .hg-weiter{border-radius:var(--st-r); box-shadow:var(--st-schatten); margin:0 0 14px}
+
+/* ============================================================= Endspurt == */
+#scStart .es-box{border:1px solid var(--rule); border-top:1px solid var(--rule);
+  border-radius:var(--st-r); box-shadow:var(--st-schatten); padding:14px 16px 10px; margin:0 0 22px}
+#scStart .es-kopf{display:flex; align-items:center; gap:10px}
+#scStart .es-box h2{font-family:var(--body); font-size:17px; font-weight:800; letter-spacing:0; margin:0}
+#scStart .es-stand{font-size:12.5px; color:var(--muted)}
+#scStart .es-zahl{margin-left:auto; font-size:12px; border-radius:999px; padding:2px 10px}
+.es-warum{margin:4px 0 8px}
+.es-warum > summary{font-size:12.5px; color:var(--muted); cursor:pointer; padding:4px 0; list-style:none}
+.es-warum > summary::-webkit-details-marker{display:none}
+.es-warum > summary::after{content:" ›"}
+.es-warum[open] > summary::after{content:" ‹"}
+#scStart .es-warum .es-satz{margin:2px 0 6px}
+
+#scStart .es-liste{list-style:none; margin:0; padding:0; gap:0}
+#scStart .es-tag{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:4px 10px;
+  border:0; border-top:1px solid var(--rule-soft); border-radius:0; background:none; padding:8px 0}
+#scStart .es-tag:first-child{border-top:0}
+#scStart .es-tag.heute{border-left:0; background:none}
+#scStart .es-tag.fertig{opacity:1}
+#scStart .es-tag.fertig .es-btitel{color:var(--muted); text-decoration:line-through; text-decoration-thickness:1px}
+#scStart .es-tag.es-pruefungstag{border-left:0}
+#scStart .es-hak{margin:0; width:30px; height:30px; min-height:0; padding:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; color:transparent;
+  border:2px solid var(--rule); background:var(--card)}
+#scStart .es-hak:hover{border-color:var(--ok); color:var(--ok)}
+#scStart .es-hak.an{background:var(--ok); border-color:var(--ok); color:#fff}
+#scStart .es-tag.heute .es-hak:not(.an){border-color:var(--pruefer)}
+.es-info{display:flex; flex-direction:column; align-items:flex-start; gap:1px; min-width:0;
+  background:none; border:0; padding:4px 0; font:inherit; color:inherit; text-align:left; cursor:pointer}
+.es-tzeile{display:flex; align-items:baseline; gap:8px}
+#scStart .es-datum{font-family:var(--body); text-transform:none; letter-spacing:0;
+  font-size:12px; font-weight:700; color:var(--muted)}
+#scStart .es-tag.heute .es-datum{color:var(--pruefer)}
+.es-min{font-family:var(--data); font-size:11.5px; color:var(--muted)}
+#scStart .es-btitel{font-size:14px; font-weight:600; line-height:1.35}
+#scStart .es-sim .es-btitel{color:inherit}
+#scStart .es-pruefungstag .es-btitel{color:var(--red)}
+.es-los{display:inline-flex; align-items:center; gap:5px; min-height:38px; padding:6px 12px;
+  border:1px solid var(--rule); border-radius:8px; background:var(--card); color:var(--ink);
+  font:inherit; font-size:13px; font-weight:600; cursor:pointer}
+.es-los:hover{border-color:var(--pruefer); color:var(--pruefer)}
+.es-los.primaer{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.es-mehr{grid-column:2 / -1; padding:0 0 6px}
+#scStart .es-bwarum{margin:2px 0 8px; font-size:12.5px}
+.es-mehr .btn{min-height:38px}
+#scStart .es-fuss{margin-top:6px; padding-top:6px}
+
+/* ============================================================== Gruppen == */
+.st-gruppe{display:flex; align-items:center; gap:10px; margin:22px 2px 8px}
+.st-gruppe::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--gr-farbe,var(--muted))}
+.st-gname{font-size:12px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--gr-farbe,var(--muted))}
+.st-gruppe .st-alle{margin-left:auto; font-size:12.5px}
+
+.st-gruppe[data-gruppe="pruefen"], details.st-block[data-gruppe="pruefen"]{--gr-farbe:var(--gr-pruefen); --gr-soft:var(--gr-pruefen-soft)}
+.st-gruppe[data-gruppe="ueben"], details.st-block[data-gruppe="ueben"]{--gr-farbe:var(--gr-ueben); --gr-soft:var(--gr-ueben-soft)}
+.st-gruppe[data-gruppe="nachschlagen"], details.st-block[data-gruppe="nachschlagen"]{--gr-farbe:var(--gr-nachschlagen); --gr-soft:var(--gr-nachschlagen-soft)}
+.st-gruppe[data-gruppe="auswerten"], details.st-block[data-gruppe="auswerten"]{--gr-farbe:var(--gr-auswerten); --gr-soft:var(--gr-auswerten-soft)}
+.st-gruppe[data-gruppe="daten"], details.st-block[data-gruppe="daten"]{--gr-farbe:var(--gr-daten); --gr-soft:var(--gr-daten-soft)}
+
+/* ============================================================ Blöcke ===== */
+#scStart details.st-block{border:1px solid var(--rule-soft); border-radius:var(--st-r);
+  background:var(--card); margin:0 0 6px; transition:border-color .12s, box-shadow .12s}
+#scStart details.st-block[open]{border-color:var(--rule); box-shadow:var(--st-schatten); margin-bottom:12px}
+#scStart details.st-block > summary{display:flex; align-items:center; gap:12px;
+  padding:10px 12px; min-height:58px; border-radius:var(--st-r)}
+#scStart details.st-block > summary::before{content:none}
+#scStart details.st-block > summary::after{content:""; flex:0 0 8px; width:8px; height:8px;
+  border-right:2px solid var(--muted); border-bottom:2px solid var(--muted);
+  transform:rotate(-45deg); margin:0 6px 0 2px; transition:transform .15s}
+#scStart details.st-block[open] > summary::after{transform:rotate(45deg); margin-top:-4px}
+#scStart details.st-block > summary:hover{background:var(--field)}
+#scStart details.st-block > summary:focus-visible{outline:2px solid var(--pruefer); outline-offset:-2px}
+#scStart details.st-block[open] > summary{border-bottom:1px solid var(--rule-soft);
+  border-radius:var(--st-r) var(--st-r) 0 0}
+
+#scStart .st-ico{flex:0 0 38px; height:38px; border-radius:10px; display:flex; align-items:center;
+  justify-content:center; background:var(--gr-soft,var(--field)); color:var(--gr-farbe,var(--muted))}
+#scStart .st-text{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:1px}
+#scStart .st-name{font-family:var(--body); text-transform:none; letter-spacing:0;
+  font-size:15px; font-weight:700; line-height:1.3; color:var(--ink)}
+#scStart details.st-block > summary:hover .st-name{color:var(--ink)}
+#scStart .st-info{font-size:12.5px; color:var(--muted); line-height:1.35;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+#scStart .st-zahl{flex:0 0 auto; margin-left:0; font-family:var(--data); font-size:11.5px;
+  color:var(--muted); background:var(--field); border-radius:999px; padding:2px 9px;
+  max-width:42%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+#scStart .st-zahl:empty{display:none}
+
+/* Inhalt eines offenen Blocks */
+#scStart details.st-block > .abschnitt,
+#scStart details.st-block > div{margin:0; padding:14px 16px 18px}
+/* Der Blockname steht schon in der Zeile darüber */
+#scStart details.st-block > .abschnitt > h2:first-child,
+#scStart details.st-block > div > h2:first-child{display:none}
+#scStart details.st-block > .abschnitt > h2:first-child + p,
+#scStart details.st-block > div > h2:first-child + p{margin-top:0}
+#scStart .seite h2, #scStart h2{font-family:var(--body); letter-spacing:0; font-weight:700}
+#scStart .eyebrow{font-family:var(--body); letter-spacing:.07em}
+
+/* ============================================================ Prüfungen == */
+.ex-filter{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 12px}
+.ex-fchip{border:1px solid var(--rule); background:var(--card); color:var(--ink); font:inherit;
+  font-size:13px; border-radius:999px; padding:5px 12px; min-height:34px; cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px}
+.ex-fchip .n{font-family:var(--data); font-size:11.5px; color:var(--muted)}
+.ex-fchip.an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.ex-fchip.an .n{color:#fff; opacity:.8}
+
+#scStart .karten{grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px}
+#scStart .ekarte{border:1px solid var(--rule-soft); border-top:1px solid var(--rule-soft);
+  border-left:4px solid var(--rule); border-radius:var(--st-r-s); padding:12px 14px 12px; gap:6px;
+  background:var(--card)}
+#scStart .ekarte.laufend{border-left-color:var(--warn)}
+#scStart .ekarte.fertig{border-left-color:var(--ok)}
+.ek-kopf{display:flex; align-items:center; gap:8px}
+#scStart .ekarte h3{font-family:var(--body); font-size:16px; font-weight:800; margin:0}
+.ek-status{margin-left:auto; font-size:11px; font-weight:700; border-radius:999px; padding:2px 9px;
+  background:var(--field); color:var(--muted)}
+.ek-status.s-begonnen{background:var(--warn-soft); color:var(--warn)}
+.ek-status.s-bewertet{background:var(--ok-soft); color:var(--ok)}
+.ek-unter{font-size:13px; color:var(--muted); margin-top:-3px}
+.ek-tags{display:flex; flex-wrap:wrap; gap:4px}
+.ek-tags span{font-size:11.5px; border-radius:6px; padding:2px 7px; background:var(--pruefer-soft); color:var(--pruefer)}
+.ek-tags b{font-family:var(--data); font-weight:600; opacity:.75}
+#scStart .ekarte .zeile{font-size:12px}
+.ek-veraltet span{color:var(--red)}
+#scStart .ekarte .aktionen{margin-top:4px; gap:6px}
+
+/* ========================================================== Übungsmodus == */
+#scStart .chips{flex-wrap:wrap; overflow:visible}
+#scStart .chip{border-radius:999px}
+
+/* Diagramm-Trainer: Knöpfe als Raster statt fünf blauer Balken */
+#scStart details.st-block[data-key="diagramm"] .steuer{display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; align-items:stretch}
+#scStart details.st-block[data-key="diagramm"] .steuer .feld{grid-column:1 / -1; max-width:200px}
+#scStart details.st-block[data-key="diagramm"] .steuer .btn{min-height:44px; text-align:left}
+#scStart details.st-block[data-key="diagramm"] .steuer .btn.primary:not(#btnNetzZufall){
+  background:var(--card); color:var(--ink); border-color:var(--rule)}
+#scStart details.st-block[data-key="diagramm"] .steuer .btn.primary:not(#btnNetzZufall):hover{
+  border-color:var(--gr-ueben); color:var(--gr-ueben)}
+#scStart details.st-block[data-key="diagramm"] > .abschnitt > p{font-size:13px; line-height:1.55}
+
+/* Spickzettel / Kompendium: Kapitel als Liste statt Versal-Knöpfe */
+#scStart .sp-schnell, #scStart .kp-schnell{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:2px 12px; margin:6px 0 12px}
+#scStart .sp-schnell .btn, #scStart .kp-schnell .btn{text-align:left; font-weight:500; font-size:13.5px;
+  color:var(--ink); padding:9px 10px; min-height:40px; border-radius:8px; border:0;
+  border-bottom:1px solid var(--rule-soft)}
+#scStart .sp-schnell .btn:hover, #scStart .kp-schnell .btn:hover{background:var(--gr-nachschlagen-soft); color:var(--gr-nachschlagen)}
+
+/* Themen-Tabelle: auf dem Telefon Karten statt einer Tabelle, die man
+   seitwärts wischen muss (der Knopf „üben“ war abgeschnitten).         */
+@media (max-width:700px){
+  #scStart table.prio{display:block; overflow:visible}
+  #scStart table.prio thead{display:none}
+  #scStart table.prio tbody{display:flex; flex-direction:column; gap:8px}
+  #scStart table.prio tr{display:grid; grid-template-columns:auto 1fr auto; gap:6px 10px; align-items:center;
+    border:1px solid var(--rule-soft); border-radius:var(--st-r-s); padding:10px 12px; background:var(--card)}
+  #scStart table.prio td{padding:0; border:0}
+  #scStart table.prio td.prio-thema{grid-column:1 / -1}
+  #scStart table.prio td.weg{display:none}
+  #scStart table.prio td:last-child{justify-self:end}
+}
+
+/* ============================================================ Telefon ==== */
+@media (max-width:700px){
+  #scStart{padding:12px 12px 90px}
+  .st-suche{margin-bottom:12px}
+  #scStart .st-kopf{padding:14px 14px 14px}
+  #scStart .st-tage{font-size:25px}
+  #scStart .st-heute{padding:12px 13px}
+  #scStart .st-htitel{font-size:16px}
+  #scStart .st-haktion .st-hknopf{flex:1 1 auto; justify-content:center}
+  #scStart .st-hzusatz{flex:1 1 auto}
+  #scStart .st-hhak{margin-left:0}
+  #scStart .st-kacheln{grid-template-columns:1fr 1fr; gap:7px}
+  #scStart .st-kachel{padding:9px 10px; gap:9px; min-height:54px}
+  #scStart .st-kico{flex-basis:30px; height:30px}
+  #scStart .st-kn{font-size:13.5px}
+  #scStart .es-box{padding:12px 12px 8px}
+  #scStart details.st-block > summary{gap:10px; padding:9px 10px; min-height:56px}
+  #scStart .st-ico{flex-basis:34px; height:34px; border-radius:9px}
+  #scStart .st-name{font-size:14.5px}
+  #scStart .st-info{font-size:12px}
+  #scStart .st-zahl{display:none}
+  #scStart details.st-block > .abschnitt,
+  #scStart details.st-block > div{padding:12px 12px 16px}
+  #scStart .karten{grid-template-columns:1fr}
+  #scStart details.st-block[data-key="diagramm"] .steuer{grid-template-columns:1fr 1fr}
+  #scStart details.st-block[data-key="diagramm"] .steuer .btn{font-size:13px; padding:8px 10px}
+  .fd-typ{display:none}
+  .fd-treffer{padding:9px 12px}
+  .fd-mehr{padding-left:55px}
+}
+@media (max-width:380px){
+  #scStart .st-kacheln{grid-template-columns:1fr}
+}
+
+@media print{
+  .st-suche, .st-gruppe{display:none !important}
+}
+
+/* Fassungszeile ganz unten */
+#scStart .ver-zeile{border-top:0; margin-top:26px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px}
+#scStart .ver-knopf{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:13px;
+  font-weight:600; border-radius:8px; min-height:38px}
+@media (max-width:700px){
+  #scStart .st-ku{white-space:normal; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical}
+}
+
+/* Prüfungskarte: „starten“ und „offline laden“ in derselben Zeile */
+#scStart .ekarte{display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:8px}
+#scStart .ekarte > *{grid-column:1 / -1}
+#scStart .ekarte > .aktionen{grid-column:1; align-self:center}
+#scStart .ekarte > .off-zeile{grid-column:2; align-self:end}
+.off-zeile{display:flex; flex-direction:column; align-items:flex-end; gap:0}
+#scStart .off-zeile .off-knopf{font-size:12.5px; font-weight:600; padding:4px 6px; min-height:30px; color:var(--muted)}
+#scStart .off-zeile .off-knopf.fertig{color:var(--ok)}
+.off-stand{font-size:11px; color:var(--muted); padding-right:6px}
+.off-spur{height:3px; background:var(--rule-soft); border-radius:2px; overflow:hidden}
+.off-spur i{display:block; height:100%; width:0; background:var(--pruefer)}
+
+/* lange Einleitungen: drei Zeilen, Tipp klappt auf (start.js) */
+#scStart p.st-lang{display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+  overflow:hidden; cursor:pointer}
+#scStart .sp-schnell .btn, #scStart .kp-schnell .btn{justify-content:flex-start; display:flex; align-items:center}
+
+/* „Weiter, wo ich war“: eine Zeile mit Knopf rechts statt Balken darunter */
+#scStart .hg-weiter{flex-wrap:nowrap; gap:12px; padding:12px 14px; border:1px solid var(--rule);
+  border-left:4px solid var(--warn); background:var(--card)}
+#scStart .hg-weiter-txt{flex:1 1 auto}
+#scStart .hg-weiter-txt::before{content:"Weiter, wo du warst"; font-size:11px; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--warn)}
+#scStart .hg-weiter-titel{font-family:var(--body); font-size:15.5px; font-weight:700}
+#scStart .hg-weiter .btn{flex:0 0 auto; min-height:42px}
+
+/* Den Countdown gibt es schon oben im Kopf */
+#scStart .es-zahl{display:none}
+
+/* Dunkel: weiße Schrift auf hellem Blau ist kaum lesbar */
+[data-theme="dunkel"] #scStart .btn.primary,
+[data-theme="dunkel"] .es-los.primaer,
+[data-theme="dunkel"] .ex-fchip.an{color:#0B1522}
+[data-theme="dunkel"] .ex-fchip.an .n{color:#0B1522}
+#scStart .pwa-box{font-size:13.5px; line-height:1.55}
+#scStart .pwa-box h3{font-size:15px}
+#scStart p.hint{font-size:13px}

@@ -15,4 +15,19 @@ assert(!/st-kachel-wrap/.test(start), "быстрые действия долж�
 assert(/s\.insertBefore\(k,\s*s\.firstChild\)/.test(start), "исходный дашборд должен стоять первым");
 assert(/g\.appendChild\(t\)/.test(start), "исходные быстрые действия должны рендериться напрямую");
 
-console.log("dashboard-structure: proven compact layout restored");
+/* v29: Gruppen, Symbole, feste Reihenfolge, Suchfeld, Endspurt als „Heute“ */
+const css = fs.readFileSync(path.join(root, "gen", "startseite.css"), "utf8");
+const endspurt = fs.readFileSync(path.join(root, "gen", "endspurt.js"), "utf8");
+assert(/gen\/startseite\.css/.test(html) && /gen\/finder\.js/.test(html) && /gen\/ikonen\.js/.test(html),
+  "стиль стартовой страницы, поиск и иконки должны быть подключены");
+assert(html.indexOf("gen/ikonen.js") < html.indexOf("gen/start.js"), "иконки грузятся раньше start.js");
+for (const g of ["pruefen", "ueben", "nachschlagen", "auswerten", "daten"])
+  assert(new RegExp('key: "' + g + '"').test(start), "группа " + g + " должна быть описана");
+for (const k of ["rechnen", "er", "plan"])
+  assert(new RegExp('key: "' + k + '",[^}]*gruppe:').test(start), "блок " + k + " должен входить в группу");
+assert(/function ordnen\(/.test(start) && /MutationObserver/.test(start), "порядок блоков должен восстанавливаться после чужих вставок");
+assert(/GENENDSPURT/.test(start) && /E\.erledigt\(/.test(start), "«Heute» должен брать задачу из Endspurt");
+assert(/erledigt, abhaken/.test(endspurt), "Endspurt должен отдавать erledigt/abhaken");
+assert(!/^[^#\n]*\bbody\s*\{/m.test(css) && !/^\s*\.btn\s*\{/m.test(css), "новый стиль не должен менять глобальные body/.btn");
+
+console.log("dashboard-structure: compact layout with groups, search and one Heute OK");

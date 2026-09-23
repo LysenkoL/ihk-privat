@@ -238,9 +238,11 @@ window.GENENDSPURT = (function () {
 
     if (!b) {
       b = el("div", "abschnitt es-box"); b.id = "endspurtBox";
-      /* ganz nach oben: vor die erste Überschrift des Startbildschirms */
-      const erst = s.querySelector(".abschnitt, .st-kacheln, h2");
-      if (erst && erst.parentNode) erst.parentNode.insertBefore(b, erst);
+      /* direkt hinter den Kopf der Startseite (Countdown, Heute, Kacheln) —
+         als eigenes Kind von scStart, damit ein Neuzeichnen des Kopfes den
+         Plan nicht mitreißt. start.js sortiert ohnehin nach.             */
+      const kopf = $("stKopf");
+      if (kopf && kopf.parentNode === s) s.insertBefore(b, kopf.nextSibling);
       else s.insertBefore(b, s.firstChild);
     }
     b.innerHTML = "";
@@ -250,26 +252,34 @@ window.GENENDSPURT = (function () {
     planVerstecken(!S.planOffen);
 
     const kopf = el("div", "es-kopf");
-    kopf.appendChild(el("h2", null, "Endspurt"));
+    kopf.appendChild(el("h2", null, $("stKopf") ? "Endspurt · nächste Tage" : "Endspurt"));
+    const fertig = tage.filter(t => S.erledigt[t.key]).length;
+    kopf.appendChild(el("span", "es-stand", fertig + " von " + tage.length + " erledigt"));
     kopf.appendChild(el("span", "es-zahl", n === 0 ? "heute" : n === 1 ? "noch 1 Tag" : "noch " + n + " Tage"));
     b.appendChild(kopf);
 
-    const p = el("p", "es-satz");
-    p.textContent = n === 0
-      ? "Heute ist Prüfungstag."
-      : "Dieser Plan steht fest und wird nicht mehr umsortiert. Der Rhythmus ist " +
-        "Prüfung → Auswertung → Schwachstelle: eine Simulation ohne Auswertung am " +
-        "nächsten Tag bringt nichts außer einer Zahl.";
-    b.appendChild(p);
+    /* Die Begründung des Rhythmus ist wichtig, aber einmal gelesen reicht —
+       sie steht hinter einer Klappe statt jeden Tag über dem Plan.      */
+    const warum = el("details", "es-warum");
+    warum.appendChild(el("summary", null, n === 0 ? "Heute ist Prüfungstag." : "Warum dieser Rhythmus?"));
+    warum.appendChild(el("p", "es-satz",
+      "Dieser Plan steht fest und wird nicht mehr umsortiert. Der Rhythmus ist " +
+      "Prüfung → Auswertung → Schwachstelle: eine Simulation ohne Auswertung am " +
+      "nächsten Tag bringt nichts außer einer Zahl. Tipp auf einen Tag zeigt, was zu tun ist."));
+    b.appendChild(warum);
 
-    const liste = el("div", "es-liste");
+    /* Der heutige Tag steht ausführlich oben unter „Heute“ (start.js) —
+       hier nur, wenn es diese Karte nicht gibt.                        */
+    const obenHeute = !!$("stKopf");
+    const rest = obenHeute ? tage.slice(1) : tage;
+    const liste = el("ol", "es-liste");
     const offen = b.dataset.alle === "1";
-    (offen ? tage : tage.slice(0, 5)).forEach((t, i) => liste.appendChild(tagEl(t, i === 0)));
-    b.appendChild(liste);
+    (offen ? rest : rest.slice(0, 4)).forEach(t => liste.appendChild(tagEl(t, t === tage[0])));
+    if (rest.length) b.appendChild(liste);
 
     const fuss = el("div", "es-fuss");
-    if (tage.length > 5) {
-      const mehr = el("button", "es-link", offen ? "nur die nächsten Tage" : "alle " + tage.length + " Tage");
+    if (rest.length > 4) {
+      const mehr = el("button", "es-link", offen ? "nur die nächsten Tage" : "alle " + rest.length + " Tage");
       mehr.type = "button";
       mehr.onclick = () => { b.dataset.alle = offen ? "0" : "1"; box(); };
       fuss.appendChild(mehr);
@@ -277,7 +287,7 @@ window.GENENDSPURT = (function () {
     const neu = el("button", "es-link", "neu planen");
     neu.type = "button";
     neu.title = "Baut den Endspurt aus dem heutigen Stand noch einmal — abgehakte Tage bleiben abgehakt.";
-    neu.onclick = () => { bauen(); box(); };
+    neu.onclick = () => { bauen(); box(); kopfNeu(); };
     fuss.appendChild(neu);
 
     const pl = el("button", "es-link", S.planOffen ? "rechnenden Lernplan ausblenden" : "rechnenden Lernplan anzeigen");
@@ -287,50 +297,74 @@ window.GENENDSPURT = (function () {
     b.appendChild(fuss);
   }
 
+  /* „Heute“ oben auf der Startseite liest denselben Plan — nach jedem
+     Abhaken dort mitziehen.                                             */
+  function kopfNeu() {
+    try { window.GENSTART && window.GENSTART.kopfAktualisieren(); } catch (e) { }
+  }
+
+  function erledigt(key) { return !!S.erledigt[key]; }
+  function abhaken(key) {
+    const t = (S.tage || []).find(x => x.key === key);
+    if (S.erledigt[key]) delete S.erledigt[key];
+    else S.erledigt[key] = { art: t ? t.art : null, thema: t && t.thema || null,
+                             examId: t && t.examId || null, zeit: Date.now() };
+    sichern();
+  }
+
+  /* Ein Tag als EINE Zeile: Haken · Datum + Titel + Minuten · Los.
+     Der erklärende Text und der Zweitknopf (Auswertung) erscheinen erst
+     nach einem Tipp auf die Zeile — der heutige Tag steht ohnehin
+     ausführlich oben unter „Heute“.                                     */
   function tagEl(t, heute) {
     const fertig = !!S.erledigt[t.key];
-    const z = el("div", "es-tag es-" + t.art + (heute ? " heute" : "") + (fertig ? " fertig" : ""));
+    const z = el("li", "es-tag es-" + t.art + (heute ? " heute" : "") + (fertig ? " fertig" : ""));
 
-    const kopf = el("div", "es-tkopf");
-    const d = new Date(t.key + "T00:00:00");
-    kopf.appendChild(el("span", "es-datum",
-      (heute ? "Heute · " : "") + WOCHENTAG[d.getDay()] + " " +
-      String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0")));
-    kopf.appendChild(el("span", "es-rest",
-      t.rest === 0 ? "Prüfung" : t.rest === 1 ? "noch 1 Tag" : "noch " + t.rest + " Tage"));
-    const hak = el("button", "es-hak" + (fertig ? " an" : ""), fertig ? "✓ erledigt" : "abhaken");
+    const hak = el("button", "es-hak" + (fertig ? " an" : ""));
     hak.type = "button";
-    hak.onclick = () => {
-      if (fertig) delete S.erledigt[t.key];
-      else S.erledigt[t.key] = { art: t.art, thema: t.thema || null, examId: t.examId || null, zeit: Date.now() };
-      sichern(); box();
-    };
-    kopf.appendChild(hak);
-    z.appendChild(kopf);
+    hak.setAttribute("aria-pressed", fertig ? "true" : "false");
+    hak.setAttribute("aria-label", fertig ? "als nicht erledigt markieren" : "als erledigt abhaken");
+    hak.innerHTML = window.GENIKON ? window.GENIKON.svg("check", 15) : "✓";
+    hak.onclick = () => { abhaken(t.key); box(); kopfNeu(); };
+    z.appendChild(hak);
 
-    const zeile = el("div", "es-block");
-    const links = el("div", "es-btxt");
-    links.appendChild(el("div", "es-btitel", t.titel + "  ·  " + t.minuten + " min"));
-    links.appendChild(el("div", "es-bwarum", t.text));
-    zeile.appendChild(links);
+    const d = new Date(t.key + "T00:00:00");
+    const info = el("button", "es-info");
+    info.type = "button";
+    info.setAttribute("aria-expanded", "false");
+    const zeile1 = el("span", "es-tzeile");
+    zeile1.appendChild(el("span", "es-datum",
+      (heute ? "Heute · " : "") + WOCHENTAG[d.getDay()] + " " +
+      String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0") + "."));
+    zeile1.appendChild(el("span", "es-min", t.art === "pruefungstag" ? "Prüfung" : t.minuten + " min"));
+    info.appendChild(zeile1);
+    info.appendChild(el("span", "es-btitel", t.titel));
+    z.appendChild(info);
+
     if (t.art !== "pruefungstag") {
-      const k = el("button", "btn " + (heute ? "primary" : "ghost") + " klein", "los");
+      const k = el("button", "es-los" + (heute && !fertig ? " primaer" : ""));
       k.type = "button";
+      k.setAttribute("aria-label", "starten: " + t.titel);
+      k.innerHTML = (window.GENIKON ? window.GENIKON.svg("play", 14) : "") + "<span>los</span>";
       k.onclick = () => starte(t);
-      zeile.appendChild(k);
+      z.appendChild(k);
     }
-    z.appendChild(zeile);
 
-    /* Zweiter Knopf für den Teil, der zum selben Tag gehört — bei der
-       Simulation ist das die Auswertung, die direkt danach kommt.      */
+    const mehr = el("div", "es-mehr");
+    mehr.hidden = true;
+    mehr.appendChild(el("p", "es-bwarum", t.text));
     if (t.zusatz) {
-      const zz = el("div", "es-zusatz");
       const k2 = el("button", "btn ghost klein", "→ " + t.zusatz.titel);
       k2.type = "button";
       k2.onclick = () => starte(t.zusatz);
-      zz.appendChild(k2);
-      z.appendChild(zz);
+      mehr.appendChild(k2);
     }
+    z.appendChild(mehr);
+    info.onclick = () => {
+      mehr.hidden = !mehr.hidden;
+      info.setAttribute("aria-expanded", mehr.hidden ? "false" : "true");
+      z.classList.toggle("auf", !mehr.hidden);
+    };
     return z;
   }
 
@@ -353,5 +387,5 @@ window.GENENDSPURT = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
   else einhaengen();
 
-  return { plan, bauen, box, starte, tageBis, aktiv, warteschlange, schwachstellen };
+  return { plan, bauen, box, starte, tageBis, aktiv, warteschlange, schwachstellen, erledigt, abhaken };
 })();
