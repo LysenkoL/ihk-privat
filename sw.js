@@ -25,9 +25,12 @@
 /* Bei jeder Veröffentlichung hochzählen — dann wirft der Worker den alten
    Programm-Cache weg und holt alles frisch. Die Bilder bleiben davon
    unberührt.                                                              */
-const VERSION   = "ihk-ap1-v32";
+const VERSION   = "ihk-ap1-v34";
 const CACHE_APP = VERSION + "-app";
 const CACHE_BILD = "ihk-ap1-bilder";       /* ohne Version — bleibt bestehen */
+/* Große Bibliotheken (SQL-Datenbank, 0,7 MB) tragen die Version im Pfad
+   (vendor/sqljs-1.14.2/) und bleiben deshalb über Updates hinweg liegen. */
+const CACHE_LIB = "ihk-ap1-lib";
 
 /* Alles, was index.html beim Start direkt braucht. So ist die Oberfläche
    schon nach dem ersten Besuch vollständig offline verfügbar; große
@@ -84,9 +87,18 @@ const GRUNDGERUEST = [
   "./gen/azubi.js",
   "./gen/wiederholen.css",
   "./gen/wiederholen.js",
+  "./gen/pruefen.css",
+  "./gen/pruefen.js",
+  "./gen/sync.css",
+  "./gen/sync.js",
+  "./gen/sql.css",
+  "./gen/sql-daten.js",
+  "./gen/sql.js",
   "./gen/glossar.css",
   "./gen/glossar-daten.js",
   "./gen/glossar.js",
+  "./gen/wortschatz-daten.js",
+  "./gen/nachschlagen.js",
   "./gen/kern.js",
   "./gen/kompakt.js",
   "./gen/kompendium-daten.js",
@@ -155,7 +167,7 @@ self.addEventListener("activate", ev => {
   ev.waitUntil((async () => {
     const namen = await caches.keys();
     await Promise.all(namen.map(n => {
-      if (n === CACHE_APP || n === CACHE_BILD) return null;
+      if (n === CACHE_APP || n === CACHE_BILD || n === CACHE_LIB) return null;
       return caches.delete(n);            /* alte Programmstände wegräumen */
     }));
     await self.clients.claim();
@@ -186,6 +198,19 @@ self.addEventListener("fetch", ev => {
         return (await c.match("./index.html")) || (await c.match("./")) ||
                new Response("Offline und nichts im Cache.", { status: 503 });
       }
+    })());
+    return;
+  }
+
+  /* Bibliotheken: einmal holen, dann für immer aus dem Cache */
+  if (url.pathname.indexOf("/vendor/") >= 0) {
+    ev.respondWith((async () => {
+      const c = await caches.open(CACHE_LIB);
+      const da = await c.match(req);
+      if (da) return da;
+      const netz = await fetch(req);
+      if (netz && netz.ok) c.put(req, netz.clone());
+      return netz;
     })());
     return;
   }

@@ -46,12 +46,13 @@ window.GENZURUECK = (function () {
     scAzubi: "scStart",
     scWieder: "scStart",
     scGlossar: "scStart",
+    scSql: "scStart",
     scGen: "scStart"
   };
   const NAMEN = {
     scStart: "Start", scBogen: "Prüfungsbogen", scAuswertung: "Auswertung",
     scNetz: "Netzplan-Trainer", scKK: "Karteikarten", scModell: "Modell-Trainer",
-    scUml: "UML-Trainer", scArchiv: "Archiv", scSpick: "Spickzettel", scKomp: "Kompendium", scKatalog: "Prüfungskatalog", scAzubi: "Azubi-Navigator", scWieder: "Fehler wiederholen", scGlossar: "Glossar", scGen: "Arbeitsblatt"
+    scUml: "UML-Trainer", scArchiv: "Archiv", scSpick: "Spickzettel", scKomp: "Kompendium", scKatalog: "Prüfungskatalog", scAzubi: "Azubi-Navigator", scWieder: "Fehler wiederholen", scGlossar: "Glossar", scSql: "SQL-Trainer", scGen: "Arbeitsblatt"
   };
 
   let jetzt = "scStart";
@@ -62,7 +63,7 @@ window.GENZURUECK = (function () {
      nach den bekannten Kennungen gesucht und nicht nach der Klasse — sonst
      bleibt genau der Bildschirm unsichtbar, um den es am meisten geht.   */
   const SCHIRME = ["scStart", "scBogen", "scAuswertung", "scNetz", "scKK",
-                   "scModell", "scUml", "scArchiv", "scSpick", "scKomp", "scKatalog", "scAzubi", "scWieder", "scGlossar", "scGen"];
+                   "scModell", "scUml", "scArchiv", "scSpick", "scKomp", "scKatalog", "scAzubi", "scWieder", "scGlossar", "scSql", "scGen"];
   function sichtbar() {
     for (const id of SCHIRME) { const e = $(id); if (e && !e.hidden) return id; }
     return "scStart";

@@ -353,6 +353,15 @@
     } else {
       ta.value = SITZ.text || "";
       loesungTeil(x, k);
+      /* Textantwort wie ein Prüfer ansehen lassen (gen/pruefen.js) */
+      if (root.GENPRUEFEN && (x.quelle === "ihk" || x.quelle === "azubi")) {
+        try {
+          let o = null;
+          if (x.quelle === "ihk") o = { frage: [x.it.groupIntro, x.it.prompt].filter(Boolean).join("\n"), loesung: (x.it.solution || {}).text, punkte: x.it.maxPoints };
+          else { const v = root.GENAZUBI && root.GENAZUBI.ansicht(x.mid, x.tid); if (v) o = { frage: v.t.text, loesung: v.t.loesung, hinweis: v.t.hinweis, punkte: v.t.punkte }; }
+          if (o) { o.antwort = () => ta.value; k.appendChild(root.GENPRUEFEN.kasten(o)); }
+        } catch (e) { console.error("Wiederholen/Prüfen:", e); }
+      }
       const frage = el("p", "wd-frage-satz", "Wie war es?");
       k.appendChild(frage);
       const r = el("div", "wd-bewerten");

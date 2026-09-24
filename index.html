@@ -504,6 +504,9 @@
 <link rel="stylesheet" href="gen/azubi.css">
 <link rel="stylesheet" href="gen/wiederholen.css">
 <link rel="stylesheet" href="gen/glossar.css">
+<link rel="stylesheet" href="gen/pruefen.css">
+<link rel="stylesheet" href="gen/sync.css">
+<link rel="stylesheet" href="gen/sql.css">
 <!-- Zuletzt, damit die Druckregeln die Bildschirmregeln oben
      überschreiben können, ohne überall !important zu brauchen. -->
 <link rel="stylesheet" href="gen/druckbogen.css">
@@ -838,6 +841,8 @@
 <script src="exams/exams.js"></script>
 <script src="gen/abbildungen.js"></script>
 <script src="gen/storage-tools.js"></script>
+<!-- früh laden: merkt sich, wann welcher Stand geändert wurde (Abgleich Handy ↔ Computer) -->
+<script src="gen/sync.js"></script>
 <script src="gen/progress-tools.js"></script>
 <script>
 "use strict";
@@ -4480,9 +4485,17 @@ schirm("scStart");
 <script src="gen/azubi.js"></script>
 <!-- Fehler aus allen Quellen, eine Schlange mit Wiederholung -->
 <script src="gen/wiederholen.js"></script>
+<!-- Textantworten: Kurzcheck und „Mit Claude prüfen“ -->
+<script src="gen/pruefen.js"></script>
+<!-- SQL-Trainer (AP2): die Datenbank selbst (vendor/sqljs) lädt erst beim Öffnen -->
+<script src="gen/sql-daten.js"></script>
+<script src="gen/sql.js"></script>
 <!-- Fachbegriffe DE → RU, antippbar in allen Texten -->
 <script src="gen/glossar-daten.js"></script>
 <script src="gen/glossar.js"></script>
+<!-- jedes Wort markieren → nachschlagen, Prüfungsdeutsch, „Meine Wörter“ -->
+<script src="gen/wortschatz-daten.js"></script>
+<script src="gen/nachschlagen.js"></script>
 <!-- nach start.js: die „weiter wo ich war“-Karte soll ganz oben stehen,
      also zuletzt eingefügt werden. -->
 <script src="gen/rechnen.js"></script>

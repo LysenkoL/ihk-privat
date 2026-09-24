@@ -1150,6 +1150,18 @@
       h.appendChild(sicher(t.hinweis));
       box.appendChild(h);
     }
+    /* Textantworten: Kurzcheck und „Mit Claude prüfen“ (gen/pruefen.js) */
+    if (hatFreitext(t) && root.GENPRUEFEN) {
+      try {
+        box.appendChild(root.GENPRUEFEN.kasten({
+          frage: t.text, loesung: t.loesung, hinweis: t.hinweis, punkte: t.punkte,
+          antwort: () => {
+            const a = z.a[t.id] || {};
+            return Object.keys(a).filter(k => k[0] === "t" || k === "rw").map(k => a[k]).filter(Boolean).join("\n");
+          }
+        }));
+      } catch (e) { console.error("Azubi/Prüfen:", e); }
+    }
     box.appendChild(bewerten(m, t, z, r));
     const nochmal = el("button", "btn ghost klein az-nochmal", "Diese Teilaufgabe neu versuchen");
     nochmal.type = "button";

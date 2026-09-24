@@ -1,0 +1,28 @@
+/* ============================================================================
+   gen/pruefen.css — „Prüfen lassen“ (gen/pruefen.js)
+   ========================================================================== */
+
+.pf-box{margin-top:12px}
+.pf-los{border:1px solid var(--pruefer); background:var(--pruefer-soft); color:var(--pruefer); border-radius:9px;
+  padding:8px 14px; font:inherit; font-size:14px; font-weight:700; cursor:pointer; min-height:38px}
+.pf-los:hover{background:var(--card)}
+.pf-inhalt{margin-top:8px; border:1px solid var(--rule); border-radius:11px; padding:10px 12px; background:var(--card)}
+.pf-kopf{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.pf-kopf b{font-size:14px}
+.pf-op{font-size:11.5px; font-weight:800; border-radius:99px; padding:2px 9px; background:var(--pruefer-soft); color:var(--pruefer)}
+.pf-liste{list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:6px}
+.pf-liste li{font-size:13.5px; line-height:1.45; padding:6px 9px 6px 30px; border-radius:8px; position:relative; background:var(--field)}
+.pf-liste li::before{position:absolute; left:10px; top:6px; font-weight:800}
+.pf-liste li.pf-ok{background:var(--ok-soft)} .pf-liste li.pf-ok::before{content:"✓"; color:var(--ok)}
+.pf-liste li.pf-warn{background:var(--warn-soft)} .pf-liste li.pf-warn::before{content:"!"; color:var(--warn)}
+.pf-liste li.pf-info::before{content:"i"; color:var(--pruefer); font-family:var(--data)}
+.pf-sw{display:flex; flex-wrap:wrap; gap:4px; align-items:center}
+.pf-w{font-size:12px; border-radius:99px; padding:1px 8px; font-weight:700}
+.pf-w.ok{background:var(--ok-soft); color:var(--ok)}
+.pf-w.fehlt{background:var(--red-soft); color:var(--red); text-decoration:none}
+.pf-claude{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.pf-claude .btn{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:13.5px; border-radius:9px; min-height:38px; padding:7px 13px}
+.pf-klein{font-size:12px; color:var(--muted); margin:6px 0 0; line-height:1.45}
+.pf-prompt{width:100%; margin-top:8px; font-family:var(--data); font-size:12px; line-height:1.45; min-height:140px}
+.tk .pf-box.pf-ihk{margin-top:10px}
+@media print{ .pf-box{display:none} }

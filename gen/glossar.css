@@ -39,7 +39,7 @@
   box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06)}
 .gl-karte h2{font-family:var(--body); font-size:21px; font-weight:800; margin:0; color:var(--pruefer)}
 .gl-info{font-size:13px; color:var(--muted); line-height:1.5; margin:6px 2px 0}
-.gl-fakten{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:12px}
+.gl-fakten{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:12px}
 .gl-fakt{background:var(--field); border-radius:9px; padding:8px 10px; display:flex; flex-direction:column}
 .gl-fakt b{font-size:19px; font-family:var(--data)}
 .gl-fakt span{font-size:11.5px; color:var(--muted)}
@@ -86,4 +86,60 @@
   .gl-fakt b{font-size:17px}
   .gl-liste{grid-template-columns:1fr}
 }
-@media print{ .gl-w{text-decoration:none} .gl-blase{display:none} }
+/* ---------------------------------------- Meine Wörter & Nachschlagen --- */
+:root{--mein:#7B4FC9; --mein-soft:#F1EBFB}
+[data-theme="dunkel"]{--mein:#B596F0; --mein-soft:#2A2238}
+.gl-w.apmein{text-decoration-color:var(--mein); text-decoration-style:solid}
+.gl-ap.apmein, .gl-fakt.apmein b{color:var(--mein)}
+.gl-ap.apmein{background:var(--mein-soft)}
+.gl-ap.ns-pd{background:var(--field); color:var(--ink)}
+.gl-ap.ns-neu{background:var(--warn-soft); color:var(--warn)}
+.gl-tipp{font-size:13px; line-height:1.5; margin:10px 0 0; padding:8px 10px; border-radius:9px; background:var(--mein-soft)}
+.gl-tipp b{color:var(--mein)}
+.gl-leer{list-style:none; padding:14px; border:1px dashed var(--rule); border-radius:11px; font-size:14px}
+.gl-leer p{margin:6px 0 0; color:var(--muted)}
+.gl-abschnitt{list-style:none; font-size:12.5px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:14px 2px 2px}
+.gl-e.gl-wort{border-style:dashed}
+.gl-blase.ns, .gl-blase{max-height:min(78vh, 640px); overflow-y:auto; overscroll-behavior:contain}
+.ns-kontext{font-size:13.5px; line-height:1.45; margin:8px 0 0; padding:6px 10px; border-left:3px solid var(--mein); background:var(--field);
+  border-radius:0 8px 8px 0; font-style:italic; color:var(--ink)}
+.ns-op{font-size:13.5px; line-height:1.45; margin:8px 0 0; padding:7px 10px; background:var(--pruefer-soft); border-radius:8px}
+.ns-eingabe{width:100%; box-sizing:border-box; margin-top:10px; font:inherit; font-size:16px; padding:9px 11px; border:1px solid var(--rule);
+  border-radius:9px; background:var(--card); color:var(--ink)}
+.ns-eingabe:focus{outline:none; border-color:var(--mein)}
+.ns-b-knoepfe{flex-wrap:wrap}
+.ns-b-knoepfe a.btn{text-decoration:none; display:inline-flex; align-items:center}
+.gl-b-knoepfe .btn.primary{background:var(--mein); border-color:var(--mein); color:#fff}
+.ns-aendern{display:flex; gap:6px; align-items:center; margin-top:8px}
+.ns-aendern .ns-eingabe{margin:0; font-size:15px; padding:6px 9px}
+
+/* Wo kommt das vor? */
+.ns-vk{margin-top:10px; border-top:1px solid var(--rule); padding-top:6px}
+.ns-vk-knopf{border:0; background:none; font:inherit; font-size:13.5px; font-weight:700; color:var(--pruefer); cursor:pointer; padding:6px 0; min-height:34px; text-align:left}
+.ns-vk-knopf::before{content:"▸"; display:inline-block; width:1.1em}
+.ns-vk-knopf.offen::before{content:"▾"}
+.ns-vk-inhalt{margin-top:2px}
+.ns-klein{font-size:12.5px; color:var(--muted); margin:2px 0 6px; line-height:1.4}
+.ns-funde{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.ns-fund{display:flex; flex-direction:column; gap:3px; width:100%; text-align:left; border:1px solid var(--rule); background:var(--card); color:var(--ink);
+  border-radius:9px; padding:7px 9px; font:inherit; cursor:pointer}
+.ns-fund:hover{border-color:var(--pruefer)}
+.ns-fund-kopf{display:flex; align-items:center; justify-content:space-between; gap:6px}
+.ns-fund-kopf b{font-size:12.5px; color:var(--pruefer)}
+.ns-wo{font-size:10.5px; font-weight:800; border-radius:99px; padding:1px 7px; background:var(--ok-soft); color:var(--ok); white-space:nowrap}
+.ns-wo.l{background:var(--field); color:var(--muted)}
+.ns-satz{font-size:13px; line-height:1.45}
+.ns-satz mark{background:var(--mein-soft); color:inherit; font-weight:700; border-radius:3px; padding:0 2px; box-shadow:inset 0 -2px 0 var(--mein)}
+.ns-knoepfe{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+.ns-link{border:0; background:none; font:inherit; font-size:13px; font-weight:700; color:var(--pruefer); cursor:pointer; text-decoration:underline; padding:4px 0}
+
+/* Knopf unten, sobald ein Wort markiert ist */
+.ns-pille{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(74px + env(safe-area-inset-bottom, 0px)); z-index:96;
+  display:flex; align-items:center; gap:8px; max-width:92vw; border:0; border-radius:99px; padding:11px 18px; min-height:46px;
+  background:var(--mein); color:#fff; font:inherit; font-size:15px; font-weight:700; cursor:pointer;
+  box-shadow:0 8px 24px rgba(40,20,80,.35); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ns-pille[hidden]{display:none}
+[data-theme="dunkel"] .ns-pille, [data-theme="dunkel"] .gl-b-knoepfe .btn.primary{color:#1B1428}
+.ns-lupe{font-size:16px}
+
+@media print{ .gl-w{text-decoration:none} .gl-blase{display:none} .ns-pille{display:none} }

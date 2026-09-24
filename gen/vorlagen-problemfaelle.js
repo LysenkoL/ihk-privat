@@ -242,6 +242,22 @@ direkt durch den Mehrpreis teilen, statt zuerst auf den Monat herunterzubrechen.
       const clientHost = R.stufe(100, 200, 1);
       const domain = R.waehle(["averbeck", "lindner", "sturm", "kellermann", "havelblick"]) + ".local";
       const terminal = R.ganz(2, 9);
+      const serverName = "appsrv." + domain;
+
+      /* Maske: nur ENGER als /24 ist hier ein echter Fehler. Eine zu weite Maske
+         (z. B. /16) schließt den Server ja weiterhin ein — dann funktioniert die
+         Verbindung, und die Aufgabe wäre falsch. Gewählt wird deshalb nur eine
+         Maske, bei der der Server (und das Gateway .1) außerhalb des Bereichs
+         des Terminals liegt. Die Zufallszahl wird wie früher genau einmal gezogen,
+         damit alle anderen Werte zur selben Saat gleich bleiben.              */
+      const serverHost = +serverIp.split(".")[3];
+      const PRAEFIX = { 25: "255.255.255.128", 26: "255.255.255.192", 27: "255.255.255.224" };
+      const bereich = (host, pfx) => { const g = Math.pow(2, 32 - pfx), start = Math.floor(host / g) * g; return [start, start + g - 1]; };
+      const aussen = pfx => { const [a, e] = bereich(clientHost, pfx); return serverHost < a || serverHost > e; };
+      const maskenWahl = R.waehle([0, 1, 2]);
+      const passend = [25, 26, 27].filter(aussen);
+      const falschPfx = passend[maskenWahl % passend.length];
+      const [bA, bE] = bereich(clientHost, falschPfx);
 
       const fehlerArten = [
         {
@@ -251,15 +267,16 @@ direkt durch den Mehrpreis teilen, statt zuerst auf den Monat herunterzubrechen.
           richtig: basis + clientHost,
           feldName: "IPv4-Adresse",
           grund: ["falsches Subnetz", "anderes Netz", "dritte Oktett falsch", "nicht im selben Netz",
-            "Netzadresse unterschiedlich"]
+            "Netzadresse unterschiedlich", "Gateway nicht erreichbar"]
         },
         {
           key: "maske", label: "Die Subnetzmaske passt nicht zum Netz.",
           clientIp: basis + clientHost,
-          maske: R.waehle(["255.255.255.128", "255.255.0.0", "255.255.255.192"]), gw: gateway, dnsC: dns,
+          maske: PRAEFIX[falschPfx], gw: gateway, dnsC: dns,
           richtig: "255.255.255.0",
           feldName: "Subnetzmaske",
-          grund: ["falsche Subnetzmaske", "Maske stimmt nicht", "andere Netzgröße", "Netzadresse unterschiedlich"]
+          grund: ["falsche Subnetzmaske", "Maske stimmt nicht", "Server liegt außerhalb", "nicht im selben Netz",
+            "Gateway nicht im eigenen Netz", "Netzadresse unterschiedlich", "Subnetz zu klein"]
         },
         {
           key: "gw", label: "Das Standardgateway zeigt auf eine Adresse außerhalb des Netzes.",
@@ -300,10 +317,18 @@ Ethernet-Adapter Ethernet:
       const mac2 = "00-1B-21-" + R.ganz(16, 99) + "-C4-" + R.ganz(16, 99);
 
       return {
+        /* Das Fehlerbild muss zum Fehler passen: ein falsches Gateway stört den
+           Server im EIGENEN Netz nicht, ein falscher DNS-Server nur den Aufruf
+           über den Namen. */
         situation:
-`In der ${c.firma} meldet die Abteilung ${c.abteilung}, dass Terminal ${terminal} den Anwendungsserver ` +
-`nicht erreicht. Alle anderen Arbeitsplätze arbeiten normal. Sie lassen sich auf beiden Rechnern ` +
-`die IP-Konfiguration ausgeben.`,
+`In der ${c.firma} meldet die Abteilung ${c.abteilung}, dass ` +
+({ ip: `Terminal ${terminal} den Anwendungsserver nicht erreicht.`,
+   maske: `Terminal ${terminal} den Anwendungsserver nicht erreicht.`,
+   gw: `Terminal ${terminal} zwar mit dem Anwendungsserver im eigenen Netz arbeiten kann, aber keine ` +
+       `Verbindung ins Internet hat — Webseiten und der Cloud-Dienst des Herstellers laden nicht.`,
+   dns: `auf Terminal ${terminal} die Anwendung nicht startet: Der Server „${serverName}“ wird nicht gefunden.` })[fehler.key] +
+` Alle anderen Arbeitsplätze arbeiten normal. Sie lassen sich auf dem Terminal und auf dem ` +
+`Anwendungsserver die IP-Konfiguration ausgeben.`,
         code:
 block("Ausgabe auf Terminal " + terminal, "Realtek PCIe GbE Family Controller",
       fehler.clientIp, fehler.maske, fehler.gw, fehler.dnsC, mac1) +
@@ -316,37 +341,66 @@ block("Ausgabe auf dem Anwendungsserver", "Intel(R) I210 Gigabit Network Connect
             optionen: ["IPv4-Adresse", "Subnetzmaske", "Standardgateway", "DNS-Server"],
             loesung: fehler.feldName },
           { typ: "text", label: "Wie muss der Eintrag richtig lauten?", be: 2, zeilen: 1,
-            erwartet: [[fehler.richtig]] },
+            erwartet: [[fehler.richtig].concat(fehler.key === "maske" ? ["/24"] : [])] },
           { typ: "text", label: "Begründen Sie, warum die Verbindung mit der falschen Angabe scheitert",
             be: 2, zeilen: 3, satzbau: true, minWorte: 10, erwartet: [fehler.grund] },
-          { typ: "text", label: "Mit welchem Befehl prüfen Sie nach der Korrektur die Erreichbarkeit des Servers?",
-            be: 1, zeilen: 1, satzbau: false,
-            erwartet: [["ping " + serverIp, "ping", "Test-NetConnection"]] },
+          fehler.key === "dns"
+            ? { typ: "text", label: "Mit welchem Befehl prüfen Sie nach der Korrektur, ob der Servername aufgelöst wird?",
+                be: 1, zeilen: 1, satzbau: false,
+                erwartet: [["nslookup " + serverName, "nslookup", "Resolve-DnsName", "ping " + serverName]] }
+            : fehler.key === "gw"
+              ? { typ: "text", label: "Mit welchem Befehl prüfen Sie nach der Korrektur, ob das Gateway erreichbar ist und welchen Weg die Pakete nehmen?",
+                  be: 1, zeilen: 1, satzbau: false,
+                  erwartet: [["ping " + gateway, "tracert", "traceroute", "ping", "Test-NetConnection", "pathping"]] }
+              : { typ: "text", label: "Mit welchem Befehl prüfen Sie nach der Korrektur die Erreichbarkeit des Servers?",
+                  be: 1, zeilen: 1, satzbau: false,
+                  erwartet: [["ping " + serverIp, "ping", "Test-NetConnection"]] },
           { typ: "text", label: "Welche Angabe der Ausgabe zeigt, dass die Adresse nicht automatisch bezogen wird?",
             be: 1, zeilen: 1, satzbau: false,
             erwartet: [["DHCP aktiviert Nein", "DHCP", "DHCP steht auf Nein", "statisch"]] }
         ],
         loesung:
 `Netzadressen vergleichen (IP UND Subnetzmaske):
-   Terminal ${terminal}: ${fehler.clientIp} mit ${fehler.maske}
-   Server:      ${serverIp} mit 255.255.255.0 → Netz ${basis}0
+` + (fehler.key === "maske"
+  ? `   Terminal ${terminal}: ${fehler.clientIp} mit ${fehler.maske} (/${falschPfx})
+                → Netz ${basis}${bA}, Bereich ${basis}${bA} bis ${basis}${bE}
+   Server:      ${serverIp} mit 255.255.255.0 (/24) → Netz ${basis}0`
+  : fehler.key === "ip"
+    ? `   Terminal ${terminal}: ${fehler.clientIp} mit 255.255.255.0 → Netz ${fehler.clientIp.replace(/\.\d+$/, ".0")}
+   Server:      ${serverIp} mit 255.255.255.0 → Netz ${basis}0`
+    : `   Terminal ${terminal}: ${fehler.clientIp} mit 255.255.255.0 → Netz ${basis}0
+   Server:      ${serverIp} mit 255.255.255.0 → Netz ${basis}0   (gleiches Netz)`) + `
 
 Falsch ist die ${fehler.feldName}: ${fehler.label}
 Richtig wäre: ${fehler.richtig}
 
-` + (fehler.key === "ip" || fehler.key === "maske"
-  ? `Beide Rechner liegen dadurch in verschiedenen Subnetzen. Der Rechner versucht, das Ziel über das
-Gateway zu erreichen, obwohl der Server im lokalen Netz steht — oder er hält den Server für lokal,
-obwohl er es nicht ist. In beiden Fällen kommt keine Verbindung zustande.`
-  : fehler.key === "gw"
-    ? `Das Standardgateway muss im eigenen Subnetz liegen, sonst kann der Rechner es nicht ansprechen.
-Verbindungen ins lokale Netz funktionieren dann zwar noch, alles außerhalb aber nicht.`
-    : `Die IP-Verbindung funktioniert, aber Namen werden nicht mehr aufgelöst: Der Server ist per
-IP-Adresse erreichbar, über seinen Namen jedoch nicht. Typisches Bild: „ping ${serverIp}“ klappt,
-„ping servername“ nicht.`) +
+` + ({
+  maske:
+`Mit /${falschPfx} reicht das Netz des Terminals nur von .${bA} bis .${bE}. Der Server (.${serverHost}) liegt
+außerhalb — das Terminal hält ihn für ein fremdes Netz und schickt die Pakete an das Gateway
+${gateway}. Das liegt aber ebenfalls außerhalb seines Bereichs und ist nicht ansprechbar.
+Also kommt keine Verbindung zustande. Richtig ist /24 wie beim Server und den anderen Arbeitsplätzen.
+
+Achtung Denkfalle: Eine zu GROSSE Maske (z. B. 255.255.0.0) wäre hier kein Grund für den Fehler —
+der Server läge dann weiterhin im eigenen Bereich des Terminals, die Verbindung würde funktionieren.`,
+  ip:
+`Das Terminal liegt in einem anderen Netz als Server und Gateway. Den Server hält es für fremd und
+will über das Gateway ${gateway} gehen — das liegt aber nicht im Netz des Terminals und ist damit nicht
+ansprechbar. Es kommt keine Verbindung zustande.`,
+  gw:
+`Terminal und Server liegen im selben Netz — deshalb klappt die Arbeit mit dem Anwendungsserver:
+dafür wird kein Gateway gebraucht. Alles AUSSERHALB des eigenen Netzes (Internet, Cloud) geht über
+das Standardgateway. Das eingetragene ${fehler.gw} liegt aber nicht im eigenen Subnetz, der Rechner
+kann es nicht ansprechen → keine Verbindung nach draußen.`,
+  dns:
+`Die IP-Verbindung funktioniert, aber der Name „${serverName}“ wird nicht aufgelöst: Der eingetragene
+DNS-Server ${fehler.dnsC} kennt die internen Namen der Domäne ${domain} nicht (oder ist nicht erreichbar).
+Typisches Bild: „ping ${serverIp}“ klappt, „ping ${serverName}“ nicht.`
+})[fehler.key] +
 `
 
-Prüfen nach der Korrektur: ping ${serverIp} (Erreichbarkeit) und nslookup servername (Namensauflösung).
+Prüfen nach der Korrektur: ` + ({ maske: `ping ${serverIp}`, ip: `ping ${serverIp}`, gw: `ping ${gateway}, dann tracert zu einem Ziel im Internet`,
+  dns: `nslookup ${serverName}` })[fehler.key] + `.
 Die Zeile „DHCP aktiviert: Nein“ zeigt, dass die Adresse fest eingetragen ist — der Fehler wurde
 also von Hand konfiguriert und kommt nach einem Neustart wieder.`
       };

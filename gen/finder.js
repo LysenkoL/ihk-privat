@@ -130,8 +130,14 @@ window.GENFINDER = (function () {
       ["Prüfungskatalog öffnen", "Original der ZPA · Lücken · eigener Stand", "katalog", () => {
         if (window.GENKATALOG) window.GENKATALOG.oeffnen(null, { filter: "alle" });
       }, "katalog pruefungskatalog zpa themen stichworte"],
-      ["Fortschritt exportieren", "Datei zum Sichern oder Umziehen", "daten", klick("btnExport"), "export sichern backup datei"],
-      ["Fortschritt importieren", "Datei von einem anderen Gerät", "daten", klick("btnImport"), "import laden datei"],
+      ["Stand senden", "Handy ↔ Computer abgleichen · Datei an dich selbst schicken", "daten",
+        () => window.GENSYNC && window.GENSYNC.senden(), "export sichern backup datei sync abgleichen computer handy senden"],
+      ["Stand holen", "Datei vom anderen Gerät zusammenführen", "daten", () => {
+        if (G()) G().oeffneBlock("daten");
+        setTimeout(() => { const i = document.getElementById("syDatei"); if (i) i.click(); }, 120);
+      }, "import laden datei sync abgleichen computer handy holen"],
+      ["SQL-Trainer", "AP2 · 44 Aufgaben an einer echten Datenbank", "sql",
+        () => window.GENSQL && window.GENSQL.oeffnen(), "sql select join datenbank abfrage ap2 trainer"],
       ["Hell / Dunkel umschalten", "Farbschema", "werkzeug", klick("btnTheme"), "dunkel hell dark theme nacht"],
       ["Nach Update suchen", "neue Fassung laden", "werkzeug", () => {
         const b = document.querySelector("#versionZeile .ver-knopf"); if (b) b.click();
@@ -254,13 +260,21 @@ window.GENFINDER = (function () {
   function glossar() {
     const G = window.GENGLOSSAR && window.GENGLOSSAR.daten();
     if (!G) return [];
-    const AP = { "1": "AP1", "2": "AP2", "1+2": "AP1+2" };
-    return G.liste.map(e => ({
+    const AP = { "1": "AP1", "2": "AP2", "1+2": "AP1+2", mein: "Mein Wort" };
+    const fach = G.liste.map(e => ({
       typ: "glossar", titel: e.wort + " — " + e.ru, ikon: "glossar",
       unter: AP[e.ap] + " · " + e.einfach,
       worte: e.formen.join(" ") + " " + e.ru,
       tun: () => window.GENGLOSSAR.oeffnen(e.id)
     }));
+    /* Prüfungsdeutsch: „gewährleisten“, „hinsichtlich“ … → Kärtchen mit Fundstellen */
+    const W = window.GENWORT ? window.GENWORT.wortschatz().liste : [];
+    return fach.concat(W.map(w => ({
+      typ: "glossar", titel: (w.artikel ? w.artikel + " " : "") + w.lemma + " — " + w.ru, ikon: "glossar",
+      unter: "Prüfungsdeutsch · antippen: Übersetzung und Stellen in den Prüfungen",
+      worte: w.formen.join(" ") + " " + w.ru,
+      tun: () => window.GENWORT.karte(w.lemma)
+    })));
   }
 
   let INDEX = null;

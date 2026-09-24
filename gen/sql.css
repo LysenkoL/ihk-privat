@@ -1,0 +1,127 @@
+/* ============================================================================
+   gen/sql.css — SQL-Trainer (gen/sql.js)
+   ========================================================================== */
+
+.sq-seite{max-width:860px}
+.sq-wrap{display:flex; flex-direction:column; gap:12px; min-width:0}
+.sq-seite .btn{font-family:var(--body); text-transform:none; letter-spacing:0; font-size:14px; font-weight:650; border-radius:9px; padding:9px 15px; min-height:42px}
+.sq-karte{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:16px 18px; min-width:0;
+  box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06)}
+.sq-karte h2{font-family:var(--body); font-size:21px; font-weight:800; margin:0; color:var(--pruefer); line-height:1.25}
+.sq-info{font-size:14px; line-height:1.5; margin:8px 0 0; color:var(--ink)}
+.sq-klein{font-size:12.5px; color:var(--muted); line-height:1.45; margin:6px 0 0}
+.sq-steuer, .sq-knoepfe{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center}
+.sq-balken{height:8px; border-radius:99px; background:var(--field); margin-top:12px; overflow:hidden}
+.sq-balken span{display:block; height:100%; background:var(--ok); border-radius:99px}
+.sq-laden b, .sq-fehlerbox b{font-size:16px}
+.sq-fehlerbox{border-color:var(--red)}
+.sq-fehlerbox .btn{margin-top:10px}
+
+/* Themen-Filter */
+.sq-chips{display:flex; flex-wrap:wrap; gap:6px}
+.sq-chip{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:99px; padding:5px 11px;
+  font:inherit; font-size:13px; cursor:pointer; min-height:34px}
+.sq-chip.an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+
+/* Liste */
+.sq-liste{display:flex; flex-direction:column; gap:6px}
+.sq-thema{font-family:var(--body); font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10px 2px 2px}
+.sq-zeile{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:var(--card); color:var(--ink);
+  border:1px solid var(--rule); border-radius:11px; padding:10px 12px; font:inherit; cursor:pointer; min-width:0}
+.sq-zeile:hover{border-color:var(--pruefer)}
+.sq-zeile.ok{border-color:var(--ok); background:var(--ok-soft)}
+.sq-zeile.halb{border-color:var(--warn)}
+.sq-status{flex:0 0 24px; height:24px; border-radius:99px; background:var(--field); display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:13px; color:var(--muted)}
+.sq-zeile.ok .sq-status{background:var(--ok); color:#fff}
+.sq-zeile.halb .sq-status{background:var(--warn-soft); color:var(--warn)}
+.sq-z-text{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px}
+.sq-z-text b{font-size:14.5px}
+.sq-z-text span{font-size:12.5px; color:var(--muted); line-height:1.4}
+.sq-stufe{flex:0 0 auto; font-size:9px; letter-spacing:1px; color:var(--pruefer)}
+.sq-stufe.s2{color:var(--warn)} .sq-stufe.s3{color:var(--red)}
+
+/* Aufgabe */
+.sq-nav{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+.sq-nav-r{display:flex; align-items:center; gap:6px}
+.sq-nav-r .sq-klein{margin:0 4px 0 0}
+.sq-mini{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:9px; padding:6px 12px;
+  font:inherit; font-size:13.5px; font-weight:600; cursor:pointer; min-height:38px}
+.sq-mini:disabled{opacity:.4; cursor:default}
+.sq-a-kopf{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px}
+.sq-marke{font-size:11.5px; font-weight:800; border-radius:99px; padding:2px 9px; background:var(--pruefer-soft); color:var(--pruefer)}
+.sq-marke.ok{background:var(--ok-soft); color:var(--ok)}
+.sq-text{font-size:16px; line-height:1.55; margin:10px 0 0; color:var(--ink)}
+
+/* Schema */
+.sq-schema{margin-top:12px; border-top:1px solid var(--rule); padding-top:8px}
+.sq-schema summary{cursor:pointer; font-weight:700; font-size:14px; color:var(--pruefer); padding:6px 0; min-height:32px}
+.sq-schema-in{display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:8px; margin-top:6px}
+.sq-tab{border:1px solid var(--rule); border-radius:10px; padding:9px 10px; background:var(--field); min-width:0}
+.sq-tab-kopf{display:flex; align-items:baseline; justify-content:space-between; gap:6px}
+.sq-tab-kopf b{font-family:var(--data); font-size:14px}
+.sq-tab-kopf .sq-klein{margin:0}
+.sq-spalten{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px}
+.sq-sp{font-family:var(--data); font-size:12px; background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:1px 6px}
+.sq-sp.pk{text-decoration:underline; text-decoration-thickness:2px; font-weight:800}
+.sq-sp.fk small{color:var(--warn); font-weight:700}
+.sq-tab .sq-mini{margin-top:6px; min-height:32px; padding:4px 10px; font-size:12.5px}
+.sq-tab .sq-ergebnis{margin-top:6px}
+
+/* Editor */
+.sq-editor-w{display:flex; flex-direction:column; gap:6px; min-width:0}
+.sq-editor{width:100%; box-sizing:border-box; font-family:var(--data); font-size:15px; line-height:1.5; padding:10px 12px;
+  border:1.5px solid var(--rule); border-radius:10px; background:var(--field); color:var(--ink); resize:vertical; min-height:130px;
+  tab-size:2}
+.sq-editor:focus{outline:none; border-color:var(--pruefer); background:var(--card)}
+.sq-tasten{display:flex; gap:5px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch; scrollbar-width:thin}
+.sq-taste{flex:0 0 auto; font-family:var(--data); font-size:12.5px; border:1px solid var(--rule); background:var(--card); color:var(--ink);
+  border-radius:7px; padding:5px 9px; min-height:34px; cursor:pointer; white-space:nowrap}
+.sq-taste.tab{color:var(--pruefer); border-color:var(--pruefer-soft); background:var(--pruefer-soft)}
+.sq-taste:active{background:var(--pruefer); color:#fff}
+
+/* Ergebnis */
+.sq-ausgabe, .sq-urteil{min-width:0}
+.sq-ausgabe:not(:empty){margin-top:12px}
+.sq-ergebnis{max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:8px}
+.sq-tabelle{border-collapse:collapse; font-size:13px; font-family:var(--data); min-width:min(100%, 420px)}
+.sq-tabelle th{background:var(--pruefer-soft); color:var(--pruefer); text-align:left; font-weight:800; padding:5px 8px; white-space:nowrap;
+  border-bottom:2px solid var(--pruefer); position:sticky; top:0}
+.sq-tabelle td{padding:4px 8px; border-bottom:1px solid var(--rule); white-space:nowrap; max-width:260px; overflow:hidden; text-overflow:ellipsis}
+.sq-tabelle td.zahl, .sq-tabelle th.zahl{text-align:right}
+.sq-tabelle td.null{color:var(--muted); font-style:italic}
+.sq-tabelle tbody tr:nth-child(even) td{background:var(--field)}
+.sq-meldung{border-radius:10px; padding:10px 12px; margin-top:12px; font-size:14px; line-height:1.5}
+.sq-meldung p{margin:6px 0 0}
+.sq-meldung.richtig{background:var(--ok-soft); border:1px solid var(--ok)}
+.sq-meldung.richtig > b{color:var(--ok)}
+.sq-meldung.falsch{background:var(--red-soft); border:1px solid var(--red)}
+.sq-meldung.falsch > b{color:var(--red)}
+.sq-roh{font-family:var(--data); font-size:11.5px; color:var(--muted); word-break:break-word}
+.sq-diff{margin:4px 0 0; padding-left:18px; font-family:var(--data); font-size:12.5px; word-break:break-word}
+.sq-punkte{list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:4px}
+.sq-punkte li{font-size:13.5px; padding:4px 8px 4px 26px; position:relative; border-radius:7px; background:var(--card)}
+.sq-punkte li::before{position:absolute; left:8px; top:4px; font-weight:800}
+.sq-punkte li.ok::before{content:"✓"; color:var(--ok)}
+.sq-punkte li.nein::before{content:"✗"; color:var(--red)}
+.sq-punkte li.info::before{content:"i"; color:var(--pruefer); font-family:var(--data)}
+.sq-notiz{font-size:13px; line-height:1.45; margin:8px 0 0; padding:6px 10px; border-radius:8px; background:var(--field)}
+.sq-notiz.ok{background:var(--ok-soft)}
+.sq-notiz.warn{background:var(--warn-soft)}
+.sq-tipp{font-size:14px; line-height:1.5; margin:12px 0 0; padding:8px 12px; border-radius:9px; background:var(--pruefer-soft)}
+.sq-loesung{margin-top:12px; border:1px dashed var(--pruefer); border-radius:10px; padding:10px 12px}
+.sq-loesung pre{font-family:var(--data); font-size:13.5px; line-height:1.5; margin:8px 0 0; white-space:pre-wrap; word-break:break-word}
+.sq-ru{font-size:14px; line-height:1.5; margin:8px 0 0; color:var(--ink); opacity:.9}
+.sq-ru::before{content:"RU  "; font-family:var(--data); font-size:11px; font-weight:800; color:var(--muted)}
+.sq-loesung .sq-mini{margin-top:8px}
+.sq-weiter{margin-top:10px}
+
+@media (max-width:560px){
+  .sq-karte{padding:14px 13px}
+  .sq-karte h2{font-size:19px}
+  .sq-text{font-size:15.5px}
+  .sq-knoepfe .btn{flex:1 1 40%}
+  .sq-schema-in{grid-template-columns:1fr}
+  .sq-editor{font-size:16px}
+}
+@media print{ .sq-seite{display:none} }

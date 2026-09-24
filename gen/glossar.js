@@ -31,8 +31,8 @@
   let UI = Object.assign({ an: true, ap: "alle", gebiet: "", suche: "", tab: "liste" }, hatDom ? lies(SK_UI, {}) : {});
   const merkeUI = () => schreib(SK_UI, { an: UI.an, ap: UI.ap, gebiet: UI.gebiet });
 
-  const AP_NAME = { "1": "AP1", "2": "AP2", "1+2": "AP1+2" };
-  const AP_LANG = { "1": "vor allem AP1", "2": "vor allem AP2", "1+2": "AP1 und AP2" };
+  const AP_NAME = { "1": "AP1", "2": "AP2", "1+2": "AP1+2", mein: "Mein Wort" };
+  const AP_LANG = { "1": "vor allem AP1", "2": "vor allem AP2", "1+2": "AP1 und AP2", mein: "von dir gespeichert" };
 
   /* ======================================================================
      Daten aufbereiten — reine Funktionen (tests/glossar.test.js)
@@ -47,10 +47,10 @@
   function aufbereiten(roh) {
     const liste = [], von = {}, formVon = {};
     (roh || []).forEach(r => {
-      const [de, ru, einfach, ap, gebiet, varianten] = r;
+      const [de, ru, einfach, ap, gebiet, varianten, festId] = r;
       const m = /^(der|die|das)\s+(.+)$/.exec(de);
       const wort = m ? m[2] : de;
-      let id = slug(wort);
+      let id = festId || slug(wort);
       while (von[id]) id += "-x";
       const e = { id, de, wort, artikel: m ? m[1] : "", ru, einfach, ap: AP_NAME[ap] ? ap : "1+2", gebiet, formen: [] };
       [wort].concat(varianten || []).forEach(f => {
@@ -97,10 +97,23 @@
      ====================================================================== */
   let G = null;
   function daten() {
-    if (!G && root.IHK_GLOSSAR) G = aufbereiten(root.IHK_GLOSSAR);
+    if (!G && root.IHK_GLOSSAR) G = aufbereiten((root.GENWORT ? root.GENWORT.zeilen() : []).concat(root.IHK_GLOSSAR));
     return G;
   }
-  const GEBIETE = () => root.IHK_GLOSSAR_GEBIETE || {};
+  const GEBIETE = () => Object.assign({ mein: "Meine Wörter" }, root.IHK_GLOSSAR_GEBIETE || {});
+  const istMein = e => e && e.ap === "mein";
+  const zahlMein = () => { const D = daten(); return D ? D.liste.filter(istMein).length : 0; };
+
+  /** „Meine Wörter“ haben sich geändert: neu aufbauen, neu markieren */
+  function neu() {
+    G = null;
+    if (!daten()) return;
+    entmarkieren();
+    if (UI.an) allesMarkieren();
+    const s = $("scGlossar");
+    if (s && !s.hidden && UI.tab === "liste") { const y = root.scrollY; zeichnen(); root.scrollTo(0, y); }
+    try { block(); } catch (e) { }
+  }
 
   /* ------------------------------------------------ im Text markieren --- */
   /* Grundwörter, die jeder kennt — im Glossar ja, im Text nicht unterstreichen */
@@ -173,6 +186,7 @@
       document.body.appendChild(b);
     }
     b.innerHTML = "";
+    b.classList.remove("ns");
     const kopf = el("div", "gl-b-kopf");
     const t = el("div", "gl-b-t");
     if (e.artikel) t.appendChild(el("span", "gl-art", e.artikel + " "));
@@ -185,18 +199,20 @@
     kopf.appendChild(zu);
     b.appendChild(kopf);
     b.appendChild(el("p", "gl-ru", e.ru));
-    b.appendChild(el("p", "gl-einfach", e.einfach));
-    b.appendChild(el("p", "gl-meta", AP_LANG[e.ap] + " · " + (GEBIETE()[e.gebiet] || "")));
+    b.appendChild(el("p", istMein(e) ? "ns-kontext" : "gl-einfach", e.einfach));
+    b.appendChild(el("p", "gl-meta", AP_LANG[e.ap] + (istMein(e) ? "" : " · " + (GEBIETE()[e.gebiet] || ""))));
     const st = el("div", "gl-b-knoepfe");
     const kann = el("button", "btn klein" + (KANN[e.id] ? " an" : ""), KANN[e.id] ? "✓ kann ich" : "kann ich");
     kann.type = "button";
     kann.onclick = () => { kannSetzen(e.id, !KANN[e.id]); blase(id); };
     const oeff = el("button", "btn ghost klein", "Im Glossar");
     oeff.type = "button";
-    oeff.onclick = () => { b.classList.remove("an"); oeffnen(e.id); };
+    oeff.onclick = () => { b.classList.remove("an"); if (istMein(e)) { UI.ap = "mein"; merkeUI(); } oeffnen(e.id); };
     st.append(kann, oeff);
     b.appendChild(st);
+    if (root.GENWORT) b.appendChild(root.GENWORT.vorkommenTeil({ art: istMein(e) ? "mein" : "glossar", e, text: e.wort }, e.wort));
     b.classList.add("an");
+    b.scrollTop = 0;
   }
   function kannSetzen(id, ja) {
     if (ja) KANN[id] = 1; else delete KANN[id];
@@ -269,11 +285,16 @@
     const L = D.liste;
     const kopf = el("div", "gl-karte");
     kopf.appendChild(el("h2", null, "Fachbegriffe DE → RU"));
-    kopf.appendChild(el("p", "gl-info", L.length + " Begriffe aus AP1 und AP2: Artikel, Übersetzung, einfache Erklärung. " +
+    kopf.appendChild(el("p", "gl-info", (L.length - zahlMein()) + " Begriffe aus AP1 und AP2: Artikel, Übersetzung, einfache Erklärung. " +
       "Im Aufgabentext ist jeder Begriff beim ersten Vorkommen unterstrichen — antippen zeigt das Kärtchen."));
+    const tipp = el("p", "gl-tipp");
+    tipp.appendChild(el("b", null, "Unbekanntes Wort, das nicht unterstrichen ist? "));
+    tipp.appendChild(document.createTextNode("Im Aufgabentext markieren (lange drücken oder doppelt tippen) → unten „Nachschlagen“. " +
+      "Du siehst Übersetzung und alle Stellen in den Prüfungen; „+ Mein Glossar“ speichert es hier unter „Meine Wörter“."));
+    kopf.appendChild(tipp);
     const f = el("div", "gl-fakten");
     [["AP1", L.filter(e => e.ap === "1").length, "ap1"], ["AP1+2", L.filter(e => e.ap === "1+2").length, "ap12"],
-     ["AP2", L.filter(e => e.ap === "2").length, "ap2"], ["kann ich", Object.keys(KANN).filter(k => D.von[k]).length, "kann"]]
+     ["AP2", L.filter(e => e.ap === "2").length, "ap2"], ["meine", zahlMein(), "apmein"], ["kann ich", Object.keys(KANN).filter(k => D.von[k]).length, "kann"]]
       .forEach(([t, n, c]) => { const x = el("div", "gl-fakt " + c); x.appendChild(el("b", null, String(n))); x.appendChild(el("span", null, t)); f.appendChild(x); });
     kopf.appendChild(f);
     const schalter = el("label", "gl-schalter");
@@ -292,13 +313,13 @@
     const leiste = el("div", "gl-leiste");
     const feld = el("div", "gl-sfeld");
     const inp = el("input"); inp.type = "search"; inp.id = "glSuche";
-    inp.placeholder = "Suchen: deutsch oder russisch, z. B. Tilgung, окупаемость";
+    inp.placeholder = "Suchen: deutsch oder russisch, z. B. Tilgung, gewährleisten, окупаемость";
     inp.value = UI.suche || ""; inp.autocomplete = "off";
     inp.oninput = () => { UI.suche = inp.value; listeZeichnen(); };
     feld.appendChild(inp);
     leiste.appendChild(feld);
     const chips = el("div", "gl-chips");
-    [["alle", "alle"], ["1", "AP1"], ["1+2", "AP1+2"], ["2", "AP2"], ["lernen", "noch lernen"]].forEach(([k2, t]) => {
+    [["alle", "alle"], ["mein", "Meine Wörter" + (zahlMein() ? " " + zahlMein() : "")], ["1", "AP1"], ["1+2", "AP1+2"], ["2", "AP2"], ["lernen", "noch lernen"]].forEach(([k2, t]) => {
       const c = el("button", "gl-chip" + (UI.ap === k2 ? " an" : ""), t);
       c.type = "button";
       c.onclick = () => { UI.ap = k2; merkeUI(); chips.querySelectorAll(".gl-chip").forEach(x => x.classList.toggle("an", x === c)); listeZeichnen(); };
@@ -329,15 +350,55 @@
     k.appendChild(t);
     k.appendChild(el("span", "gl-ap ap" + e.ap.replace("+", ""), AP_NAME[e.ap]));
     li.appendChild(k);
-    li.appendChild(el("p", "gl-ru", e.ru));
-    li.appendChild(el("p", "gl-einfach", e.einfach));
+    const ru = el("p", "gl-ru", e.ru);
+    li.appendChild(ru);
+    li.appendChild(el("p", istMein(e) ? "ns-kontext" : "gl-einfach", e.einfach));
     const fuss = el("div", "gl-e-fuss");
     fuss.appendChild(el("span", "gl-geb", GEBIETE()[e.gebiet] || ""));
+    if (istMein(e) && root.GENWORT) {
+      const ae = el("button", "gl-link", "Übersetzung ändern"); ae.type = "button";
+      ae.onclick = () => {
+        if (li.querySelector(".ns-eingabe")) return;
+        const m = root.GENWORT.MEIN[e.id] || {};
+        const inp = el("input", "ns-eingabe"); inp.type = "text"; inp.value = m.ru || ""; inp.placeholder = "russisch";
+        const ok = el("button", "gl-kann an", "speichern"); ok.type = "button";
+        ok.onclick = () => root.GENWORT.aendern(e.id, { ru: inp.value.trim() });
+        inp.onkeydown = ev => { if (ev.key === "Enter") ok.click(); };
+        const r = el("div", "ns-aendern"); r.append(inp, ok);
+        ru.replaceWith(r); inp.focus();
+      };
+      const weg = el("button", "gl-link", "löschen"); weg.type = "button";
+      weg.onclick = () => { if (confirm("„" + e.wort + "“ aus deinen Wörtern löschen?")) root.GENWORT.loeschen(e.id); };
+      fuss.append(ae, weg);
+    }
     const kb = el("button", "gl-kann" + (KANN[e.id] ? " an" : ""), KANN[e.id] ? "✓ kann ich" : "kann ich");
     kb.type = "button";
     kb.onclick = () => { kannSetzen(e.id, !KANN[e.id]); li.replaceWith(eintragEl(e)); };
     fuss.appendChild(kb);
     li.appendChild(fuss);
+    if (root.GENWORT) li.appendChild(root.GENWORT.vorkommenTeil({ art: istMein(e) ? "mein" : "glossar", e, text: e.wort }, e.wort));
+    return li;
+  }
+
+  /* Prüfungsdeutsch (gen/wortschatz-daten.js) in der Suche mit anzeigen */
+  function wortEl(w) {
+    const li = el("li", "gl-e gl-wort");
+    const k = el("div", "gl-e-kopf");
+    const t = el("div", "gl-e-t");
+    if (w.artikel) t.appendChild(el("span", "gl-art", w.artikel + " "));
+    t.appendChild(el("b", null, w.lemma));
+    k.appendChild(t);
+    k.appendChild(el("span", "gl-ap ns-pd", "Prüfungsdeutsch"));
+    li.appendChild(k);
+    li.appendChild(el("p", "gl-ru", w.ru));
+    const fuss = el("div", "gl-e-fuss");
+    fuss.appendChild(el("span", "gl-geb", w.extra && w.extra.length ? w.extra.slice(0, 3).join(", ") : ""));
+    const schon = root.GENWORT.meinVonWort(w.wort);
+    const sp = el("button", "gl-kann" + (schon ? " an" : ""), schon ? "✓ in meinen Wörtern" : "+ Mein Glossar"); sp.type = "button";
+    sp.onclick = () => { if (!schon) root.GENWORT.speichern({ art: "wort", e: w, text: w.lemma }, null, "", "Glossar-Suche"); };
+    fuss.appendChild(sp);
+    li.appendChild(fuss);
+    li.appendChild(root.GENWORT.vorkommenTeil({ art: "wort", e: w, text: w.lemma }, w.lemma));
     return li;
   }
 
@@ -349,6 +410,22 @@
     L.slice(0, 450).forEach(e => ul.appendChild(eintragEl(e)));
     info.textContent = L.length + " Begriffe" + (L.length > 450 ? " — die ersten 450 stehen hier" : "") +
       (UI.ap === "2" ? " · AP2: Softwareentwicklung, Datenbanken, WiSo — für die AP1 nur zum Wiedererkennen." : "");
+    if (UI.ap === "mein" && !L.length && !(UI.suche || "").trim()) {
+      const leer = el("li", "gl-leer");
+      leer.appendChild(el("b", null, "Noch keine eigenen Wörter."));
+      leer.appendChild(el("p", null, "Markiere in einer Aufgabe ein Wort, das du nicht kennst, und tippe unten auf „Nachschlagen“ → „+ Mein Glossar“."));
+      ul.appendChild(leer);
+    }
+    /* allgemeine Prüfungswörter zusätzlich, wenn gesucht wird */
+    if (root.GENWORT && (UI.suche || "").trim().length >= 3 && UI.ap !== "mein") {
+      const W = root.GENWORT.suchen(UI.suche).filter(w => !root.GENWORT.meinVonWort(w.wort)).slice(0, 30);
+      if (W.length) {
+        const h = el("li", "gl-abschnitt", "Prüfungsdeutsch — allgemeine Wörter aus den Aufgaben (" + W.length + ")");
+        ul.appendChild(h);
+        W.forEach(w => ul.appendChild(wortEl(w)));
+        info.textContent += " · dazu " + W.length + " allgemeine Wörter";
+      }
+    }
   }
 
   /* ---------------------------------------------------------- Karten --- */
@@ -493,7 +570,7 @@
     setTimeout(() => allesMarkieren(), 600);
   }
 
-  const api = { aufbereiten, finde, suchen, norm, oeffnen, block, markieren, allesMarkieren, blase, daten,
+  const api = { aufbereiten, finde, suchen, norm, oeffnen, block, markieren, allesMarkieren, blase, daten, neu,
                 kartenStarten, get UI() { return UI; } };
   root.GENGLOSSAR = api;
   if (typeof module === "object" && module.exports) module.exports = api;

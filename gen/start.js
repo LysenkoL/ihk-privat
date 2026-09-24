@@ -96,6 +96,9 @@ window.GENSTART = (function () {
     { key: "er", id: "erUebungBlock", gruppe: "ueben", ikon: "er",
       name: "ER-Modelle — drei Übungsaufgaben", info: "Kardinalitäten, Schlüssel, n:m gezielt üben",
       worte: "er modell entität kardinalität datenbank schlüssel beziehung" },
+    { key: "sql", id: "sqlBox", gruppe: "ueben", ikon: "sql",
+      name: "SQL-Trainer (AP2)", info: "44 Aufgaben an einer echten Datenbank, mit Prüfung",
+      worte: "sql select join group by having insert update delete create table datenbank abfrage ap2 view unterabfrage" },
     { key: "pseudo", id: "pseudoBox", gruppe: "ueben", ikon: "pseudo",
       name: "Pseudocode selbst schreiben", info: "Algorithmen schreiben, prüfen lassen",
       worte: "pseudocode algorithmus schleife programmieren code schreibtischtest" },
@@ -137,9 +140,9 @@ window.GENSTART = (function () {
       name: "Lernplan bis zur Prüfung", info: "Rechnet jeden Tag das riskanteste Thema aus",
       worte: "lernplan plan tage thema risiko" },
 
-    { key: "daten", titel: /^Fortschritt sichern$/, gruppe: "daten", ikon: "daten",
-      name: "Fortschritt sichern", info: "Exportieren, importieren, auf ein anderes Gerät umziehen",
-      worte: "export import sichern backup datei umziehen löschen handy" }
+    { key: "daten", titel: /^(Fortschritt sichern|Geräte abgleichen & sichern)$/, gruppe: "daten", ikon: "daten",
+      name: "Geräte abgleichen & sichern", info: "Handy ↔ Computer: Stand senden und holen — ohne Überschreiben",
+      worte: "export import sichern backup datei umziehen löschen handy computer abgleichen synchronisieren sync stand senden holen" }
   ];
 
   /* ------------------------------------------------------- Kennzahlen --- */
