@@ -122,14 +122,14 @@
     "homeoffice", "datenbank", "algorithmus", "variable", "funktion", "methode", "klasse", "objekt", "attribut", "index",
     "bedingung", "parameter", "schnittstelle", "ergonomie", "lizenz", "cloud-computing", "vorgang", "port", "ping"]);
   const ZIELE = "#sitTxt, .tk-frage, .tk-gintro, .loesung-txt, .az-text, .az-zeile-text, .az-wahl-text, .az-zuo-text, " +
-                ".wd-text, .wd-intro, .kp-inhalt, .sp-inhalt, #kkVorne, #kkHinten";
+                ".wd-text, .wd-intro, .kp-inhalt, .sp-inhalt, #kkVorne, #kkHinten, .satz-frage, .satz-muster, .sz-otext";
   const NICHT_IN = "textarea, input, select, button, a, code, pre, script, style, .gl-w, .az-bewerten, svg";
 
   function markieren(box) {
     const D = daten();
     if (!D || !UI.an || !box || !box.isConnected) return 0;
     /* nur das erste Vorkommen je Aufgabe/Karte — nicht jede Wiederholung unterstreichen */
-    const bereich = box.closest(".tk, .az-teil, .az-situation, .wd-karte, .kk-karte, .kp-inhalt, .sp-inhalt") || box;
+    const bereich = box.closest(".tk, .az-teil, .az-situation, .wd-karte, .kk-karte, .kp-inhalt, .sp-inhalt, .satz-karte") || box;
     const schon = new Set(Array.from(bereich.querySelectorAll(".gl-w")).map(x => x.dataset.gl));
     const knoten = [];
     const w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, {

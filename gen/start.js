@@ -106,8 +106,8 @@ window.GENSTART = (function () {
       name: "Karteikarten", info: "Begriffe und Kurzfragen aus den Musterlösungen",
       worte: "karteikarten karten begriffe fragen anki lernen" },
     { key: "satz", id: "satzBox", gruppe: "ueben", ikon: "satz",
-      name: "Satzbau, Formeln, Operatoren", info: "Antworten richtig formulieren, Formelblatt zum Drucken",
-      worte: "satzbau formulieren erläutern begründen nennen operator formel formelblatt merkblatt" },
+      name: "Kurzfragen — Antworten in Sätzen", info: "150 Prüfungsfragen in 5-Minuten-Runden: schreiben, auswählen, aufdecken",
+      worte: "kurzfragen satzbau formulieren erläutern begründen nennen operator formel formelblatt merkblatt fragen antworten musterantwort schnell handy" },
 
     { key: "katalog", id: "katalogBox", gruppe: "nachschlagen", ikon: "katalog",
       name: "Prüfungskatalog AP1", info: "Das Original der ZPA: 167 Stichworte, Lücken, eigener Stand",
@@ -205,7 +205,7 @@ window.GENSTART = (function () {
           return {
             tag: t, fertig: true, titel: "Heute erledigt",
             warum: m ? "Morgen: " + m.titel + " · " + m.minuten + " min" : "Morgen ist Prüfung.",
-            knopf: "5 Min. Satzbau", tun: satzbau, zweitrangig: true,
+            knopf: "5 Min. Kurzfragen", tun: satzbau, zweitrangig: true,
             abhaken: () => { E.abhaken(t.key); }
           };
         }
@@ -270,7 +270,7 @@ window.GENSTART = (function () {
     /* 5. Letzte Woche: kurze Einheiten, Formulieren statt neuem Stoff */
     if (tage <= 7) {
       return {
-        titel: "Satzbau-Training, fünf Minuten",
+        titel: "Kurzfragen, fünf Minuten",
         warum: "In der letzten Woche bringt sauberes Formulieren mehr als neuer Stoff.",
         knopf: "Training starten", tun: satzbau
       };
@@ -514,7 +514,7 @@ window.GENSTART = (function () {
     setz("pruefungen", z.begonnen ? z.begonnen + " von " + z.pruefungen + " begonnen" : z.pruefungen + "");
     setz("gesamt", z.prognose != null ? "Prognose " + z.prognose + " %" : "");
     setz("blatt", z.fehlerOffen ? z.fehlerOffen + " Fehler offen" : z.vorlagen + " Typen");
-    setz("satz", z.satzKarten ? z.satzKarten + " Karten" : "");
+    setz("satz", z.satzKarten ? z.satzKarten + " Fragen" : "");
     /* Kompendium: der eigene Lernstand, nicht die Zahl der Seiten — die ändert
        sich nie, der Stand jeden Tag. */
     (function () {
@@ -645,7 +645,7 @@ window.GENSTART = (function () {
       () => oeffneBlock("pruefungen"), "pruefung");
     kachel("Arbeitsblatt", z.vorlagen + " Aufgabentypen", assistent, "blatt");
     kachel("Simulation", z.letzteSim ? "zuletzt " + datum(z.letzteSim.erstellt) : "90 Minuten · 100 BE", simulation, "sim");
-    kachel("Satzbau", z.satzKarten ? z.satzKarten + " Karten · 5 Min." : "5 Minuten", satzbau, "satz");
+    kachel("Kurzfragen", z.satzKarten ? z.satzKarten + " Fragen · 5 Min." : "5 Minuten", satzbau, "satz");
     kachel("Fehlerjournal", z.fehlerOffen ? z.fehlerOffen + " offen" : "nichts offen", journal, "journal", z.fehlerOffen >= 5);
     kachel("Formeln & Operatoren", "zum Ausdrucken", formeln, "formel");
     k.appendChild(g);

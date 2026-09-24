@@ -76,7 +76,8 @@
     azubi: { name: "Azubi-Navigator", rang: 1 },
     gen: { name: "Generator", rang: 2 },
     katalog: { name: "Katalog", rang: 3 },
-    karte: { name: "Karteikarte", rang: 4 }
+    karte: { name: "Karteikarte", rang: 4 },
+    satz: { name: "Kurzfrage", rang: 5 }
   };
   const prio = (a, b) => (b.verlust - a.verlust) || (QUELLEN[a.quelle].rang - QUELLEN[b.quelle].rang) ||
     (a.id < b.id ? -1 : 1);
@@ -153,6 +154,17 @@
         });
       }
     } catch (e) { console.error("Wiederholen/Karten:", e); }
+    /* 6. Kurzfragen (gen/satzbau.js): halb oder nicht gewusst */
+    try {
+      if (root.GENSATZ && root.SATZ_POOL) {
+        root.SATZ_POOL.forEach(q => {
+          const st = root.GENSATZ.stand(q.id);
+          if (st !== "halb" && st !== "nicht") return;
+          out.push({ id: "sz:" + q.id, quelle: "satz", verlust: st === "nicht" ? 2 : 1, q,
+                     titel: q.frage, wo: "Kurzfrage · " + q.thema, punkte: st === "nicht" ? "nicht gewusst" : "halb" });
+        });
+      }
+    } catch (e) { console.error("Wiederholen/Kurzfragen:", e); }
     return out;
   }
 
@@ -287,6 +299,9 @@
       if (x.kreis) f.appendChild(el("p", "wd-sub", "Themenkreis " + x.p.kreis + " · " + x.kreis));
     } else if (x.quelle === "karte") {
       f.appendChild(el("p", "wd-text", x.c.vorne || ""));
+    } else if (x.quelle === "satz") {
+      f.appendChild(el("p", "wd-text", x.q.frage));
+      f.appendChild(el("p", "wd-sub", "In ganzen Sätzen: was ist gemeint — und warum? Nicht nur „" + x.q.stichwort + "“."));
     }
     ziel.appendChild(f);
   }
@@ -310,6 +325,10 @@
       l.appendChild(el("p", "wd-text", "Vergleiche mit dem Katalog: dort stehen Aufgaben, Karten und Seiten zum Nachlesen."));
     } else if (x.quelle === "karte") {
       l.appendChild(el("div", "wd-text", x.c.hinten || ""));
+    } else if (x.quelle === "satz") {
+      l.appendChild(el("div", "wd-text", x.q.muster));
+      if (x.q.ru) l.appendChild(el("p", "wd-sub", "По-русски: " + x.q.ru));
+      if (x.q.tipp) l.appendChild(el("p", "wd-sub", "Worauf es ankommt: " + x.q.tipp));
     }
     ziel.appendChild(l);
   }
@@ -322,6 +341,7 @@
       }
     } else if (x.quelle === "azubi") root.GENAZUBI && root.GENAZUBI.oeffnen(x.mid, { ziel: x.tid });
     else if (x.quelle === "katalog") root.GENKATALOG && root.GENKATALOG.oeffnen(x.p.id);
+    else if (x.quelle === "satz") root.GENSATZ && root.GENSATZ.starten([x.q.id], { modus: "schreiben", anzahl: 1 });
     else if (x.quelle === "gen" && root.GENUI && x.e.vorlageId) {
       root.GENUI.erzeugeBlatt({ liste: [{ vorlageId: x.e.vorlageId, saat: Number(String(x.e.schluessel).split("|")[2]) }], titel: x.e.titel, zeit: 1 });
     }
@@ -334,7 +354,7 @@
     const kopf = el("div", "wd-kopf");
     kopf.appendChild(el("span", "wd-quelle q-" + x.quelle, QUELLEN[x.quelle].name));
     kopf.appendChild(el("span", "wd-wo", x.wo));
-    kopf.appendChild(el("span", "wd-verlust", x.quelle === "katalog" || x.quelle === "karte" ? x.punkte : "−" + String(Math.round(x.verlust * 10) / 10).replace(".", ",") + " P."));
+    kopf.appendChild(el("span", "wd-verlust", x.quelle === "katalog" || x.quelle === "karte" || x.quelle === "satz" ? x.punkte : "−" + String(Math.round(x.verlust * 10) / 10).replace(".", ",") + " P."));
     k.appendChild(kopf);
     if (x.quelle === "azubi" || x.quelle === "gen") k.appendChild(el("h3", "wd-titel", x.titel));
     if (x.leer) k.appendChild(el("p", "wd-sub", "Damals leer gelassen."));
@@ -354,10 +374,11 @@
       ta.value = SITZ.text || "";
       loesungTeil(x, k);
       /* Textantwort wie ein Prüfer ansehen lassen (gen/pruefen.js) */
-      if (root.GENPRUEFEN && (x.quelle === "ihk" || x.quelle === "azubi")) {
+      if (root.GENPRUEFEN && (x.quelle === "ihk" || x.quelle === "azubi" || x.quelle === "satz")) {
         try {
           let o = null;
-          if (x.quelle === "ihk") o = { frage: [x.it.groupIntro, x.it.prompt].filter(Boolean).join("\n"), loesung: (x.it.solution || {}).text, punkte: x.it.maxPoints };
+          if (x.quelle === "satz") o = { frage: x.q.frage, loesung: x.q.muster, hinweis: x.q.tipp, punkte: 2 };
+          else if (x.quelle === "ihk") o = { frage: [x.it.groupIntro, x.it.prompt].filter(Boolean).join("\n"), loesung: (x.it.solution || {}).text, punkte: x.it.maxPoints };
           else { const v = root.GENAZUBI && root.GENAZUBI.ansicht(x.mid, x.tid); if (v) o = { frage: v.t.text, loesung: v.t.loesung, hinweis: v.t.hinweis, punkte: v.t.punkte }; }
           if (o) { o.antwort = () => ta.value; k.appendChild(root.GENPRUEFEN.kasten(o)); }
         } catch (e) { console.error("Wiederholen/Prüfen:", e); }
@@ -394,6 +415,7 @@
 
   function bewerten(x, wert) {
     S.k[x.id] = naechster(S.k[x.id], wert);
+    if (x.quelle === "satz" && root.GENSATZ && root.GENSATZ.setzeStand) { try { root.GENSATZ.setzeStand(x.q.id, wert); } catch (e) { } }
     const h = heuteIso();
     S.tage[h] = (S.tage[h] || 0) + 1;
     /* nur die letzten 30 Tage behalten */
@@ -477,7 +499,7 @@
         t.appendChild(el("span", null, x.titel));
         bt.appendChild(t);
         const rr = el("span", "wd-z-r");
-        rr.appendChild(el("span", "wd-verlust", x.quelle === "katalog" || x.quelle === "karte" ? "" : "−" + String(Math.round(x.verlust * 10) / 10).replace(".", ",") + " P."));
+        rr.appendChild(el("span", "wd-verlust", x.quelle === "katalog" || x.quelle === "karte" || x.quelle === "satz" ? "" : "−" + String(Math.round(x.verlust * 10) / 10).replace(".", ",") + " P."));
         rr.appendChild(el("span", "wd-faellig" + (x.faellig <= h ? " heute" : ""), x.faellig <= h ? "heute" : x.faellig.slice(8, 10) + "." + x.faellig.slice(5, 7) + "."));
         bt.appendChild(rr);
         bt.onclick = () => starten([x]);

@@ -20,13 +20,13 @@
   box-shadow:0 1px 2px rgba(20,23,28,.05), 0 6px 18px rgba(18,69,126,.06); border-left:4px solid var(--pruefer)}
 .wd-karte.q-azubi{border-left-color:var(--warn)}
 .wd-karte.q-gen{border-left-color:var(--gr-ueben, var(--ok))}
-.wd-karte.q-katalog, .wd-karte.q-karte{border-left-color:var(--gr-nachschlagen, var(--muted))}
+.wd-karte.q-katalog, .wd-karte.q-karte, .wd-karte.q-satz{border-left-color:var(--gr-nachschlagen, var(--muted))}
 .wd-karte h2{font-family:var(--body); font-size:21px; font-weight:800; margin:0; color:var(--pruefer)}
 .wd-kopf{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
 .wd-quelle{font-size:11.5px; font-weight:800; border-radius:99px; padding:2px 9px; background:var(--pruefer-soft); color:var(--pruefer)}
 .wd-quelle.q-azubi{background:var(--warn-soft); color:var(--warn)}
 .wd-quelle.q-gen{background:var(--gr-ueben-soft, var(--ok-soft)); color:var(--gr-ueben, var(--ok))}
-.wd-quelle.q-katalog, .wd-quelle.q-karte{background:var(--field); color:var(--ink)}
+.wd-quelle.q-katalog, .wd-quelle.q-karte, .wd-quelle.q-satz{background:var(--field); color:var(--ink)}
 .wd-wo{font-family:var(--data); font-size:12.5px; color:var(--muted); flex:1 1 auto}
 .wd-verlust{font-family:var(--data); font-size:12.5px; font-weight:700; color:var(--red); white-space:nowrap}
 .wd-titel{font-size:16px; font-weight:800; margin:8px 0 0}

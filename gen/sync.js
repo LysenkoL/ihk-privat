@@ -102,6 +102,21 @@
     return out;
   }
 
+  /* Kurzfragen: je Karte die zuletzt geübte Fassung, Zähler als Maximum */
+  function satzStand(l, f, b) {
+    const out = Object.assign({}, l);
+    Object.keys(f).forEach(id => {
+      const x = out[id], y = f[id];
+      if (!istObj(y)) return;
+      if (!istObj(x)) { out[id] = y; b.neu++; return; }
+      if (gleich(x, y)) return;
+      const z = Object.assign({}, (y.t || 0) > (x.t || 0) ? x : y, (y.t || 0) > (x.t || 0) ? y : x);
+      ["versuche", "bestPunkte", "wahlN", "wahlOk"].forEach(n => { const m = Math.max(x[n] || 0, y[n] || 0); if (m) z[n] = m; });
+      if (!gleich(z, x)) { out[id] = z; b.geaendert++; }
+    });
+    return out;
+  }
+
   /**
    * Einen Schlüssel zusammenführen. Rückgabe: neuer Rohwert (String) oder null = lokal bleibt.
    * lm/fm: Zeitstempel der letzten Änderung (0 = unbekannt).
@@ -150,6 +165,8 @@
       });
     } else if (/^ihk2:azubi:az/.test(k) && istObj(l) && istObj(f)) {
       out = azubiZustand(l, f, b);
+    } else if (k === "ihk2:gen:satz" && istObj(l) && istObj(f)) {
+      out = satzStand(l, f, b);
     } else if (k === "ihk2:sql" && istObj(l) && istObj(f)) {
       out = sqlStand(l, f, fNeuer, b);
     } else if (k === "ihk2:wieder" && istObj(l) && istObj(f)) {
@@ -188,6 +205,7 @@
     if (k === "ihk2:answers" || k === "ihk2:scores" || k === "ihk2:timer") return "Prüfungen (Antworten, Punkte)";
     if (k === "ihk2:attempts" || k === "ihk2:archiv") return "Durchgänge und Archiv";
     if (k === "ihk2:wieder") return "Fehler wiederholen";
+    if (k === "ihk2:gen:satz" || k === "ihk2:satz:ein") return "Kurzfragen";
     if (k.indexOf("ihk2:gen:") === 0) return "Generator und Fehlerjournal";
     if (k === "ihk2:cards") return "Karteikarten";
     if (k.indexOf("ihk2:glossar") === 0) return "Fachbegriffe";

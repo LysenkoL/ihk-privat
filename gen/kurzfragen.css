@@ -1,0 +1,94 @@
+/* ============================================================================
+   gen/kurzfragen.css — Kurzfragen (gen/satzbau.js): Einstellungen, Auswählen,
+   Aufdecken, Ergebnis. Die Karte selbst (.satz-karte …) steht in gen/blatt.css.
+   ========================================================================== */
+
+.sz-seite{max-width:820px}
+.sz-wrap{display:flex; flex-direction:column; gap:12px; min-width:0}
+.sz-wrap .satz-karte{margin:0}
+.sz-info{font-size:14.5px; line-height:1.55; margin:6px 0 0; color:var(--ink)}
+.sz-klein{font-size:12.5px; color:var(--muted); line-height:1.45; margin:8px 0 0}
+.sz-h{font-family:var(--body); font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:16px 0 8px}
+.sz-h:first-child{margin-top:0}
+
+/* Fortschrittsbalken: grün sitzt, gelb halb, rot nicht */
+.sz-balken{display:flex; height:9px; border-radius:99px; background:var(--field); overflow:hidden; margin-top:12px}
+.sz-balken.klein{height:6px; margin:0; flex:1 1 auto; min-width:40px}
+.sz-balken span{display:block; height:100%}
+.sz-gut{background:var(--ok)} .sz-halb{background:var(--warn)} .sz-nicht{background:var(--red)}
+.sz-zahlen{font-size:12.5px; color:var(--muted); margin:6px 0 0}
+.sz-start{flex-wrap:wrap}
+
+/* Modus-Kacheln */
+.sz-modi{display:flex; flex-direction:column; gap:8px}
+.sz-modus{display:flex; align-items:center; gap:12px; width:100%; text-align:left; border:1.5px solid var(--rule); background:var(--card);
+  color:var(--ink); border-radius:12px; padding:10px 12px; font:inherit; cursor:pointer; min-height:56px}
+.sz-modus.an{border-color:var(--pruefer); background:var(--pruefer-soft)}
+.sz-ikon{font-size:22px; width:30px; text-align:center; flex:0 0 auto}
+.sz-mt{display:flex; flex-direction:column; gap:2px; min-width:0}
+.sz-mt b{font-size:15px}
+.sz-mt span{font-size:12.5px; color:var(--muted); line-height:1.35}
+.sz-chips{display:flex; flex-wrap:wrap; gap:6px}
+.sz-chip{border:1px solid var(--rule); background:var(--card); color:var(--ink); border-radius:99px; padding:6px 12px; font:inherit;
+  font-size:13.5px; cursor:pointer; min-height:36px}
+.sz-chip small{font-family:var(--data); font-size:11px; color:var(--muted)}
+.sz-chip.an{background:var(--pruefer); border-color:var(--pruefer); color:#fff}
+.sz-chip.an small{color:#fff; opacity:.8}
+.sz-los{margin-top:16px}
+.sz-los .btn.primary{flex:1 1 auto}
+
+/* Themenübersicht */
+.sz-themen{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px}
+.sz-thema-b{display:flex; align-items:center; gap:10px; width:100%; border:0; background:none; color:var(--ink); font:inherit;
+  padding:7px 4px; cursor:pointer; border-radius:8px; text-align:left}
+.sz-thema-b:hover{background:var(--field)}
+.sz-tn{flex:0 0 42%; font-size:14px}
+.sz-tz{flex:0 0 auto; font-family:var(--data); font-size:12px; color:var(--muted); min-width:44px; text-align:right}
+
+/* Runde */
+.sz-leiste{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+.sz-leiste .thema{font-size:12px; font-weight:700; background:var(--field); border-radius:6px; padding:3px 8px; color:var(--muted)}
+.sz-fort{flex:1 1 100%; height:4px; background:var(--field); border-radius:99px; overflow:hidden}
+.sz-fort i{display:block; height:100%; background:var(--pruefer)}
+.sz-auftrag{font-size:14px; color:var(--muted); margin:4px 0 12px; line-height:1.5}
+.sz-eingabe{font-size:16px}
+.sz-knoepfe{flex-wrap:wrap; margin-top:12px}
+.sz-zeig{width:100%; min-height:48px; margin-top:4px}
+.sz-link{border:0; background:none; font:inherit; font-size:13px; color:var(--pruefer); text-decoration:underline; cursor:pointer; padding:8px 0; text-align:left}
+.sz-loesung{margin-top:12px}
+.sz-loesung .satz-muster{font-family:var(--body); font-size:15px; line-height:1.6; white-space:normal}
+.sz-ru{font-size:14px; line-height:1.55; margin:10px 0 0; padding:8px 10px; border-radius:8px; background:var(--field)}
+.sz-ru b{font-size:12px; color:var(--muted)}
+.sz-selbst{margin-top:8px}
+
+/* Auswählen */
+.sz-optionen{display:flex; flex-direction:column; gap:8px}
+.sz-option{display:flex; flex-wrap:wrap; align-items:flex-start; gap:10px; width:100%; text-align:left; border:1.5px solid var(--rule);
+  background:var(--card); color:var(--ink); border-radius:12px; padding:11px 12px; font:inherit; font-size:14.5px; line-height:1.5; cursor:pointer}
+.sz-option:not(:disabled):hover{border-color:var(--pruefer)}
+.sz-option:disabled{cursor:default}
+.sz-buchst{flex:0 0 26px; height:26px; border-radius:99px; background:var(--field); display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:13px; font-family:var(--data)}
+.sz-otext{flex:1 1 calc(100% - 40px); min-width:0}
+.sz-warum{flex:1 1 100%; font-size:13px; line-height:1.45; color:var(--muted); border-top:1px dashed var(--rule); padding-top:6px}
+.sz-warum b{color:var(--ink)}
+.sz-option.voll{border-color:var(--ok); background:var(--ok-soft)}
+.sz-option.voll .sz-buchst{background:var(--ok); color:#fff}
+.sz-option.halb{opacity:.92}
+.sz-option.null{opacity:.8}
+.sz-option.gewaehlt:not(.voll){border-color:var(--red); background:var(--red-soft)}
+.sz-option.gewaehlt:not(.voll) .sz-buchst{background:var(--red); color:#fff}
+.sz-urteil{font-size:15px; font-weight:700; margin:12px 0 0}
+.sz-urteil.ok{color:var(--ok)} .sz-urteil.nein{color:var(--red)}
+
+/* Ergebnis */
+.sz-ergliste{list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:4px}
+.sz-ergliste li{display:flex; gap:10px; align-items:flex-start; font-size:13.5px; line-height:1.4; padding:6px 8px; border-radius:8px; background:var(--field)}
+.sz-e-p{flex:0 0 22px; height:22px; border-radius:99px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:#fff; background:var(--muted)}
+.sz-e-gut .sz-e-p{background:var(--ok)} .sz-e-halb .sz-e-p{background:var(--warn)} .sz-e-nicht .sz-e-p{background:var(--red)}
+
+@media (max-width:560px){
+  .sz-start .btn{flex:1 1 100%}
+  .sz-tn{flex-basis:46%; font-size:13.5px}
+  .sz-option{font-size:14px; padding:10px}
+}
