@@ -201,6 +201,7 @@
 
   /* Für den Bericht: welcher Schlüssel gehört zu welchem Bereich */
   function bereichVon(k) {
+    if (/^ihk2:azubi:azprog/.test(k)) return "Prognose-Prüfungen";
     if (/^ihk2:azubi:az/.test(k)) return "Azubi-Navigator";
     if (k === "ihk2:answers" || k === "ihk2:scores" || k === "ihk2:timer") return "Prüfungen (Antworten, Punkte)";
     if (k === "ihk2:attempts" || k === "ihk2:archiv") return "Durchgänge und Archiv";

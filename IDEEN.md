@@ -241,6 +241,13 @@
   - экран настроек: режим, 6/10/15/20 вопросов, темы (несколько), порядок «новые и шаткие сначала» / «только шаткие» / «случайно»; прогресс по темам, тема по тапу = раунд; итог раунда со списком и «нечёткие — ещё раз письменно»;
   - шаткие вопросы попадают в «Fehler wiederholen» (оценка там возвращается в Kurzfragen); прогресс едет в синхронизацию (по карточке: свежая оценка, счётчики — максимум); кнопка «Назад» телефона работает; термины подчёркнуты и в вопросах;
   - обновление кэша Service Worker до `ihk-ap1-v35-app`.
+- **Themen-Radar и три Prognose-Prüfungen** (`gen/radar-daten.js`, `gen/radar.js`, `gen/radar.css`, `gen/prognose-daten.js`, `gen/azubi.js`, `gen/wiederholen.js`, `gen/sync.js`, `gen/start.js`, `gen/finder.js`, `gen/zurueck.js`, `gen/ikonen.js`, `index.html`, `sw.js`, `tests/radar.test.js`, `tests/prognose.test.js`, 25.09):
+  - анализ тем из `IHK_Pruefung_Themen.xlsx` встроен в приложение: для каждого из 71 темы Teil 1 — в каких из 10 новых AP1 (H21…F26) и 21 старых экзаменов она была; столбец «Anzahl» таблицы не используется (там ошибки, Malware 28 вместо 2) — считается по крестикам;
+  - **прогноз**: Radar-Wert = попадания в 10 экзаменах + в последних 4 (свежие считаются дважды) → «sehr wahrscheinlich» (IPv4/6, Kostenkalkulation, Netzwerk, Algorithmus, IT-Sicherheit, ERM), «wahrscheinlich», «gut möglich», «Außenseiter»; пометки «2× ausgesetzt — fällig?» и «neu seit …»; SQL и RAID — «nur noch Teil 2»; 21 тема с 2021 года не встречалась;
+  - у каждой темы — **свой уровень** (баллы IHK, Azubi и Prognose по совпадению текста), кнопки «IHK-Aufgaben (N)» и «Kurzfragen (N)», ссылки на Aufgabe в Prognose-Prüfung; «Deine Prioritäten» = вероятно × слабо; блок «Überraschungen einplanen» (новые темы каждого из последних экзаменов); свёрнуто — Außenseiter, weggefallen, AP2 FIAE;
+  - **три Prognose-Prüfungen по 100 BE / 90 мин**: каждая Teilaufgabe — настоящая задача из IHK (10 экзаменов) или Azubi-Navigator, перемешаны по прогнозу; текст слегка изменён (другая фирма, другие числа — решения пересчитаны, переформулировано), вопрос, формат ответа и баллы как в оригинале; под решением «Vorlage: …»; из лицензионного Azubi-текста ничего не скопировано;
+  - идут в бланке Azubi-Navigator (Übung/Prüfung, часы, сохранение, автопроверка чисел, Auswertung, «Fehler wiederholen», синхронизация `ihk2:azubi:azprog1–3`) и **не требуют пакета Azubi**; одну Aufgabe можно решать отдельно без часов;
+  - на главной — блок «Themen-Radar & Prognose-Prüfungen» первым в «Prüfen & simulieren», поиск находит «Themen-Radar» и «Prognose-Prüfung 1–3»; обновление кэша Service Worker до `ihk-ap1-v36-app`.
 
 
 ## Чего не хватает

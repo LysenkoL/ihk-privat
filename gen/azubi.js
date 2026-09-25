@@ -177,7 +177,13 @@
     if (!PAKET && gueltig(root.IHK_AZUBI)) PAKET = root.IHK_AZUBI;
     return PAKET;
   }
-  const modul = id => { const p = paket(); return p ? p.module.find(m => m.id === id) || null : null; };
+  /* Virtuelle Module: die Prognose-Prüfungen (gen/prognose-daten.js) laufen im
+     selben Bogen, brauchen aber kein Azubi-Paket. */
+  const virtuelle = () => ((root.IHK_PROGNOSE && root.IHK_PROGNOSE.pruefungen) || []).filter(m => m && m.id && Array.isArray(m.aufgaben));
+  const virt = id => virtuelle().find(m => m.id === id) || null;
+  const modul = id => { const v = virt(id); if (v) return v; const p = paket(); return p ? p.module.find(m => m.id === id) || null : null; };
+  /** Alle Module: Paket (falls geladen) + Prognose-Prüfungen */
+  const alleModule = () => (paket() ? paket().module : []).concat(virtuelle());
 
   function idb() {
     return new Promise((ok, nein) => {
@@ -350,14 +356,15 @@
 
   function zeigen() {
     const s = seite();
-    const vorher = ["scBogen", "scAuswertung", "scKatalog", "scWieder"].find(id => $(id) && !$(id).hidden) || "scStart";
+    const vorher = ["scBogen", "scAuswertung", "scKatalog", "scWieder", "scRadar"].find(id => $(id) && !$(id).hidden) || "scStart";
     if (vorher !== "scAzubi") herkunft = vorher;
     document.querySelectorAll("div.seite[id^='sc'], #scBogen").forEach(e => { if (e.id !== "scAzubi") e.hidden = true; });
     s.hidden = false;
     const f = $("fuss"); if (f) f.hidden = true;
     const kt = $("kopfTitel"); if (kt) kt.hidden = false;
-    if ($("kTitel")) $("kTitel").textContent = "Azubi-Navigator";
-    if ($("kEyebrow")) $("kEyebrow").textContent = "u-form · Prüfungstraining AP1";
+    const vm = VIEW.id && virt(VIEW.id);
+    if ($("kTitel")) $("kTitel").textContent = vm ? "Prognose-Prüfung " + vm.nr : "Azubi-Navigator";
+    if ($("kEyebrow")) $("kEyebrow").textContent = vm ? "Themen-Radar · 30.09.2026" : "u-form · Prüfungstraining AP1";
     if (root.GENZURUECK) {
       try { root.GENZURUECK.hoeher && root.GENZURUECK.hoeher("scAzubi", (herkunft === "scKatalog" || herkunft === "scWieder") ? "scStart" : herkunft); } catch (e) { }
       try { root.GENZURUECK.knopfPflegen(); } catch (e) { }
@@ -395,9 +402,10 @@
     const box = el("div", "az-wrap");
     s.appendChild(box);
     if (VIEW.art !== "modul" && LAUF) { lauffStop(); LAUF = null; }
-    if (!paket()) { keinPaket(box); return; }
-    if (VIEW.art === "modul" && modul(VIEW.id)) bogenZeichnen(box, modul(VIEW.id));
-    else if (VIEW.art === "ergebnis" && modul(VIEW.id)) ergebnisZeichnen(box, modul(VIEW.id));
+    const m = VIEW.id ? modul(VIEW.id) : null;
+    if (!paket() && !(m && m.virtuell)) { keinPaket(box); return; }
+    if (VIEW.art === "modul" && m) bogenZeichnen(box, m);
+    else if (VIEW.art === "ergebnis" && m) ergebnisZeichnen(box, m);
     else { VIEW = { art: "liste" }; listeZeichnen(box); }
   }
 
@@ -703,9 +711,7 @@
     const erg = el("button", "btn" + (z.modus === "pruefung" && !z.abgegeben ? "" : " primary"), "Auswertung");
     erg.type = "button"; erg.onclick = () => oeffnen(m.id, { ergebnis: true });
     fuss.appendChild(erg);
-    const ueb = el("button", "btn ghost", "Zur Übersicht");
-    ueb.type = "button"; ueb.onclick = () => oeffnen(null);
-    fuss.appendChild(ueb);
+    fuss.appendChild(zurUebersicht(m));
     box.appendChild(fuss);
 
     leisteAktualisieren();
@@ -714,6 +720,15 @@
     const ziel = VIEW.ziel || z.pos, blink = !!VIEW.ziel;
     if (ziel) setTimeout(() => springeZu(ziel, blink), 60);
     VIEW.ziel = null;
+  }
+
+  /** „Zur Übersicht“ — bei den Prognose-Prüfungen ist das der Themen-Radar */
+  function zurUebersicht(m) {
+    const radar = m && m.virtuell && root.GENRADAR;
+    const b = el("button", "btn ghost", radar ? "Zum Themen-Radar" : "Zur Übersicht");
+    b.type = "button";
+    b.onclick = () => { if (radar) { lauffStop(); LAUF = null; root.GENRADAR.oeffnen("rdPruefungen"); } else oeffnen(null); };
+    return b;
   }
 
   function springeZu(teilId, blinken) {
@@ -732,7 +747,7 @@
     const intro = el("div", "az-text az-intro");
     htmlIn(intro, m.intro);
     k.appendChild(intro);
-    const b = (P.bisher || {})[m.id];
+    const b = ((P && P.bisher) || {})[m.id];
     if (b) k.appendChild(el("p", "az-info", "Im Azubi-Navigator bisher: " + b + "."));
     if (z.versuche.length) {
       const v = z.versuche[z.versuche.length - 1];
@@ -1150,6 +1165,7 @@
       h.appendChild(sicher(t.hinweis));
       box.appendChild(h);
     }
+    if (t.vorbild) box.appendChild(el("p", "az-vorlage", "Vorlage: " + t.vorbild));
     /* Textantworten: Kurzcheck und „Mit Claude prüfen“ (gen/pruefen.js) */
     if (hatFreitext(t) && root.GENPRUEFEN) {
       try {
@@ -1242,7 +1258,7 @@
     const info = [];
     if (z.modus === "pruefung") info.push("Prüfungsmodus · Zeit " + minuten(z.zeit));
     else if (z.modus === "uebung") info.push("Übungsmodus");
-    const b = (P.bisher || {})[m.id];
+    const b = ((P && P.bisher) || {})[m.id];
     if (b) info.push("Azubi-Navigator bisher: " + b);
     if (info.length) k.appendChild(el("p", "az-info", info.join(" · ")));
     if (s.bewertet < s.n) {
@@ -1318,9 +1334,7 @@
       oeffnen(m.id);
     });
     st.appendChild(neu);
-    const ueb = el("button", "btn ghost", "Zur Übersicht");
-    ueb.type = "button"; ueb.onclick = () => oeffnen(null);
-    st.appendChild(ueb);
+    st.appendChild(zurUebersicht(m));
     box.appendChild(st);
 
     if (z.versuche.length) {
@@ -1486,11 +1500,12 @@
       h.appendChild(sicher(t.hinweis));
       loesung.appendChild(h);
     }
+    if (t.vorbild) loesung.appendChild(el("p", "az-vorlage", "Vorlage: " + t.vorbild));
     return { m, t, aufgabe: a, titel: textAus(t.titel), frage, loesung };
   }
 
   const api = {
-    oeffnen, zeigen, block, laden, importieren, paket, modul, zustand, ansicht, teileVon,
+    oeffnen, zeigen, block, laden, importieren, paket, modul, alleModule, zustand, ansicht, teileVon,
     normText, zahlen, feldRichtig, pruefe, stellen, hatAntwort, note, auswertung, einordnen, sortiert, paketAusText,
     get VIEW() { return VIEW; }
   };

@@ -81,6 +81,7 @@ assert.deepStrictEqual(Object.keys(P(r.schreiben["ihk2:endspurt"]).erledigt).sor
 
 /* Bericht nach Bereichen */
 assert.strictEqual(S.bereichVon("ihk2:azubi:az8091"), "Azubi-Navigator");
+assert.strictEqual(S.bereichVon("ihk2:azubi:azprog1"), "Prognose-Prüfungen");
 assert.strictEqual(S.bereichVon("ihk2:scores"), "Prüfungen (Antworten, Punkte)");
 
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");

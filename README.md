@@ -419,7 +419,7 @@ fehlte*. Остальное — один клик.
 * **Полнотекстовый поиск:** поиск по всем главам с мгновенным выводом контекстных цитат и прямым переходом к подсвеченным совпадениям;
 * **Адаптивное чтение:** оптимизировано под телефон и десктоп, таблицы прокручиваются внутри блоков, запоминается последнее открытое место (`localStorage`);
 * **Офлайн PWA:** оболочка, генераторы и уже загруженные материалы кэшируются
-  Service Worker v35; изображения целого экзамена надо заранее загрузить
+  Service Worker v36; изображения целого экзамена надо заранее загрузить
   кнопкой «offline laden» на его карточке.
 
 ---
@@ -436,6 +436,20 @@ Auswertung с IHK-Note и архивом попыток.
 * **На компьютере** пакет подхватывается из папки `privat/` сам (при открытии `index.html`).
 * **На телефоне** (GitHub Pages) — один раз «Paket laden» и выбрать `azubi-daten.js`;
   пакет хранится в памяти устройства (IndexedDB), прогресс — в обычном экспорте.
+
+---
+
+## Themen-Radar и Prognose-Prüfungen
+
+Блок **«Themen-Radar & Prognose-Prüfungen»** (первый в «Prüfen & simulieren»):
+
+* **Прогноз по темам** из анализа `IHK_Pruefung_Themen.xlsx` (`gen/radar-daten.js`, пересоздать:
+  `python tools/radar_import.py IHK_Pruefung_Themen.xlsx`): Radar-Wert = попадания в 10 новых AP1 + в последних 4;
+  категории от «sehr wahrscheinlich» до «seit 2021 nicht mehr», свой уровень по каждой теме,
+  «Deine Prioritäten», неожиданные темы последних экзаменов, обзор AP2 FIAE.
+* **Три Prognose-Prüfungen** (`gen/prognose-daten.js`): настоящие задачи IHK и Azubi-Navigator,
+  перемешанные по прогнозу, с изменённой фирмой, числами и формулировкой; решения проверяет
+  `tests/prognose.test.js`. Работают в бланке Azubi-Navigator, пакет Azubi для них не нужен.
 
 ---
 
@@ -611,6 +625,9 @@ ihk-sim/
 │   ├── satzbausteine.js    Kurzfragen s01–s51
 │   ├── satzbausteine2.js   Kurzfragen s52–s153 + объяснения по-русски
 │   ├── satzbau.js          Kurzfragen: Schreiben / Auswählen / Aufdecken
+│   ├── radar-daten.js      Themenanalyse: какие темы в каких экзаменах
+│   ├── radar.js            Themen-Radar: прогноз, свой уровень, приоритеты
+│   ├── prognose-daten.js   3 Prognose-Prüfungen (формат Azubi-Navigator)
 │   ├── formeln.js          Formelblatt A4
 │   ├── operatoren.js       IHK-операторы: помощь в поле + лист A4
 │   ├── simulation.js       Prüfungssimulation 90 минут по весам экзаменов

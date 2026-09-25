@@ -112,7 +112,9 @@
     /* 2. Azubi-Navigator */
     try {
       const A = root.GENAZUBI, P = A && A.paket();
-      if (P) P.module.forEach(m => {
+      /* Paket-Module und die Prognose-Prüfungen (die brauchen kein Paket) */
+      const mods = A && A.alleModule ? A.alleModule() : (P ? P.module : []);
+      mods.forEach(m => {
         const z = A.zustand(m.id);
         A.teileVon(m).forEach(t => {
           const p = z.p[t.id];

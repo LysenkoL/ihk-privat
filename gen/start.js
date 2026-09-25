@@ -65,6 +65,9 @@ window.GENSTART = (function () {
   ];
 
   const BLOECKE = [
+    { key: "radar", id: "radarBox", gruppe: "pruefen", ikon: "radar",
+      name: "Themen-Radar & Prognose-Prüfungen", info: "Was am 30.09. wahrscheinlich kommt — 3 Prüfungen genau dazu",
+      worte: "radar prognose themen wahrscheinlich häufigkeit analyse vorhersage statistik herbst 2026 prognose-prüfung xlsx top themen ap2" },
     { key: "pruefungen", titel: /^Prüfungen$/, gruppe: "pruefen", ikon: "pruefung",
       name: "Alle zehn Prüfungen", info: "Echte AP1-Bögen 2021–2026 mit Uhr und Auswertung",
       worte: "prüfung bogen klausur frühjahr herbst jahrgang starten fortsetzen zurücksetzen offline laden" },
