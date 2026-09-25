@@ -381,7 +381,11 @@
           let o = null;
           if (x.quelle === "satz") o = { frage: x.q.frage, loesung: x.q.muster, hinweis: x.q.tipp, punkte: 2 };
           else if (x.quelle === "ihk") o = { frage: [x.it.groupIntro, x.it.prompt].filter(Boolean).join("\n"), loesung: (x.it.solution || {}).text, punkte: x.it.maxPoints };
-          else { const v = root.GENAZUBI && root.GENAZUBI.ansicht(x.mid, x.tid); if (v) o = { frage: v.t.text, loesung: v.t.loesung, hinweis: v.t.hinweis, punkte: v.t.punkte }; }
+          else {
+            const A = root.GENAZUBI, v = A && A.ansicht(x.mid, x.tid);
+            if (v && A.htmlZuMd) o = { klartext: true, frage: A.htmlZuMd(v.t.text), loesung: A.htmlZuMd(v.t.loesung), hinweis: A.htmlZuMd(v.t.hinweis), punkte: v.t.punkte };
+            else if (v) o = { frage: v.t.text, loesung: v.t.loesung, hinweis: v.t.hinweis, punkte: v.t.punkte };
+          }
           if (o) { o.antwort = () => ta.value; o.gruppe = { id: "wieder", name: "Fehler wiederholen" }; k.appendChild(root.GENPRUEFEN.kasten(o)); }
         } catch (e) { console.error("Wiederholen/Prüfen:", e); }
       }

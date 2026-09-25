@@ -263,3 +263,55 @@
 @media print{
   .az-leiste, .az-bogen-fuss, .az-aktionen, .az-bewerten, .az-nochmal{display:none !important}
 }
+
+/* ---------------------------------------- Claude & Papier (unter dem Bogen) */
+.az-extra{margin:0 0 24px; padding:12px 14px; border:1px dashed var(--rule); border-radius:12px; background:var(--card)}
+.az-extra-t{display:block; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:8px}
+.az-extra-reihe{display:flex; flex-wrap:wrap; gap:8px}
+.az-extra-reihe .btn{min-height:40px}
+.az-import{margin-top:10px}
+.az-import textarea{width:100%; font-family:var(--data); font-size:13px}
+.az-druckwahl{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.az-druck-k{flex:1 1 180px; display:flex; flex-direction:column; gap:2px; text-align:left; border:1.5px solid var(--rule); background:var(--field);
+  color:var(--ink); border-radius:10px; padding:9px 12px; font:inherit; cursor:pointer}
+.az-druck-k:hover{border-color:var(--pruefer)}
+.az-druck-k b{font-size:14px}
+.az-druck-k span{font-size:12px; color:var(--muted)}
+
+/* ------------------------------------------------ Druckfassung (#azDruck) */
+#azDruck{display:none}
+@media print{
+  body.az-druckt > *:not(#azDruck){display:none !important}
+  body.az-druckt{background:#fff !important; color:#000 !important}
+  body.az-druckt #azDruck{display:block !important; font-family:Arial, Helvetica, sans-serif; font-size:10.5pt; line-height:1.4; color:#000}
+  @page{size:A4; margin:16mm 14mm}
+  #azDruck h1{font-size:15pt; margin:0 0 4pt}
+  #azDruck .azd-kopf p{margin:0 0 10pt; font-size:9.5pt}
+  #azDruck h2{font-size:12.5pt; margin:12pt 0 6pt; border-bottom:1.5pt solid #000; padding-bottom:2pt; display:flex; justify-content:space-between; break-after:avoid}
+  #azDruck h3{font-size:11pt; margin:0 0 4pt; display:flex; justify-content:space-between; gap:10pt; break-after:avoid}
+  #azDruck .azd-p{font-weight:700; white-space:nowrap}
+  #azDruck .azd-sit{border:1pt solid #999; padding:6pt 9pt; margin-bottom:8pt}
+  #azDruck .azd-teil{border-top:0.75pt solid #999; padding:6pt 0 8pt; break-inside:auto; orphans:3; widows:3}
+  #azDruck .azd-text table, #azDruck pre, #azDruck .azd-muster, #azDruck .azd-feldzeile{break-inside:avoid}
+  #azDruck .azd-feldzeile.inline{display:flex; flex-wrap:wrap; align-items:baseline; gap:4pt 10pt; margin-top:3pt}
+  #azDruck .azd-feldzeile.inline .azd-label{margin:0}
+  #azDruck .azd-text table, #azDruck .azd-raster{border-collapse:collapse; margin:4pt 0; width:100%}
+  #azDruck td, #azDruck th{border:0.75pt solid #666; padding:2pt 5pt; vertical-align:top; text-align:left}
+  #azDruck .azd-raster td.feld{min-width:18mm; height:14pt}
+  #azDruck pre{font-family:"Courier New", monospace; font-size:9pt; white-space:pre-wrap; border:0.75pt solid #aaa; padding:4pt 6pt; margin:4pt 0}
+  #azDruck img{max-width:100%}
+  #azDruck .azd-anlage{border-left:2pt solid #999; padding-left:6pt; margin:4pt 0}
+  #azDruck .azd-antwort{margin-top:5pt}
+  #azDruck .azd-label{font-weight:700; margin-top:4pt; break-after:avoid}
+  #azDruck .azd-linien{margin-top:2pt}
+  #azDruck .azd-linie{height:17pt; border-bottom:0.6pt dotted #555}
+  #azDruck .azd-luecke{display:inline-block; margin:2pt 12pt 2pt 0}
+  #azDruck .azd-eigen{white-space:pre-wrap; border-left:2pt solid #333; padding:2pt 0 2pt 6pt; margin-top:2pt; font-family:"Courier New", monospace; font-size:9.5pt}
+  #azDruck .azd-zeile{display:flex; justify-content:space-between; gap:10pt; padding:2pt 0; border-bottom:0.5pt dotted #bbb}
+  #azDruck .azd-o{margin-left:8pt; white-space:nowrap}
+  #azDruck .azd-opt{margin:2pt 0 4pt 16pt; padding:0}
+  #azDruck .azd-muster{margin-top:6pt; padding:5pt 8pt; border:1pt solid #333; background:#f2f2f2}
+  #azDruck .azd-hinweis{font-size:9pt; margin-top:3pt}
+  #azDruck .azd-summe{font-weight:700; margin-top:12pt; font-size:11.5pt}
+  .az-extra{display:none !important}
+}

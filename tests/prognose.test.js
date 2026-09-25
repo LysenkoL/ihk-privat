@@ -129,4 +129,35 @@ const art = (g, ex, k, e) => k ? (e > 100 ? "Kühl-LKW, Abfahrt sofort" : "Kühl
 ok(feld("p3-4b", 0)[0] === art(800, false, false, 60), "Aufruf 1");
 ok(feld("p3-4b", 1)[0] === art(500, true, false, 20), "Aufruf 2");
 
+/* ------------------------------------------- Prüfen, Markdown, Punkte zurück */
+const A = require(path.join(__dirname, "..", "gen", "azubi.js"));
+const f = (soll, w, art) => A.feldRichtig({ soll: [].concat(soll), art: art || "text" }, w);
+ok(f("10.40.7.128", "10.40.7.128/26") && f("10.40.7.128", "Netzadresse: 10.40.7.128") && f("255.255.255.192", "255.255.255.192 (/26)"), "IP mit Präfix/Beschriftung");
+ok(f("summe = summe + (pos.gewicht * pos.menge)", "summe=summe+pos.gewicht*pos.menge"), "Codezeile ohne Leerzeichen/Klammern");
+ok(!f("10.40.7.128", "10.40.7.129") && !f("summe = summe + (pos.gewicht * pos.menge)", "summe = summe +") && !f("/25", "/24"), "falsche bleiben falsch");
+ok(f("375", "330/0,88 = 375 W", "zahl") && f("375", "375 W (bei 600 W: 409)", "zahl") && f("18", "2,5*4+0,8*10=18", "zahl") && f("2,75", "≈ 2,75 TiB", "zahl"), "Zahl mit Rechenweg");
+ok(!f("62", "64", "zahl") && !f("4", "4,2", "zahl"), "falsche Zahl bleibt falsch");
+/* Jede automatisch prüfbare Musterantwort besteht ihre eigene Prüfung */
+D.pruefungen.forEach(m => A.teileVon(m).forEach(t => {
+  const a = {};
+  A.stellen(t).forEach(s0 => {
+    if (s0.art === "feld") a[s0.key] = s0.f.soll[0];
+    else if (s0.art === "wahl") a[s0.key] = s0.soll;
+    else if (s0.art === "zuordnung") a[s0.key] = s0.soll;
+    else if (s0.art === "mehrfach") a.m = s0.soll.slice();
+  });
+  const r = A.pruefe(t, a);
+  if (r.pruefbar) ok(r.k === r.n, t.id + ": Musterantwort voll richtig (" + r.k + "/" + r.n + ")");
+}));
+const m1 = D.pruefungen[0];
+const zz = { a: { "p1-1a": { f1: "34,20", f5: "512,45" }, "p1-4h": { t1: "Konstante bleibt gleich", t2: "MWST_SATZ" } }, p: { "p1-1a": 3 }, auf: {}, auto: {}, modus: "pruefung", zeit: 600000, versuche: [] };
+const md = A.markdown(m1, zz, {});
+ok(md.anzahl === 35 && md.text.includes("`id: p1-1a`") && md.text.includes("PUNKTE"), "Markdown: alle Teilaufgaben mit id und PUNKTE-Anweisung");
+ok(md.text.includes("Monitore (alle sechs) pro Monat: 34,20 €") && md.text.includes("Unterschied: Konstante bleibt gleich"), "Markdown: Antworten mit Beschriftung");
+ok(md.text.includes("_(keine Antwort)_") && md.text.includes("Meine Selbstbewertung bisher: 3 von 7"), "Markdown: leere und bewertete");
+ok(A.markdown(m1, zz, { nurText: true }).anzahl < 35, "nur Textantworten");
+ok(A.antwortMd(A.teileVon(m1).find(t => t.id === "p1-4c"), { f1: "4", t1: "Multiplikation" }) === "Fehlerhafte Zeile: 4\nErläuterung: Multiplikation", "Antwort mit Feld und Text");
+const pk = A.punkteLesen(m1, "PUNKTE\n`p1-1a: 5,5`\n- p1-4h: 2\n1 b): 3\nAufgabe 2 a) = 4\np1-3a: 9\nxyz: 1\n3 z): 2");
+ok(JSON.stringify(pk) === JSON.stringify({ "p1-1a": 5.5, "p1-4h": 2, "p1-1b": 3, "p1-2a": 4, "p1-3a": 2 }), "Punkte lesen: " + JSON.stringify(pk));
+
 console.log("prognose.test.js: " + n + " Prüfungen bestanden");

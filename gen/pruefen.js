@@ -223,6 +223,34 @@
     schreib(SK_CHATS, c);
   }
 
+  /** Kopieren ohne sichtbares Feld (für ganze Bögen) */
+  function kopierenRoh(t) {
+    const alt = () => {
+      try {
+        const f = document.createElement("textarea");
+        f.value = t; f.setAttribute("readonly", ""); f.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+        document.body.appendChild(f); f.select();
+        const ok = document.execCommand("copy"); f.remove(); return ok;
+      } catch (e) { return false; }
+    };
+    if (navigator.clipboard && root.isSecureContext) return navigator.clipboard.writeText(t).then(() => true, alt);
+    return Promise.resolve(alt());
+  }
+
+  /**
+   * Einen fertigen Text (z. B. den ganzen Bogen als Markdown) nach der
+   * eingestellten Art losschicken: kopieren und je nach Modus den Chat der
+   * Prüfung, einen neuen Chat oder nichts öffnen.
+   */
+  function senden(t, gruppe) {
+    return kopierenRoh(t).then(ok => {
+      const m = modus(), link = gruppe && gruppe.id ? chatVon(gruppe.id) : "";
+      if (m === "neu") { try { root.open("https://claude.ai/new", "_blank", "noopener"); } catch (e) { } }
+      else if (m === "pruefung") oeffneTab(link || "https://claude.ai/new");
+      return { ok, modus: m, link };
+    });
+  }
+
   /** Immer derselbe Tab: so entsteht nicht für jede Aufgabe ein neues Fenster */
   function oeffneTab(url) {
     try { const w = root.open(url, "ihk-claude"); if (w) { try { w.opener = null; } catch (e) { } } } catch (e) { }
@@ -356,7 +384,7 @@
   }
 
   /**
-   * Das Kästchen. opt: { frage, loesung, hinweis, punkte, antwort (String oder Funktion), mitLoesung, pruefung,
+   * Das Kästchen. opt: { frage, loesung, hinweis, punkte, antwort (String oder Funktion), mitLoesung, pruefung, klartext,
    *                      gruppe: {id, name} — zu welcher Prüfung die Aufgabe gehört (ein Claude-Chat je Gruppe) }
    * Liest die Antwort bei jedem Klick neu — so zählt, was gerade im Feld steht.
    */
@@ -370,7 +398,9 @@
     const antwort = () => (typeof opt.antwort === "function" ? opt.antwort() : opt.antwort) || "";
     const zeichnen = () => {
       inhalt.innerHTML = "";
-      const frage = text(opt.frage), loesung = text(opt.loesung), hinweis = text(opt.hinweis);
+      /* klartext: schon aufbereitet (Markdown mit Tabellen) — nicht noch einmal als HTML lesen */
+      const t0 = x => opt.klartext ? String(x || "").trim() : text(x);
+      const frage = t0(opt.frage), loesung = t0(opt.loesung), hinweis = t0(opt.hinweis);
       const a = analyse({ frage, antwort: antwort(), loesung, mitLoesung: opt.mitLoesung });
       const kopf = el("div", "pf-kopf");
       kopf.appendChild(el("b", null, "Kurzcheck"));
@@ -438,7 +468,7 @@
   function einhaengen() { karteUmhuellen(); }
 
   const api = { operatorVon, anzahlVon, punkteIn, stichworte, analyse, prompt, kasten, OPERATOREN,
-                pruefeLink, modus, setzeModus, chatVon, setzeChat, gruppeIhk, MODI };
+                pruefeLink, modus, setzeModus, chatVon, setzeChat, gruppeIhk, MODI, senden, kopierenRoh };
   root.GENPRUEFEN = api;
   if (typeof module === "object" && module.exports) module.exports = api;
   if (hatDom) {

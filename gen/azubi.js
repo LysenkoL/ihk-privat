@@ -43,15 +43,24 @@
       .replace(/[„“”"'`´‚‘’]/g, "").replace(/\s+/g, " ").replace(/[.;:!?]+$/, "").trim();
   }
 
-  /** Alle plausiblen Lesarten einer eingetippten Zahl: 1.512 kann 1512 oder 1,512 sein. */
+  /** Alle plausiblen Lesarten einer eingetippten Zahl: 1.512 kann 1512 oder 1,512 sein.
+      Mit Rechenweg im Feld zählt das Ergebnis hinter dem letzten „=“, mit
+      Klammerzusatz („375 W (mit Puffer …)“) der Teil davor.               */
   function zahlen(s) {
-    let t = String(s == null ? "" : s).replace(/[\s  ]/g, "");
-    t = t.replace(/^[^\d-]+/, "").replace(/[^\d.,]+$/, "");
+    const roh = String(s == null ? "" : s);
+    const kandidaten = [roh];
+    if (roh.indexOf("=") >= 0) kandidaten.push(roh.slice(roh.lastIndexOf("=") + 1));
+    if (roh.indexOf("(") > 0) kandidaten.push(roh.slice(0, roh.indexOf("(")));
+    if (/[\u2248~]/.test(roh)) kandidaten.push(roh.slice(roh.search(/[\u2248~]/) + 1));
     const out = [];
     const add = v => { if (!isNaN(v) && out.indexOf(v) < 0) out.push(v); };
-    if (/^-?\d+([.,]\d+)?$/.test(t)) add(parseFloat(t.replace(",", ".")));
-    if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) add(parseFloat(t.replace(/\./g, "").replace(",", ".")));
-    if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) add(parseFloat(t.replace(/,/g, "")));
+    kandidaten.forEach(k => {
+      let t = k.replace(/[\s\u00a0\u202f]/g, "");
+      t = t.replace(/^[^\d-]+/, "").replace(/[^\d.,]+$/, "");
+      if (/^-?\d+([.,]\d+)?$/.test(t)) add(parseFloat(t.replace(",", ".")));
+      if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) add(parseFloat(t.replace(/\./g, "").replace(",", ".")));
+      if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) add(parseFloat(t.replace(/,/g, "")));
+    });
     return out;
   }
 
@@ -69,8 +78,24 @@
         return ist.some(a => Math.abs(a - b) <= tol);
       });
     }
-    const n = normText(wert), n2 = n.replace(/\s/g, "");
-    return f.soll.some(s => { const m = normText(s); return m === n || m.replace(/\s/g, "") === n2; });
+    const ist = textVarianten(wert, true);
+    return f.soll.some(s => textVarianten(s, false).some(v => ist.indexOf(v) >= 0));
+  }
+
+  /** Lesarten einer Textantwort: ohne Leerzeichen und Klammerzeichen. Bei der
+      eigenen Antwort (locker) außerdem ohne „Netzadresse:“ davor, ohne
+      Präfix „/26“ hinter einer IP-Adresse und ohne Zusatz in Klammern.   */
+  function textVarianten(wert, locker) {
+    const n = normText(wert);
+    const v = [n];
+    const add = x => { x = x.trim(); if (x && v.indexOf(x) < 0) v.push(x); };
+    if (locker) {
+      add(n.replace(/^[a-z .-]{3,40}:\s*(?=\S)/, ""));                      /* „Netzadresse: …“ */
+      v.slice().forEach(x => add(x.replace(/\s*\/\s*\d{1,3}$/, "")));           /* 10.40.7.128/26 */
+      v.slice().forEach(x => add(x.replace(/\s*\([^)]*\)\s*$/, "")));          /* … (Hinweis)     */
+    }
+    v.slice().forEach(x => { add(x.replace(/\s/g, "")); add(x.replace(/[\s()]/g, "")); });
+    return v;
   }
 
   /** Alle automatisch prüfbaren Stellen einer Teilaufgabe: [{key, art, ...}] */
@@ -713,6 +738,7 @@
     fuss.appendChild(erg);
     fuss.appendChild(zurUebersicht(m));
     box.appendChild(fuss);
+    box.appendChild(extraKnoepfe(m, z));
 
     leisteAktualisieren();
     uhrStarten();
@@ -1169,13 +1195,15 @@
     /* Textantworten: Kurzcheck und „Mit Claude prüfen“ (gen/pruefen.js) */
     if (hatFreitext(t) && root.GENPRUEFEN) {
       try {
+        /* Als Klartext mit Tabellen (|…|) und mit ALLEN Eingaben samt Beschriftung —
+           vorher gingen Zahlenfelder und die Zuordnung zu den Unterfragen verloren,
+           und Claude bewertete dann „fehlt“, obwohl es dastand. */
         box.appendChild(root.GENPRUEFEN.kasten({
-          frage: t.text, loesung: t.loesung, hinweis: t.hinweis, punkte: t.punkte,
+          klartext: true,
+          frage: htmlZuMd(t.text) + (t.anlagen || []).map(x => "\n\nAnlage: " + textAus(x.titel) + "\n" + htmlZuMd(x.html)).join(""),
+          loesung: htmlZuMd(t.loesung), hinweis: htmlZuMd(t.hinweis), punkte: t.punkte,
           gruppe: { id: "az:" + m.id, name: m.virtuell ? "Prognose-Prüfung " + m.nr : "Azubi-Navigator " + m.kurz },
-          antwort: () => {
-            const a = z.a[t.id] || {};
-            return Object.keys(a).filter(k => k[0] === "t" || k === "rw").map(k => a[k]).filter(Boolean).join("\n");
-          }
+          antwort: () => antwortMd(t, z.a[t.id])
         }));
       } catch (e) { console.error("Azubi/Prüfen:", e); }
     }
@@ -1337,6 +1365,7 @@
     st.appendChild(neu);
     st.appendChild(zurUebersicht(m));
     box.appendChild(st);
+    box.appendChild(extraKnoepfe(m, z));
 
     if (z.versuche.length) {
       const h = el("div", "az-karte");
@@ -1363,6 +1392,372 @@
     z.versuche.push({ d: Date.now(), modus: z.modus, p: s.punkte, max: s.max, prozent: s.prozent, note: s.note.text,
                       zeit: z.zeit, bewertet: s.bewertet, n: s.n });
     if (z.versuche.length > 20) z.versuche = z.versuche.slice(-20);
+  }
+
+  /* ======================================================================
+     Für Claude und fürs Papier: Markdown, Punkte zurück, Drucken
+     ====================================================================== */
+
+  /** Paket-HTML → Markdown: Tabellen als |…|, Code als ```, Listen mit - */
+  function htmlZuMd(html) {
+    const s = String(html || "");
+    if (!hatDom) {
+      return s.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, (x, c) => "\n```\n" + c.replace(/<[^>]+>/g, "") + "\n```\n")
+        .replace(/<\/(td|th)>\s*<(td|th)[^>]*>/gi, " | ").replace(/<tr[^>]*>/gi, "\n| ").replace(/<\/tr>/gi, " |")
+        .replace(/<li[^>]*>/gi, "\n- ").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(div|p|h\d|ul|ol|table)>/gi, "\n")
+        .replace(/<\/?(b|strong)>/gi, "**").replace(/<[^>]+>/g, "")
+        .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+        .replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+    }
+    const tpl = document.createElement("template");
+    tpl.innerHTML = s;
+    const geh = n => {
+      if (n.nodeType === 3) return n.textContent.replace(/\s+/g, " ");
+      if (n.nodeType !== 1) return "";
+      const tag = n.tagName.toLowerCase();
+      const innen = () => Array.from(n.childNodes).map(geh).join("");
+      if (tag === "br") return "\n";
+      if (tag === "pre") return "\n```\n" + n.textContent.replace(/\n$/, "") + "\n```\n";
+      if (tag === "img") return "[Abbildung]";
+      if (tag === "table") {
+        const zeilen = Array.from(n.querySelectorAll("tr")).map(tr =>
+          "| " + Array.from(tr.children).map(c => geh(c).replace(/\n+/g, " ").replace(/\|/g, "/").trim()).join(" | ") + " |");
+        if (zeilen.length > 1) zeilen.splice(1, 0, zeilen[0].replace(/[^|]+/g, " --- "));
+        return "\n\n" + zeilen.join("\n") + "\n\n";
+      }
+      if (tag === "li") return "\n- " + innen().trim();
+      if (tag === "b" || tag === "strong" || tag === "i" || tag === "em") {
+        const c = innen(), z = /^(b|strong)$/.test(tag) ? "**" : "_";
+        if (!c.trim()) return c;
+        return c.match(/^\s*/)[0] + z + c.trim() + z + c.match(/\s*$/)[0];
+      }
+      if (tag === "sup") return "^" + innen();
+      if (/^(div|p|h\d|ul|ol|details|summary)$/.test(tag)) return "\n" + innen() + "\n";
+      return innen();
+    };
+    return Array.from(tpl.content.childNodes).map(geh).join("")
+      .replace(/[ \t]+\n/g, "\n").replace(/\n[ \t]+/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  /** Die eigene Antwort einer Teilaufgabe als lesbarer Text */
+  function antwortMd(t, a) {
+    a = a || {};
+    const E = t.eingabe || {};
+    const L = [];
+    const w = k => (a[k] == null || a[k] === "" ? "" : String(a[k]).trim());
+    if (E.typ === "raster") {
+      const z = E.zellen || [];
+      for (let r = 0; r < E.zeilen; r++) {
+        const cells = [];
+        for (let c = 0; c < E.spalten; c++) {
+          const x = z[r * E.spalten + c];
+          cells.push(!x ? "" : x.f ? (w("f" + x.f.id) || "…") + (x.f.einheit && w("f" + x.f.id) ? " " + x.f.einheit : "") : textAus(x.h));
+        }
+        L.push("| " + cells.join(" | ") + " |");
+        if (r === 0) L.push(L[0].replace(/[^|]+/g, " --- "));
+      }
+    } else if (E.typ === "zuordnung") {
+      (E.zeilen || []).forEach(zl => { const v = w("z" + zl.id); L.push("- " + textAus(zl.h) + " → " + (v ? v + " – " + textAus(E.optionen[Number(v) - 1]) : "…")); });
+    } else if (E.typ === "wahl") {
+      (E.zeilen || []).forEach(zl => { const v = a["w" + zl.id]; L.push("- " + textAus(zl.h) + " → " + (v != null && v !== "" ? textAus(zl.optionen[Number(v)]) : "…")); });
+    } else if (E.typ === "mehrfach") {
+      const gew = Array.isArray(a.m) ? a.m : [];
+      L.push(gew.length ? gew.map(i => "- " + textAus(E.optionen[i - 1])).join("\n") : "…");
+    } else {
+      (E.zeilen || []).forEach(zl => {
+        const titel = textAus(zl.h).replace(/:$/, "");
+        const teile = [];
+        if (zl.frei) teile.push(w("t" + zl.frei));
+        (zl.felder || []).forEach(f => { const v = w("f" + f.id); teile.push(v ? v + (f.einheit && !new RegExp(f.einheit.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*$").test(v) ? " " + f.einheit : "") : ""); });
+        const inhalt = teile.filter(Boolean).join(" · ");
+        if (titel || inhalt) L.push((titel ? titel + ": " : "") + (inhalt || "…"));
+      });
+      if (w("rw")) L.push("Rechenweg: " + w("rw"));
+    }
+    return hatAntwort(t, a) ? L.join("\n").trim() : "";
+  }
+
+  /**
+   * Der ganze Bogen als Markdown für Claude.
+   * opt.nurText: nur Teilaufgaben mit Textantwort (Zahlenfelder prüft die App)
+   */
+  function markdown(m, z, opt) {
+    opt = opt || {};
+    const s = auswertung(m, z);
+    const L = [];
+    L.push("# " + (m.virtuell ? "Prognose-Prüfung " + m.nr : m.kurz) + ": " + m.titel, "");
+    L.push("- Stand: " + datum(Date.now()) + " · " + (z.modus === "pruefung" ? "Prüfungsmodus" + (z.zeit ? ", Zeit " + minuten(z.zeit) : "") : "Übungsmodus"));
+    L.push("- Maximal: " + fmt(s.max) + " Punkte · bisher bewertet: " + fmt(s.punkte) + " P. in " + s.bewertet + " von " + s.n + " Teilaufgaben");
+    L.push("");
+    L.push("> Du bist Prüfer der IHK-Abschlussprüfung Teil 1 (AP1) für Fachinformatiker Anwendungsentwicklung.");
+    L.push("> Bewerte jede Teilaufgabe so streng wie in der echten Prüfung — gegen Musterlösung und Bewertungshinweis.");
+    L.push("> Gib je Teilaufgabe: erreichte Punkte, was gefehlt hat, und eine verbesserte Antwort in kurzen, einfachen");
+    L.push("> deutschen Sätzen (Niveau B1); Fachbegriffe deutsch, dahinter in Klammern die russische Übersetzung.");
+    L.push("> Antworte ganz am Ende mit einem Block `PUNKTE`, eine Zeile je Teilaufgabe im Format `<id>: <punkte>`");
+    L.push("> (halbe Punkte erlaubt, z. B. `p1-1a: 5,5`) — den füge ich direkt in den Simulator ein.");
+    (m.einleitung || []).forEach(e => { L.push("", "## " + (textAus(e.titel) || "Ausgangssituation"), "", htmlZuMd(e.html)); });
+    let n = 0;
+    (m.aufgaben || []).forEach(a => {
+      const teile = (a.teile || []).filter(t => !opt.nurText || hatFreitext(t));
+      if (!teile.length) return;
+      const mx = (a.teile || []).reduce((x, t) => x + (t.punkte || 0), 0);
+      L.push("", "## Aufgabe " + a.nr + ": " + textAus(a.titel) + " (" + fmt(mx) + " Punkte)");
+      teile.forEach(t => {
+        n++;
+        const an = z.a[t.id];
+        L.push("", "### " + t.nr + " " + t.label + " " + textAus(t.titel) + " (" + fmt(t.punkte) + " P.)  `id: " + t.id + "`");
+        L.push("", "**Aufgabe**", "", htmlZuMd(t.text));
+        (t.anlagen || []).forEach(x => L.push("", "_Anlage: " + textAus(x.titel) + "_", "", htmlZuMd(x.html)));
+        L.push("", "**Meine Antwort**", "", antwortMd(t, an) || "_(keine Antwort)_");
+        const r = pruefe(t, an);
+        if (r.pruefbar) L.push("", "_Von der App geprüft: " + r.k + " von " + r.n + " Feldern richtig._");
+        L.push("", "**Musterlösung**", "", t.loesung ? htmlZuMd(t.loesung) : "_(keine hinterlegt)_");
+        if (t.hinweis) L.push("", "**Bewertungshinweis:** " + htmlZuMd(t.hinweis).replace(/\n+/g, " "));
+        if (z.p[t.id] != null) L.push("", "_Meine Selbstbewertung bisher: " + fmt(z.p[t.id]) + " von " + fmt(t.punkte) + " P._");
+      });
+    });
+    L.push("");
+    return { text: L.join("\n").replace(/\n{3,}/g, "\n\n"), anzahl: n };
+  }
+
+  /** „p1-1a: 5,5“ / „1 a): 3“ → {id: punkte}. Nur bekannte Teilaufgaben. */
+  function punkteLesen(m, roh) {
+    const teile = teileVon(m), out = {};
+    const byId = {}; teile.forEach(t => { byId[String(t.id).toLowerCase()] = t; });
+    String(roh || "").split(/\r?\n/).forEach(zeile => {
+      const z = zeile.replace(/[`*]/g, "").trim();
+      let t = null, wert = null;
+      let x = z.match(/^[-•\s]*([A-Za-z0-9_.-]+)\s*[:=]\s*(\d+(?:[.,]\d+)?)/);
+      if (x && byId[x[1].toLowerCase()]) { t = byId[x[1].toLowerCase()]; wert = x[2]; }
+      if (!t) {
+        x = z.match(/^[-•\s]*(?:Aufgabe\s*)?(\d+)\s*([a-z]{1,2})\)?\s*[:=–-]?\s*(\d+(?:[.,]\d+)?)/i);
+        if (x) { t = teile.find(y => String(y.nr) === x[1] && String(y.label).replace(/\)$/, "").toLowerCase() === x[2].toLowerCase()); wert = x[3]; }
+      }
+      if (!t || wert == null) return;
+      const v = Math.round(parseFloat(wert.replace(",", ".")) * 2) / 2;
+      if (!isNaN(v)) out[t.id] = Math.max(0, Math.min(t.punkte || 0, v));
+    });
+    return out;
+  }
+
+  /* ------------------------------------------------ Knöpfe unter dem Bogen */
+  function extraKnoepfe(m, z) {
+    const box = el("div", "az-extra");
+    box.appendChild(el("span", "az-extra-t", "Claude & Papier"));
+    const reihe = el("div", "az-extra-reihe");
+    const gruppe = { id: "az:" + m.id, name: m.virtuell ? "Prognose-Prüfung " + m.nr : "Azubi-Navigator " + m.kurz };
+    const md = (nurText) => {
+      const b = el("button", "btn", nurText ? "Nur Textantworten für Claude" : "Markdown für Claude");
+      b.type = "button";
+      b.title = "Kopiert Aufgaben, deine Antworten und Musterlösungen als Markdown — Claude bewertet und gibt einen PUNKTE-Block zurück.";
+      b.onclick = () => {
+        sichern(true);
+        const r = markdown(m, zustand(m.id), { nurText });
+        const los = root.GENPRUEFEN && root.GENPRUEFEN.senden ? root.GENPRUEFEN.senden(r.text, gruppe) : Promise.resolve({ ok: false });
+        los.then(x => meldung(x.ok ? r.anzahl + " Teilaufgaben kopiert — in Claude einfügen und senden. Den PUNKTE-Block danach mit „Punkte einfügen“ übernehmen."
+                                   : "Kopieren gesperrt — nimm „Als .md-Datei“.", !x.ok));
+      };
+      return b;
+    };
+    reihe.appendChild(md(false));
+    reihe.appendChild(md(true));
+    const datei = el("button", "btn ghost", "Als .md-Datei");
+    datei.type = "button";
+    datei.onclick = () => {
+      sichern(true);
+      const r = markdown(m, zustand(m.id), {});
+      try {
+        const blob = new Blob([r.text], { type: "text/markdown;charset=utf-8" });
+        const a = el("a"); a.href = URL.createObjectURL(blob);
+        a.download = m.id + "_" + new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-") + ".md";
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      } catch (e) { meldung("Speichern ging nicht: " + e.message, true); }
+    };
+    reihe.appendChild(datei);
+    const imp = el("button", "btn ghost", "Punkte einfügen");
+    imp.type = "button";
+    reihe.appendChild(imp);
+    const druck = el("button", "btn ghost", "Drucken");
+    druck.type = "button";
+    reihe.appendChild(druck);
+    box.appendChild(reihe);
+
+    /* Punkte aus Claudes Antwort übernehmen */
+    const pf = el("div", "az-import");
+    pf.hidden = true;
+    pf.appendChild(el("p", "az-info", "Claudes Antwort (oder nur den PUNKTE-Block) hier einfügen. Erkannt werden Zeilen wie „p1-1a: 5,5“ oder „1 a): 3“."));
+    const ta = el("textarea", "az-frei");
+    ta.rows = 6; ta.placeholder = "PUNKTE\n" + teileVon(m).slice(0, 2).map(t => t.id + ": " + t.punkte).join("\n");
+    pf.appendChild(ta);
+    const st = el("div", "steuer");
+    const ueb = el("button", "btn primary", "Übernehmen"); ueb.type = "button";
+    ueb.onclick = () => {
+      const p = punkteLesen(m, ta.value), ids = Object.keys(p);
+      if (!ids.length) { meldung("Keine Punkte erkannt — Format „id: Punkte“.", true); return; }
+      const zz = (LAUF && LAUF.m.id === m.id) ? LAUF.z : zustand(m.id);
+      ids.forEach(id => { zz.p[id] = p[id]; zz.auf[id] = 1; delete zz.auto[id]; });
+      if (LAUF && LAUF.m.id === m.id) sichern(true); else schreib(SK + m.id, zz);
+      meldung(ids.length + " Bewertungen übernommen.");
+      ta.value = ""; pf.hidden = true;
+      zeichnen();
+    };
+    const abb = el("button", "btn ghost", "Abbrechen"); abb.type = "button";
+    abb.onclick = () => { pf.hidden = true; };
+    st.append(ueb, abb);
+    pf.appendChild(st);
+    box.appendChild(pf);
+    imp.onclick = () => { pf.hidden = !pf.hidden; if (!pf.hidden) ta.focus(); };
+
+    /* Drucken: leer, mit Antworten, mit Lösungen */
+    const dw = el("div", "az-druckwahl");
+    dw.hidden = true;
+    [["leer", "Leer zum Schreiben", "Aufgaben mit Schreiblinien"], ["antworten", "Mit meinen Antworten", "zum Nacharbeiten"],
+     ["loesungen", "Mit Antworten und Lösungen", "Musterlösung und Punkte dazu"]].forEach(([art, t1, t2]) => {
+      const b = el("button", "az-druck-k"); b.type = "button";
+      b.appendChild(el("b", null, t1)); b.appendChild(el("span", null, t2));
+      b.onclick = () => { dw.hidden = true; drucken(m, (LAUF && LAUF.m.id === m.id) ? LAUF.z : zustand(m.id), art); };
+      dw.appendChild(b);
+    });
+    box.appendChild(dw);
+    druck.onclick = () => { dw.hidden = !dw.hidden; };
+    return box;
+  }
+
+  /* -------------------------------------------------------------- Drucken */
+  function drucken(m, z, art) {
+    sichern(true);
+    let d = $("azDruck");
+    if (d) d.remove();
+    d = el("div"); d.id = "azDruck";
+    const kopf = el("header", "azd-kopf");
+    kopf.appendChild(el("h1", null, (m.virtuell ? "Prognose-Prüfung " + m.nr : m.kurz) + " — " + m.titel));
+    kopf.appendChild(el("p", null, "Name: ______________________    Datum: ____________    Zeit: " + (m.minuten || 90) + " Min. · " + fmt(auswertung(m, z).max) + " Punkte" +
+      (art === "leer" ? "" : " · " + (art === "loesungen" ? "mit Antworten und Lösungen" : "mit meinen Antworten"))));
+    d.appendChild(kopf);
+    (m.einleitung || []).forEach(e => {
+      const s = el("section", "azd-sit");
+      s.appendChild(el("h2", null, textAus(e.titel) || "Ausgangssituation"));
+      htmlIn(s.appendChild(el("div", "azd-text")), e.html);
+      d.appendChild(s);
+    });
+    const s0 = auswertung(m, z);
+    (m.aufgaben || []).forEach((a, ai) => {
+      const sec = el("section", "azd-aufgabe");
+      const mx = (a.teile || []).reduce((x, t) => x + (t.punkte || 0), 0);
+      const h = el("h2", null, "Aufgabe " + a.nr + ": " + textAus(a.titel));
+      h.appendChild(el("span", "azd-p", (art === "loesungen" ? fmt(s0.jeAufgabe[ai].p) + " / " : "") + fmt(mx) + " P."));
+      sec.appendChild(h);
+      (a.teile || []).forEach(t => sec.appendChild(druckTeil(t, z.a[t.id] || {}, z, art)));
+      d.appendChild(sec);
+    });
+    if (art === "loesungen") {
+      const f = el("p", "azd-summe", "Gesamt: " + fmt(s0.punkte) + " von " + fmt(s0.max) + " Punkten · " + fmt(s0.prozent) + " % · " + s0.note.text +
+        (s0.bewertet < s0.n ? " (" + (s0.n - s0.bewertet) + " Teilaufgaben noch ohne Punkte)" : ""));
+      d.appendChild(f);
+    }
+    document.body.appendChild(d);
+    document.body.classList.add("az-druckt");
+    const weg = () => { document.body.classList.remove("az-druckt"); root.removeEventListener("afterprint", weg); };
+    root.addEventListener("afterprint", weg);
+    setTimeout(() => { try { root.print(); } catch (e) { } setTimeout(() => { if (!root.matchMedia || !root.matchMedia("print").matches) weg(); }, 1500); }, 60);
+  }
+
+  function linien(n) {
+    const b = el("div", "azd-linien");
+    for (let i = 0; i < n; i++) b.appendChild(el("div", "azd-linie"));
+    return b;
+  }
+
+  function druckTeil(t, a, z, art) {
+    const mit = art !== "leer";
+    const c = el("article", "azd-teil");
+    const k = el("h3", null, t.nr + " " + t.label + " " + textAus(t.titel));
+    const p = z.p[t.id];
+    k.appendChild(el("span", "azd-p", (art === "loesungen" && p != null ? fmt(p) + " / " : "") + fmt(t.punkte) + " P."));
+    c.appendChild(k);
+    htmlIn(c.appendChild(el("div", "azd-text")), t.text);
+    (t.anlagen || []).forEach(x => {
+      const an = el("div", "azd-anlage");
+      an.appendChild(el("b", null, "Anlage: " + textAus(x.titel)));
+      htmlIn(an.appendChild(el("div", "azd-text")), x.html);
+      c.appendChild(an);
+    });
+    const E = t.eingabe || {};
+    const box = el("div", "azd-antwort");
+    const wert = key => (a[key] == null ? "" : String(a[key]));
+    if (E.typ === "raster") {
+      const tab = el("table", "azd-raster"), zellen = E.zellen || [];
+      for (let r = 0; r < E.zeilen; r++) {
+        const tr = el("tr");
+        for (let s = 0; s < E.spalten; s++) {
+          const zz = zellen[r * E.spalten + s];
+          const td = el(zz && zz.h && r === 0 ? "th" : "td");
+          if (zz && zz.f) { td.className = "feld"; td.textContent = mit ? wert("f" + zz.f.id) : ""; }
+          else if (zz && zz.h) htmlIn(td, zz.h);
+          tr.appendChild(td);
+        }
+        tab.appendChild(tr);
+      }
+      box.appendChild(tab);
+    } else if (E.typ === "zuordnung" || E.typ === "wahl" || E.typ === "mehrfach") {
+      if (E.typ === "zuordnung") {
+        const ol = el("ol", "azd-opt"); E.optionen.forEach(o => htmlIn(ol.appendChild(el("li")), o)); box.appendChild(ol);
+        (E.zeilen || []).forEach(zl => {
+          const r = el("div", "azd-zeile");
+          htmlIn(r.appendChild(el("span", null)), zl.h);
+          r.appendChild(el("span", "azd-luecke", mit && wert("z" + zl.id) ? "→ " + wert("z" + zl.id) : "→ ____"));
+          box.appendChild(r);
+        });
+      } else if (E.typ === "wahl") {
+        (E.zeilen || []).forEach(zl => {
+          const r = el("div", "azd-zeile");
+          htmlIn(r.appendChild(el("span", null)), zl.h);
+          const opts = el("span", "azd-luecke");
+          zl.optionen.forEach((o, i) => opts.appendChild(el("span", "azd-o", (mit && String(a["w" + zl.id]) === String(i) ? "● " : "○ ") + textAus(o))));
+          r.appendChild(opts);
+          box.appendChild(r);
+        });
+      } else {
+        const gew = Array.isArray(a.m) ? a.m : [];
+        E.optionen.forEach((o, i) => box.appendChild(el("div", "azd-zeile", (mit && gew.indexOf(i + 1) >= 0 ? "☒ " : "☐ ") + textAus(o))));
+      }
+    } else {
+      const zl = E.zeilen || [];
+      const frei = zl.filter(x => x.frei).length || 0;
+      zl.forEach(x => {
+        const inline = !x.frei && (x.felder || []).length && textAus(x.h).length < 90;
+        const r = el("div", "azd-feldzeile" + (inline ? " inline" : ""));
+        if (x.h) htmlIn(r.appendChild(el(inline ? "span" : "div", "azd-label")), x.h);
+        if (x.frei) {
+          const v = wert("t" + x.frei);
+          if (mit && v) r.appendChild(el("div", "azd-eigen", v));
+          else r.appendChild(linien(Math.min(x.gross ? 14 : 8, Math.max(2, Math.round((x.gross ? 2 : 1.3) * (t.punkte || 1) / Math.max(1, frei)) + 1))));
+        }
+        (x.felder || []).forEach(f => {
+          const v = wert("f" + f.id);
+          r.appendChild(el("span", "azd-luecke", (mit && v ? v : "______________") + (f.einheit ? " " + f.einheit : "")));
+        });
+        box.appendChild(r);
+      });
+      if (!frei && zl.some(x => x.felder && x.felder.length)) {
+        const rw = wert("rw");
+        const r = el("div", "azd-feldzeile");
+        r.appendChild(el("div", "azd-label", "Rechenweg:"));
+        if (mit && rw) r.appendChild(el("div", "azd-eigen", rw)); else r.appendChild(linien(Math.min(5, Math.max(2, Math.round(t.punkte || 1)))));
+        box.appendChild(r);
+      }
+    }
+    c.appendChild(box);
+    if (art === "loesungen") {
+      const l = el("div", "azd-muster");
+      l.appendChild(el("b", null, "Musterlösung"));
+      if (t.loesung) htmlIn(l.appendChild(el("div", "azd-text")), t.loesung);
+      if (t.hinweis) { const h = el("div", "azd-hinweis"); h.appendChild(el("b", null, "Bewertung: ")); h.appendChild(sicher(t.hinweis)); l.appendChild(h); }
+      if (t.vorbild) l.appendChild(el("div", "azd-hinweis", "Vorlage: " + t.vorbild));
+      c.appendChild(l);
+    }
+    return c;
   }
 
   /* ------------------------------------------------------- Startseite --- */
@@ -1507,7 +1902,7 @@
 
   const api = {
     oeffnen, zeigen, block, laden, importieren, paket, modul, alleModule, zustand, ansicht, teileVon,
-    normText, zahlen, feldRichtig, pruefe, stellen, hatAntwort, note, auswertung, einordnen, sortiert, paketAusText,
+    normText, zahlen, feldRichtig, textVarianten, pruefe, markdown, punkteLesen, htmlZuMd, antwortMd, stellen, hatAntwort, note, auswertung, einordnen, sortiert, paketAusText,
     get VIEW() { return VIEW; }
   };
   root.GENAZUBI = api;
