@@ -423,7 +423,7 @@ window.GENSATZ = (function () {
       loes.open = true;
       /* „Prüfen lassen“: Kurzcheck und Claude (gen/pruefen.js) */
       if (root.GENPRUEFEN) {
-        try { rueck.appendChild(root.GENPRUEFEN.kasten({ frage: item.frage, loesung: item.muster, hinweis: item.tipp, punkte: 2, antwort: () => ta.value })); } catch (e) { }
+        try { rueck.appendChild(root.GENPRUEFEN.kasten({ frage: item.frage, loesung: item.muster, hinweis: item.tipp, punkte: 2, antwort: () => ta.value, gruppe: { id: "satz", name: "Kurzfragen" } })); } catch (e) { }
       }
       if (erg.punkte < 2) {
         const gl = el("button", "sz-link", "Meine Antwort war inhaltlich gleichwertig → als gewusst zählen"); gl.type = "button";

@@ -12,10 +12,20 @@
       - Bei Erläutern/Begründen: steht eine Begründung da (weil, dadurch …)?
       - Welche Stichworte der Musterlösung sind getroffen, welche fehlen?
    2. Mit Claude prüfen: ein fertiger Text mit Aufgabe, Musterlösung,
-      Bewertungshinweis und eigener Antwort wird kopiert und Claude geöffnet.
-      Zurück kommen Punkte wie beim Prüfer, was fehlt, und die eigene
-      Antwort in kurzen, einfachen deutschen Sätzen — Fachbegriffe mit
-      russischer Übersetzung.
+      Bewertungshinweis und eigener Antwort wird kopiert. Zurück kommen
+      Punkte wie beim Prüfer, was fehlt, und die eigene Antwort in kurzen,
+      einfachen deutschen Sätzen — Fachbegriffe mit russischer Übersetzung.
+
+      Wohin der Text geht, stellt man ein (je Gerät, `ihk2:pruefen:ui`):
+      - „Chat dieser Prüfung“: EIN Claude-Chat je Prüfung. Beim ersten Mal
+        öffnet sich ein neuer Chat; dessen Link einmal einfügen — ab dann
+        öffnet jede weitere Aufgabe dieser Prüfung genau diesen Chat, immer
+        im selben Browser-Tab, und der Text ist kürzer („nächste Aufgabe“).
+        Die Links wandern mit dem Abgleich (`ihk2:pruefen:chats`).
+      - „Neuer Chat“: wie bisher, jede Aufgabe ein neuer Chat.
+      - „Nur kopieren“: nur in die Zwischenablage, kein Fenster (Handy).
+      Direkt in einen bestehenden Chat schreiben kann eine Webseite nicht —
+      einfügen (Strg+V) und senden bleibt ein Handgriff.
 
    Eingebaut in: IHK-Bögen (unter der Musterlösung), Azubi-Navigator (nach
    „Lösung zeigen“), Fehler wiederholen (nach dem Aufdecken).
@@ -146,18 +156,30 @@
     return { operator: op, verlangt, genannt, hinweise: h, getroffen, fehlt };
   }
 
-  /** Der Text für Claude */
+  /**
+   * Der Text für Claude.
+   * o.gruppe: Name der Prüfung — dann kündigt der erste Text weitere Aufgaben an.
+   * o.folge: true = weitere Aufgabe im selben Chat → kurzer Kopf, gleiche Form.
+   */
   function prompt(o) {
     const op = operatorVon(o.frage);
     const teil = o.pruefung || "Abschlussprüfung Teil 1 (AP1)";
+    const aufgabe = ["AUFGABE (" + (o.punkte || "?") + " Punkte" + (op ? ", Operator: " + op.name : "") + "):",
+      String(o.frage || "").trim(), ""];
+    if (o.folge) {
+      const z = ["Nächste Aufgabe" + (o.gruppe ? " aus „" + o.gruppe + "“" : "") + ". Bewerte sie wieder so streng wie in der echten Prüfung " +
+                 "und antworte in derselben Form wie vorher (Punkte, was fehlt, verbesserte Antwort in einfachen Sätzen " +
+                 "mit russischer Übersetzung der Fachbegriffe, ein Satz auf Russisch).", ""].concat(aufgabe);
+      if (o.loesung) z.push("MUSTERLÖSUNG:", String(o.loesung).trim(), "");
+      if (o.hinweis) z.push("BEWERTUNGSHINWEIS:", String(o.hinweis).trim(), "");
+      z.push("MEINE ANTWORT:", String(o.antwort || "").trim() || "(leer)");
+      return z.join("\n");
+    }
     const zeilen = [
       "Du bist Prüfer der IHK-" + teil + " für Fachinformatiker Anwendungsentwicklung.",
-      "Bewerte meine Antwort genau so streng wie in der echten Prüfung.",
-      "",
-      "AUFGABE (" + (o.punkte || "?") + " Punkte" + (op ? ", Operator: " + op.name : "") + "):",
-      String(o.frage || "").trim(),
-      ""
-    ];
+      "Bewerte meine Antwort genau so streng wie in der echten Prüfung."
+    ].concat(o.gruppe ? ["Ich schicke dir in diesem Chat nacheinander mehrere Aufgaben aus „" + o.gruppe + "“ — bewerte jede einzeln in der Form unten."] : [])
+     .concat([""], aufgabe);
     if (o.loesung) zeilen.push("MUSTERLÖSUNG:", String(o.loesung).trim(), "");
     if (o.hinweis) zeilen.push("BEWERTUNGSHINWEIS:", String(o.hinweis).trim(), "");
     zeilen.push("MEINE ANTWORT:", String(o.antwort || "").trim() || "(leer)", "",
@@ -167,6 +189,43 @@
       "3. Verbesserte Antwort: meine Antwort so umgeschrieben, dass sie volle Punkte bekommt — in kurzen, einfachen deutschen Sätzen (Niveau B1). Fachbegriffe bleiben deutsch, dahinter in Klammern die russische Übersetzung.",
       "4. Ein Satz auf Russisch: мой главный недочёт и как его избежать.");
     return zeilen.join("\n");
+  }
+
+  /* ======================================================================
+     Wohin mit dem Text? Einstellung und Chat je Prüfung
+     ====================================================================== */
+  const SK_UI = "ihk2:pruefen:ui";          /* nur dieses Gerät (Abgleich lässt :ui aus) */
+  const SK_CHATS = "ihk2:pruefen:chats";    /* {gruppenId: {url, name, t}} — wandert mit */
+  const MODI = [["pruefung", "Chat dieser Prüfung"], ["neu", "Neuer Chat"], ["kopieren", "Nur kopieren"]];
+  const lies = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
+  const schreib = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } };
+  const handy = () => { try { return !!(root.matchMedia && root.matchMedia("(pointer: coarse)").matches); } catch (e) { return false; } };
+
+  /** Gespeicherter Modus, sonst: Handy „Nur kopieren“, Computer „Chat dieser Prüfung“ */
+  function modus() {
+    const u = lies(SK_UI, {}) || {};
+    return MODI.some(m => m[0] === u.modus) ? u.modus : (handy() ? "kopieren" : "pruefung");
+  }
+  function setzeModus(m) {
+    if (!MODI.some(x => x[0] === m)) return;
+    const u = lies(SK_UI, {}) || {}; u.modus = m; schreib(SK_UI, u);
+  }
+
+  /** Nur echte Claude-Chat-Links: https://claude.ai/chat/<id> (auch aus Projekten) */
+  function pruefeLink(s) {
+    const m = String(s || "").trim().match(/^https:\/\/claude\.ai\/(chat|project)\/[A-Za-z0-9-]{8,}/);
+    return m ? m[0] : null;
+  }
+  function chatVon(id) { const c = lies(SK_CHATS, {}) || {}; return (c[id] && c[id].url) || ""; }
+  function setzeChat(id, url, name) {
+    const c = lies(SK_CHATS, {}) || {};
+    if (url) c[id] = { url, name: name || id, t: Date.now() }; else delete c[id];
+    schreib(SK_CHATS, c);
+  }
+
+  /** Immer derselbe Tab: so entsteht nicht für jede Aufgabe ein neues Fenster */
+  function oeffneTab(url) {
+    try { const w = root.open(url, "ihk-claude"); if (w) { try { w.opener = null; } catch (e) { } } } catch (e) { }
   }
 
   /* ======================================================================
@@ -188,11 +247,121 @@
     return Promise.resolve(alt());
   }
 
+  /** Der Teil „Mit Claude prüfen“: Modus-Wahl, Knopf, Chat-Link der Prüfung */
+  function claudeTeil(o, gruppe) {
+    const teil = el("div", "pf-claude-teil");
+    const zeichne = () => {
+      teil.innerHTML = "";
+      const m = modus(), link = chatVon(gruppe.id);
+      const folge = m === "pruefung" && !!link;
+      /* Text bei jedem Klick neu bauen — so zählt, was gerade im Antwortfeld steht */
+      const baue = () => prompt({ frage: o.frage, loesung: o.loesung, hinweis: o.hinweis, punkte: o.punkte, antwort: o.antwort(),
+                                  pruefung: o.pruefung, gruppe: m === "pruefung" ? gruppe.name : null, folge });
+      const feld = el("textarea", "pf-prompt");
+      feld.readOnly = true; feld.value = baue(); feld.hidden = true; feld.rows = 8;
+
+      const cl = el("div", "pf-claude");
+      const b1 = el("button", "btn primary klein", m === "kopieren" ? "Für Claude kopieren" : folge ? "In den Prüfungs-Chat" : "Mit Claude prüfen");
+      b1.type = "button";
+      b1.title = m === "kopieren" ? "Nur kopieren — in einen Claude-Chat deiner Wahl einfügen." :
+                 folge ? "Kopiert und öffnet den Chat dieser Prüfung im selben Tab — dort einfügen und senden." :
+                 "Kopiert Aufgabe, Musterlösung und deine Antwort und öffnet Claude — dort einfügen und senden.";
+      b1.onclick = () => {
+        feld.value = baue();
+        kopieren(feld.value, feld).then(ok => {
+          b1.textContent = ok ? "Kopiert ✓ — einfügen (Strg+V) und senden" : "Text unten markieren und kopieren";
+          if (!ok) feld.hidden = false;
+          if (m === "neu") { try { root.open("https://claude.ai/new", "_blank", "noopener"); } catch (e) { } }
+          else if (m === "pruefung") {
+            oeffneTab(link || "https://claude.ai/new");
+            if (!link) { const i = teil.querySelector(".pf-link-feld"); if (i) { i.hidden = false; teil.querySelector(".pf-link").classList.add("offen"); } }
+          }
+        });
+      };
+      const b2 = el("button", "btn ghost klein", "Text anzeigen");
+      b2.type = "button";
+      b2.onclick = () => { feld.value = baue(); feld.hidden = !feld.hidden; b2.textContent = feld.hidden ? "Text anzeigen" : "Text ausblenden"; };
+      cl.append(b1, b2);
+      teil.appendChild(cl);
+
+      /* Modus: drei kleine Schalter */
+      const wahl = el("div", "pf-modi");
+      wahl.setAttribute("role", "radiogroup");
+      wahl.appendChild(el("span", "pf-modi-t", "Senden:"));
+      MODI.forEach(([k, name]) => {
+        const c = el("button", "pf-modus" + (k === m ? " an" : ""), name);
+        c.type = "button";
+        c.setAttribute("role", "radio"); c.setAttribute("aria-checked", k === m ? "true" : "false");
+        c.onclick = () => { setzeModus(k); zeichne(); };
+        wahl.appendChild(c);
+      });
+      teil.appendChild(wahl);
+
+      if (m === "pruefung") {
+        const z = el("div", "pf-link" + (link ? " da" : ""));
+        if (link) {
+          z.appendChild(el("span", null, "Chat für „" + gruppe.name + "“ ist verknüpft — jede Aufgabe geht dorthin."));
+          const aend = el("button", "pf-mini", "Link ändern"); aend.type = "button";
+          const los = el("button", "pf-mini", "Neuen Chat beginnen"); los.type = "button";
+          los.title = "Verknüpfung lösen — die nächste Aufgabe öffnet wieder einen neuen Chat.";
+          los.onclick = () => { setzeChat(gruppe.id, ""); zeichne(); };
+          z.append(aend, los);
+          const f = linkFeld(gruppe, zeichne); f.hidden = true;
+          aend.onclick = () => { f.hidden = !f.hidden; };
+          z.appendChild(f);
+        } else {
+          z.appendChild(el("span", null, "Noch kein Chat für „" + gruppe.name + "“. Beim ersten Mal öffnet sich ein neuer Chat. " +
+            "Nach dem Senden den Link aus der Adresszeile kopieren und hier einfügen — ab dann landen alle Aufgaben dieser Prüfung in diesem einen Chat."));
+          const f = linkFeld(gruppe, zeichne);
+          z.appendChild(f);
+        }
+        teil.appendChild(z);
+      } else {
+        teil.appendChild(el("p", "pf-klein", m === "kopieren"
+          ? "Nur in die Zwischenablage — kein neues Fenster. Einfügen, wo du willst."
+          : "Jede Aufgabe öffnet einen neuen Chat."));
+      }
+      teil.appendChild(el("p", "pf-klein", "Claude bekommt: Aufgabe, Musterlösung, Bewertungshinweis und deine Antwort — zurück kommen Punkte wie beim Prüfer und deine Antwort in einfachen Sätzen."));
+      teil.appendChild(feld);
+    };
+    zeichne();
+    return teil;
+  }
+
+  /** Eingabe für den Chat-Link: einfügen oder aus der Zwischenablage holen */
+  function linkFeld(gruppe, fertig) {
+    const f = el("div", "pf-link-feld");
+    const inp = el("input", "pf-link-inp");
+    inp.type = "url"; inp.placeholder = "https://claude.ai/chat/…"; inp.autocomplete = "off";
+    const meld = el("span", "pf-link-meld");
+    const speichern = wert => {
+      const url = pruefeLink(wert);
+      if (!url) { meld.textContent = "Das ist kein Claude-Chat-Link (https://claude.ai/chat/…)."; return false; }
+      setzeChat(gruppe.id, url, gruppe.name);
+      fertig();
+      return true;
+    };
+    const ok = el("button", "pf-mini", "Speichern"); ok.type = "button";
+    ok.onclick = () => speichern(inp.value);
+    inp.addEventListener("keydown", ev => { if (ev.key === "Enter") speichern(inp.value); });
+    f.append(inp, ok);
+    if (navigator.clipboard && navigator.clipboard.readText && root.isSecureContext) {
+      const zw = el("button", "pf-mini", "Aus Zwischenablage"); zw.type = "button";
+      zw.onclick = () => navigator.clipboard.readText().then(t => { inp.value = t; speichern(t); },
+        () => { meld.textContent = "Zwischenablage gesperrt — Link bitte ins Feld einfügen."; });
+      f.appendChild(zw);
+    }
+    f.appendChild(meld);
+    return f;
+  }
+
   /**
-   * Das Kästchen. opt: { frage, loesung, hinweis, punkte, antwort (String oder Funktion), mitLoesung, pruefung }
+   * Das Kästchen. opt: { frage, loesung, hinweis, punkte, antwort (String oder Funktion), mitLoesung, pruefung,
+   *                      gruppe: {id, name} — zu welcher Prüfung die Aufgabe gehört (ein Claude-Chat je Gruppe) }
    * Liest die Antwort bei jedem Klick neu — so zählt, was gerade im Feld steht.
    */
   function kasten(opt) {
+    const gruppe = opt.gruppe && opt.gruppe.id ? opt.gruppe : { id: "allgemein", name: "Allgemeine Fragen" };
     const box = el("div", "pf-box");
     const knopf = el("button", "pf-los", "Prüfen lassen");
     knopf.type = "button";
@@ -219,27 +388,7 @@
       inhalt.appendChild(ul);
       if (opt.mitLoesung === false) inhalt.appendChild(el("p", "pf-klein", "Stichworte der Musterlösung zeigt der Check erst nach „Lösung zeigen“."));
 
-      const cl = el("div", "pf-claude");
-      const p = prompt({ frage, loesung, hinweis, punkte: opt.punkte, antwort: antwort(), pruefung: opt.pruefung });
-      const feld = el("textarea", "pf-prompt");
-      feld.readOnly = true; feld.value = p; feld.hidden = true; feld.rows = 8;
-      const b1 = el("button", "btn primary klein", "Mit Claude prüfen");
-      b1.type = "button";
-      b1.title = "Kopiert Aufgabe, Musterlösung und deine Antwort und öffnet Claude — dort einfügen und senden.";
-      b1.onclick = () => {
-        kopieren(feld.value, feld).then(ok => {
-          b1.textContent = ok ? "Kopiert ✓ — in Claude einfügen" : "Text unten markieren und kopieren";
-          if (!ok) feld.hidden = false;
-          try { root.open("https://claude.ai/new", "_blank", "noopener"); } catch (e) { }
-        });
-      };
-      const b2 = el("button", "btn ghost klein", "Text anzeigen");
-      b2.type = "button";
-      b2.onclick = () => { feld.hidden = !feld.hidden; b2.textContent = feld.hidden ? "Text anzeigen" : "Text ausblenden"; };
-      cl.append(b1, b2);
-      inhalt.appendChild(cl);
-      inhalt.appendChild(el("p", "pf-klein", "Claude bekommt: Aufgabe, Musterlösung, Bewertungshinweis und deine Antwort — zurück kommen Punkte wie beim Prüfer und deine Antwort in einfachen Sätzen."));
-      inhalt.appendChild(feld);
+      inhalt.appendChild(claudeTeil({ frage, loesung, hinweis, punkte: opt.punkte, pruefung: opt.pruefung, antwort }, gruppe));
     };
     knopf.onclick = () => {
       const auf = inhalt.hidden;
@@ -252,6 +401,10 @@
   }
 
   /* --------------------------------------- IHK-Bogen: an jede Karte hängen */
+  function gruppeIhk(it) {
+    const ex = it && it.exam, m = (ex && ex.meta) || {};
+    return ex ? { id: "ihk:" + ex.examId, name: "IHK " + (m.season || "") + " " + (m.year || "") } : null;
+  }
   function karteUmhuellen() {
     const alt = root.karte;
     if (typeof alt !== "function" || alt.__pf) return;
@@ -263,6 +416,7 @@
           const k = kasten({
             frage: [it.groupIntro, it.prompt].filter(Boolean).join("\n"),
             loesung: it.solution.text, punkte: it.maxPoints,
+            gruppe: gruppeIhk(it),
             antwort: () => {
               if (typeof ANSWERS === "undefined") return "";
               const teile = [ANSWERS[it.k] || ""];
@@ -283,7 +437,8 @@
 
   function einhaengen() { karteUmhuellen(); }
 
-  const api = { operatorVon, anzahlVon, punkteIn, stichworte, analyse, prompt, kasten, OPERATOREN };
+  const api = { operatorVon, anzahlVon, punkteIn, stichworte, analyse, prompt, kasten, OPERATOREN,
+                pruefeLink, modus, setzeModus, chatVon, setzeChat, gruppeIhk, MODI };
   root.GENPRUEFEN = api;
   if (typeof module === "object" && module.exports) module.exports = api;
   if (hatDom) {

@@ -1171,6 +1171,7 @@
       try {
         box.appendChild(root.GENPRUEFEN.kasten({
           frage: t.text, loesung: t.loesung, hinweis: t.hinweis, punkte: t.punkte,
+          gruppe: { id: "az:" + m.id, name: m.virtuell ? "Prognose-Prüfung " + m.nr : "Azubi-Navigator " + m.kurz },
           antwort: () => {
             const a = z.a[t.id] || {};
             return Object.keys(a).filter(k => k[0] === "t" || k === "rw").map(k => a[k]).filter(Boolean).join("\n");

@@ -248,6 +248,12 @@
   - **три Prognose-Prüfungen по 100 BE / 90 мин**: каждая Teilaufgabe — настоящая задача из IHK (10 экзаменов) или Azubi-Navigator, перемешаны по прогнозу; текст слегка изменён (другая фирма, другие числа — решения пересчитаны, переформулировано), вопрос, формат ответа и баллы как в оригинале; под решением «Vorlage: …»; из лицензионного Azubi-текста ничего не скопировано;
   - идут в бланке Azubi-Navigator (Übung/Prüfung, часы, сохранение, автопроверка чисел, Auswertung, «Fehler wiederholen», синхронизация `ihk2:azubi:azprog1–3`) и **не требуют пакета Azubi**; одну Aufgabe можно решать отдельно без часов;
   - на главной — блок «Themen-Radar & Prognose-Prüfungen» первым в «Prüfen & simulieren», поиск находит «Themen-Radar» и «Prognose-Prüfung 1–3»; обновление кэша Service Worker до `ihk-ap1-v36-app`.
+- **«Mit Claude prüfen»: куда отправлять** (`gen/pruefen.js`, `gen/pruefen.css`, `gen/azubi.js`, `gen/satzbau.js`, `gen/wiederholen.js`, `gen/sync.js`, `tests/pruefen.test.js`, `tests/sync.test.js`, 25.09):
+  - под кнопкой три режима «Senden»: **Chat dieser Prüfung** (один чат Claude на экзамен), **Neuer Chat** (как было — каждый раз новый чат), **Nur kopieren** (только в буфер, окно не открывается); выбор хранится на устройстве (`ihk2:pruefen:ui`), по умолчанию: компьютер — «Chat dieser Prüfung», телефон — «Nur kopieren»;
+  - «Chat dieser Prüfung»: первый раз открывается новый чат; после отправки ссылку чата (claude.ai/chat/…) один раз вставить в поле или «Aus Zwischenablage» — дальше каждая задача этого экзамена открывает **этот же чат в том же табе** (без новых окон), текст короче: «Nächste Aufgabe aus …, bewerte wieder in derselben Form»; «Link ändern», «Neuen Chat beginnen»;
+  - группы: каждый экзамен IHK, каждый модуль Azubi, каждая Prognose-Prüfung, Kurzfragen, Fehler wiederholen; ссылки едут в синхронизацию (`ihk2:pruefen:chats`), режим — нет;
+  - вставить текст в чат автоматически веб-страница не может (claude.ai этого не разрешает) — остаётся Strg+V и «Senden»; текст задачи собирается в момент нажатия, так что учитывается последняя версия ответа;
+  - обновление кэша Service Worker до `ihk-ap1-v37-app`.
 
 
 ## Чего не хватает

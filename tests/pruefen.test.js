@@ -58,6 +58,24 @@ const t = P.prompt({ frage: "Nennen Sie zwei Vorteile.", loesung: "schnell, gün
 ["AUFGABE (2 Punkte", "MUSTERLÖSUNG", "BEWERTUNGSHINWEIS", "MEINE ANTWORT", "einfachen deutschen Sätzen", "russische Übersetzung"].forEach(s =>
   assert(t.includes(s), "fehlt im Prompt: " + s));
 
+/* Ein Chat je Prüfung: erster Text kündigt weitere Aufgaben an, danach kurzer Kopf */
+const t1 = P.prompt({ frage: "Nennen Sie zwei Vorteile.", loesung: "x", punkte: 2, antwort: "y", gruppe: "IHK Frühjahr 2024" });
+assert(t1.includes("Du bist Prüfer") && t1.includes("nacheinander mehrere Aufgaben aus „IHK Frühjahr 2024“"), "erster Text");
+const t2 = P.prompt({ frage: "Nennen Sie zwei Vorteile.", loesung: "x", hinweis: "h", punkte: 2, antwort: "y", gruppe: "IHK Frühjahr 2024", folge: true });
+assert(!t2.includes("Du bist Prüfer") && t2.startsWith("Nächste Aufgabe aus „IHK Frühjahr 2024“"), "Folgetext kurz");
+["AUFGABE (2 Punkte", "MUSTERLÖSUNG", "BEWERTUNGSHINWEIS", "MEINE ANTWORT:\ny"].forEach(s => assert(t2.includes(s), "Folgetext: " + s));
+assert(t2.length < t1.length, "Folgetext kürzer");
+
+/* Nur echte Chat-Links werden gespeichert */
+assert.strictEqual(P.pruefeLink(" https://claude.ai/chat/0f3a9c1e-2b44-4d1a-9e77-12ab34cd56ef "), "https://claude.ai/chat/0f3a9c1e-2b44-4d1a-9e77-12ab34cd56ef");
+assert.strictEqual(P.pruefeLink("https://claude.ai/chat/0f3a9c1e-2b44-4d1a?x=1"), "https://claude.ai/chat/0f3a9c1e-2b44-4d1a");
+assert.strictEqual(P.pruefeLink("https://claude.ai/new"), null);
+assert.strictEqual(P.pruefeLink("https://evil.example/chat/0f3a9c1e2b44"), null);
+assert.strictEqual(P.pruefeLink("javascript:alert(1)"), null);
+assert(P.MODI.map(m => m[0]).join() === "pruefung,neu,kopieren");
+assert.strictEqual(P.modus(), "pruefung", "Computer ohne Einstellung: Chat dieser Prüfung");
+assert.deepStrictEqual(P.gruppeIhk({ exam: { examId: "ap1-2024-f", meta: { season: "Frühjahr", year: 2024 } } }), { id: "ihk:ap1-2024-f", name: "IHK Frühjahr 2024" });
+
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 ["gen/pruefen.js", "gen/pruefen.css"].forEach(f => { assert(html.includes(f)); assert(sw.includes("./" + f)); });
