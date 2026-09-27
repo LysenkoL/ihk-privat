@@ -86,6 +86,23 @@
     return out;
   }
 
+  /* Je Eintrag gewinnt der zuletzt geänderte (Zeitstempel im Eintrag selbst):
+     „Fehler durchgehen“ (ihk2:analyse → k[id].t) und Papier-Fehler
+     (ihk2:papier → [id].geaendert). Sonst gewänne das ganze Objekt der
+     Seite, die zuletzt irgendetwas geändert hat.                          */
+  function jeEintrag(l, f, b, feld) {
+    const out = Object.assign({}, l);
+    Object.keys(f).forEach(id => {
+      const x = out[id], y = f[id];
+      if (!istObj(y)) return;
+      if (!istObj(x)) { out[id] = y; b.neu++; return; }
+      if (gleich(x, y)) return;
+      b.konflikt++;
+      if ((y[feld] || 0) > (x[feld] || 0)) { out[id] = y; b.geaendert++; }
+    });
+    return out;
+  }
+
   /* SQL-Trainer: je Aufgabe „gelöst“ bleibt gelöst, Versuche als Maximum,
      der zuletzt geschriebene Code gewinnt. */
   function sqlStand(l, f, fNeuer, b) {
@@ -171,6 +188,10 @@
       out = sqlStand(l, f, fNeuer, b);
     } else if (k === "ihk2:wieder" && istObj(l) && istObj(f)) {
       out = wiederholen(l, f, b);
+    } else if (k === "ihk2:analyse" && istObj(l) && istObj(f)) {
+      out = Object.assign({}, l, { k: jeEintrag(istObj(l.k) ? l.k : {}, istObj(f.k) ? f.k : {}, b, "t") });
+    } else if (k === "ihk2:papier" && istObj(l) && istObj(f)) {
+      out = jeEintrag(l, f, b, "geaendert");
     } else if (k === "ihk2:endspurt" && istObj(l) && istObj(f)) {
       const neuer = fNeuer ? f : l;
       out = Object.assign({}, fNeuer ? l : f, neuer);
@@ -208,6 +229,7 @@
     if (k === "ihk2:attempts" || k === "ihk2:archiv") return "Durchgänge und Archiv";
     if (k === "ihk2:wieder") return "Fehler wiederholen";
     if (k === "ihk2:analyse") return "Fehler durchgehen";
+    if (k === "ihk2:papier") return "Papier-Fehler";
     if (k === "ihk2:gen:satz" || k === "ihk2:satz:ein") return "Kurzfragen";
     if (k.indexOf("ihk2:gen:") === 0) return "Generator und Fehlerjournal";
     if (k === "ihk2:cards") return "Karteikarten";

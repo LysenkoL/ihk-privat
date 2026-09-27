@@ -270,6 +270,12 @@
   - Merkblatt начинается с «Was mir gefehlt hat»: по темам радара — термины, которых не хватило (из генератора — точные, из сверки со словами решения — только те, что знает глоссарий или технические), с русским из глоссария; перепутанные факты; суть решения текстовых задач (IHK, Azubi, Prognose) в 1–2 предложениях;
   - Merkblatt на телефоне больше не уменьшенный A4, а текст по ширине экрана (`dr-lesbar`), печать не изменилась;
   - Rechen-Sprint: 5 задач (IP, Kosten, Speicher/Übertragung, Nutzwert/Leasing, Strom) с новыми числами, из каждой области самый слабый шаблон, часы 0,9 мин/BE; Mini — 3 задачи; плитки «Rechen-Sprint» и «Merkblatt» на главной; обновление кэша Service Worker до `ihk-ap1-v40-app`.
+- **Fehler von Papier** (`gen/papier.js`, `gen/fehleranalyse.js`, `gen/fehleranalyse.css`, `gen/merkblatt.js`, `gen/endspurt.js`, `gen/sync.js`, `tests/papier.test.js`, 27.09):
+  - всё, что решено письменно, попадает в приложение: инструкция для Claude (фото → блоки `## FEHLER`), вставка текста или .md/.txt/.json, предпросмотр, «Übernehmen»; парсер терпим к Markdown и JSON, повторный ввод обновляет запись;
+  - в «Fehler durchgehen» — источник «Papier» первым; карточка: задание, Du ↔ Richtig, Fehlt / Weg damit, «Warum», Merksatz, Begriffe DE → RU; по `Ref` — оригинальная задача и Musterlösung; запись можно удалить;
+  - Merkblatt: Begriffe из Vokabeln с русским, суть решения с Merksatz; причины (Warum) считаются в «Was mir am häufigsten passiert»;
+  - синхронизация: `ihk2:papier` и `ihk2:analyse` сливаются по каждой записи (раньше у `ihk2:analyse` выигрывало всё более новое устройство целиком), «wieder offen» сохраняется, а не удаляется;
+  - Endspurt (версия плана 3): 28.09 «Nur Fehler: Papier einlesen und durchgehen» + Rechen-Sprint, 29.09 «Restliche Fehler, Merkblatt, Tasche»; «Fehler»-шаг открывает «Fehler durchgehen»; обновление кэша Service Worker до `ihk-ap1-v41-app`.
 
 
 ## Чего не хватает

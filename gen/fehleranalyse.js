@@ -336,6 +336,7 @@
      Einsammeln
      ====================================================================== */
   const ARTEN = {
+    papier: { name: "Papier", reihe: 0 },
     prognose: { name: "Prognose", reihe: 1 },
     ihk: { name: "IHK-Prüfungen", reihe: 2 },
     azubi: { name: "Azubi", reihe: 3 },
@@ -376,7 +377,48 @@
                    gruppe: { key: "gen", name: "Generator" } });
       });
     } catch (e) { console.error("Fehler durchgehen/Generator:", e); }
+    /* Papier: von Fotos über Claude eingelesen (gen/papier.js) — die aktuellsten Fehler, darum zuerst */
+    try {
+      const P = root.GENPAPIER;
+      if (P) P.alle().forEach(e => {
+        const blatt = String(e.quelle || "").split(/\s*[·|]\s*/)[0].trim() || "Papier";
+        const verlust = e.max != null && e.erreicht != null ? Math.max(0.5, e.max - e.erreicht) : 1;
+        out.push({ id: "pa:" + e.id, quelle: "papier", art: "papier", ref: e,
+                   titel: e.aufgabe ? ersterSatz(e.aufgabe, 120) : (e.thema || "Aufgabe von Papier"),
+                   wo: e.quelle || (e.thema ? "Papier · " + e.thema : "Papier"), verlust,
+                   erreicht: e.erreicht, max: e.max,
+                   gruppe: { key: "pa:" + blatt.toLowerCase(), name: "Papier · " + blatt } });
+      });
+    } catch (e) { console.error("Fehler durchgehen/Papier:", e); }
     return ordnen(out);
+  }
+
+  /** Kennung von Papier („p1-2c“, „ap1-2024-f:3b“) → Teil im Azubi-Bogen oder IHK-Aufgabe */
+  function refFinden(ref) {
+    const r = String(ref || "").trim().toLowerCase();
+    if (!r || r === "-") return null;
+    try {
+      const A = root.GENAZUBI;
+      const mods = A && A.alleModule ? A.alleModule() : [];
+      for (const m of mods) {
+        const t = A.teileVon(m).find(y => String(y.id).toLowerCase() === r);
+        if (t) return { art: "azubi", mid: m.id, tid: t.id };
+      }
+    } catch (e) { }
+    try {
+      if (typeof ALLE !== "undefined") {
+        const it = ALLE.find(x => String(x.k).toLowerCase() === r);
+        if (it) return { art: "ihk", it };
+      }
+    } catch (e) { }
+    return null;
+  }
+
+  function zeilenPapier(e) {
+    const hatP = e.max != null && e.erreicht != null;
+    const st = hatP ? (e.erreicht <= 0 ? "falsch" : "teil") : "falsch";
+    return [zeile({ typ: "papier", label: "Deine Antwort", be: hatP ? e.max : null, punkte: hatP ? e.erreicht : null, status: e.meine ? st : "leer",
+                    du: e.meine, richtig: e.richtig, fehlt: e.fehlt || [], weg: e.falsch || [], hinweis: e.warum ? "Warum: " + e.warum : "" })];
   }
 
   /** Gruppen in fester Reihenfolge (Prognose, IHK, Azubi, Generator), darin wie gesammelt */
@@ -398,7 +440,8 @@
 
   function setzen(x, wert) {
     const F = root.GENFEHLER;
-    if (wert === "offen") delete S.k[x.id];
+    /* „offen“ wird gespeichert, nicht gelöscht — sonst holt der Abgleich den alten Stand zurück */
+    if (wert === "offen") S.k[x.id] = { s: "offen", t: Date.now() };
     else if (wert === "sitzt") S.k[x.id] = { s: "sitzt", t: Date.now() };
     else if (wert === "morgen") S.k[x.id] = { s: "morgen", f: morgenIso(), t: Date.now() };
     sichern();
@@ -574,6 +617,12 @@
 
   /** Fehlerkarte ohne Seite aufbauen: Zeilen, Aufgabentext, Thema */
   function zeilenFuer(x) {
+    if (x.quelle === "papier") {
+      const e = x.ref;
+      return { zeilen: zeilenPapier(e), text: [e.thema, e.quelle, e.aufgabe].join(" "), thema: e.thema || "",
+               kern: kernsatz(e.richtig) + (e.merksatz ? " Merke: " + e.merksatz : ""), kernFrage: ersterSatz(e.aufgabe || e.quelle, 160),
+               vokabeln: e.vokabeln || [] };
+    }
     if (x.quelle === "gen") {
       const d = detailGen(x);
       if (d.fehler) return null;
@@ -616,8 +665,17 @@
       if (!frage || !richtig || NUR_ZAHL.test(richtig) || fakten.some(f => f.frage === frage)) return;
       fakten.push({ frage: frage.length > 160 ? frage.slice(0, 157) + "…" : frage, richtig, art: art || "fakt" });
     };
+    (d.vokabeln || []).forEach(v => {
+      if (!v.de || begriffe.some(b => normS(b.de) === normS(v.de))) return;
+      begriffe.push({ de: v.de, ru: v.ru || uebersetze(v.de) });
+    });
     d.zeilen.forEach(z => {
       if (z.status === "richtig") return;
+      if (z.typ === "papier") {
+        /* kurze Begriffe (höchstens drei Wörter, großgeschrieben) — Sätze stehen im Kern */
+        z.fehlt.filter(b => b.split(/\s+/).length <= 3 && /^[A-ZÄÖÜ0-9]/.test(b)).forEach(b => neuB(b, true));
+        return;
+      }
       if ((z.typ === "text" || z.typ === "liste") && z.status !== "leer") z.fehlt.forEach(b => neuB(b, true));
       else if ((z.typ === "text" || z.typ === "liste") && z.status === "leer") (z.fehlt.length ? z.fehlt : String(z.richtig).split(" · ")).slice(0, 4).forEach(b => neuB(b, true));
       else if (z.typ === "abgleich") z.fehlt.forEach(b => neuB(b, false));
@@ -629,7 +687,7 @@
       });
     });
     /* Textaufgabe (IHK, Azubi, Prognose): der Kern der Musterlösung in einem Satz */
-    if (d.kern && d.zeilen.some(z => z.frei && z.typ !== "rechenweg" && z.status !== "richtig")) neuF(d.kernFrage, d.kern, "kern");
+    if (d.kern && d.zeilen.some(z => (z.frei || z.typ === "papier") && z.typ !== "rechenweg" && z.status !== "richtig")) neuF(d.kernFrage, d.kern, "kern");
     return { text: d.text, thema: d.thema, begriffe, fakten };
   }
 
@@ -671,7 +729,7 @@
   let UI = Object.assign({ filter: "alle" }, lies(SK_UI, {}));
   let herkunft = "scStart";
 
-  const QNAME = { prognose: "Prognose", ihk: "IHK-Prüfung", azubi: "Azubi", gen: "Generator" };
+  const QNAME = { papier: "Papier", prognose: "Prognose", ihk: "IHK-Prüfung", azubi: "Azubi", gen: "Generator" };
   const ICON = { richtig: "✓", teil: "◐", falsch: "✗", leer: "○", offen: "✎", info: "i" };
   const fmtP = n => String(Math.round((n || 0) * 10) / 10).replace(".", ",");
 
@@ -798,17 +856,32 @@
     st.appendChild(los);
     kopf.appendChild(st);
     if (z.offen) kopf.appendChild(el("p", "fa-klein", "≈ 2–3 Minuten je Fehler. Du kannst jederzeit aufhören — was du entschieden hast, bleibt gespeichert."));
+    if (root.GENPAPIER) {
+      const pz = ITEMS.filter(x => x.art === "papier").length;
+      const pk = el("button", "btn fa-papier-k", (UI.papierAuf ? "▾ " : "＋ ") + "Fehler von Papier hinzufügen" + (pz ? " (" + pz + " da)" : ""));
+      pk.type = "button";
+      pk.onclick = () => { UI.papierAuf = !UI.papierAuf; schreib(SK_UI, UI); zeichnen(); };
+      kopf.appendChild(pk);
+    }
     if (root.GENMERKBLATT && ITEMS.length) {
       const mb = el("button", "fa-link", "Merkblatt: was mir gefehlt hat (Begriffe DE → RU, A4)");
       mb.type = "button"; mb.onclick = () => root.GENMERKBLATT.zeigen();
       kopf.appendChild(mb);
     }
     box.appendChild(kopf);
+    if (root.GENPAPIER && (UI.papierAuf || !ITEMS.length)) {
+      const pk = el("div", "fa-karte");
+      pk.appendChild(root.GENPAPIER.kasten(n => {
+        UI.papierAuf = false; UI.filter = "alle"; schreib(SK_UI, UI);
+        ITEMS = sammeln(); zeichnen(); root.scrollTo(0, 0);
+      }));
+      box.appendChild(pk);
+    }
 
     if (!ITEMS.length) {
       const k = el("div", "fa-karte");
       k.appendChild(el("p", "fa-sub", "Noch keine Fehler mit gespeicherter Antwort. Sobald du in einer Prognose-Prüfung, im Azubi-Navigator, " +
-        "in einer echten Prüfung oder auf einem Arbeitsblatt Punkte verlierst, stehen sie hier."));
+        "in einer echten Prüfung oder auf einem Arbeitsblatt Punkte verlierst, stehen sie hier — Fehler von Papier holst du oben herein."));
       box.appendChild(k);
       return;
     }
@@ -879,7 +952,7 @@
 
   function zeileEl(z) {
     const kurz = z.status === "richtig" && !z.sub && !z.fehlt.length && !z.weg.length;
-    const d = el("div", "fa-z st-" + z.status + (kurz ? " kurz" : ""));
+    const d = el("div", "fa-z st-" + z.status + (kurz ? " kurz" : "") + (z.typ ? " t-" + z.typ : ""));
     const k = el("div", "fa-z-kopf");
     k.appendChild(el("span", "fa-ic", ICON[z.status] || "?"));
     k.appendChild(el("b", "fa-z-label", z.label || "Antwort"));
@@ -977,7 +1050,77 @@
     }
   }
 
+  function detailPapier(x) {
+    const e = x.ref;
+    const d = { zeilen: zeilenPapier(e), orig: null, origItem: null };
+    const r = refFinden(e.ref);
+    if (r && r.art === "azubi") {
+      const A = root.GENAZUBI;
+      d.orig = A && A.ansicht ? A.ansicht(r.mid, r.tid) : null;
+      d.origItem = { quelle: "azubi", ref: { mid: r.mid, tid: r.tid } };
+    } else if (r && r.art === "ihk") {
+      d.origIhk = r.it;
+      d.orig = true;
+      d.origItem = { quelle: "ihk", ref: r.it };
+    }
+    return d;
+  }
+
+  function aufgabePapier(inn, e, det) {
+    if (e.aufgabe) inn.appendChild(el("div", "fa-text", e.aufgabe));
+    else inn.appendChild(el("p", "fa-sub", "Die Aufgabe steht auf deinem Blatt."));
+    if (e.thema) inn.appendChild(el("p", "fa-klein", "Thema: " + e.thema));
+    if (det.orig && det.orig.frage) {
+      const d = el("details", "fa-orig");
+      d.appendChild(el("summary", null, "Originalaufgabe"));
+      d.appendChild(det.orig.frage);
+      inn.appendChild(d);
+    } else if (det.origIhk) {
+      const d = el("details", "fa-orig");
+      d.appendChild(el("summary", null, "Originalaufgabe"));
+      const box = el("div");
+      aufgabeIhk(box, det.origIhk);
+      d.appendChild(box);
+      inn.appendChild(d);
+    }
+  }
+
+  function loesungPapier(lo, e, det) {
+    /* „Richtig“ steht schon oben neben deiner Antwort — hier nur, was hängen bleiben soll */
+    const h = lo.querySelector("h4"); if (h) h.textContent = "Zum Merken";
+    if (e.merksatz) {
+      const m = el("div", "fa-merk"); m.appendChild(el("b", null, "Merksatz: ")); m.appendChild(document.createTextNode(e.merksatz));
+      lo.appendChild(m);
+    }
+    if ((e.vokabeln || []).length) {
+      const v = el("div", "fa-vok");
+      v.appendChild(el("b", null, "Begriffe"));
+      const ul = el("ul");
+      e.vokabeln.forEach(x => {
+        const li = el("li");
+        li.appendChild(el("b", null, x.de));
+        if (x.ru) li.appendChild(el("span", null, " — " + x.ru));
+        ul.appendChild(li);
+      });
+      v.appendChild(ul);
+      lo.appendChild(v);
+    }
+    if (det.orig && det.orig.loesung) {
+      const d = el("details", "fa-orig");
+      d.appendChild(el("summary", null, "Musterlösung im Original"));
+      d.appendChild(det.orig.loesung);
+      lo.appendChild(d);
+    } else if (det.origIhk && det.origIhk.solution && det.origIhk.solution.text) {
+      const d = el("details", "fa-orig");
+      d.appendChild(el("summary", null, "Musterlösung im Original"));
+      d.appendChild(el("div", "fa-text", det.origIhk.solution.text));
+      lo.appendChild(d);
+    }
+    lo.appendChild(el("p", "fa-klein", "Von Claude aus deinem Foto erstellt — bei Zweifeln die Musterlösung im Original ansehen."));
+  }
+
   function originalOeffnen(x) {
+    if (!x) return;
     if (x.quelle === "ihk") {
       if (typeof root.oeffnePruefung === "function") {
         root.oeffnePruefung(x.ref.exam);
@@ -1044,7 +1187,7 @@
 
     let det = null;
     try {
-      det = x.quelle === "gen" ? detailGen(x) : (x.quelle === "ihk" ? detailIhk(x) : detailAzubi(x));
+      det = x.quelle === "gen" ? detailGen(x) : (x.quelle === "ihk" ? detailIhk(x) : (x.quelle === "papier" ? detailPapier(x) : detailAzubi(x)));
     } catch (e) {
       console.error("Fehler durchgehen:", e);
       det = { fehler: "Diese Aufgabe konnte nicht aufgebaut werden." };
@@ -1064,6 +1207,7 @@
       auf.d.addEventListener("toggle", () => { UI.aufZu = !auf.d.open; schreib(SK_UI, UI); });
       if (x.quelle === "gen") aufgabeGen(auf.inn, det.a);
       else if (x.quelle === "ihk") aufgabeIhk(auf.inn, x.ref);
+      else if (x.quelle === "papier") aufgabePapier(auf.inn, x.ref, det);
       else auf.inn.appendChild(det.v.frage);
       k.appendChild(auf.d);
 
@@ -1102,6 +1246,8 @@
           b.type = "button"; b.onclick = () => root.zeigeLupe(it.solution.image);
           lo.appendChild(b);
         }
+      } else if (x.quelle === "papier") {
+        loesungPapier(lo, x.ref, det);
       } else {
         lo.appendChild(det.v.loesung);
       }
@@ -1139,9 +1285,24 @@
     }
 
     const links = el("div", "fa-links");
-    const orig = el("button", "fa-link", x.quelle === "gen" ? "Dieselbe Aufgabe neu rechnen" : "Im Original öffnen");
-    orig.type = "button"; orig.onclick = () => originalOeffnen(x);
-    links.appendChild(orig);
+    if (x.quelle !== "papier" || (det && det.orig)) {
+      const orig = el("button", "fa-link", x.quelle === "gen" ? "Dieselbe Aufgabe neu rechnen" : "Im Original öffnen");
+      orig.type = "button"; orig.onclick = () => originalOeffnen(x.quelle === "papier" ? det.origItem : x);
+      links.appendChild(orig);
+    }
+    if (x.quelle === "papier" && root.GENPAPIER) {
+      const weg = el("button", "fa-link", "Eintrag löschen");
+      weg.type = "button";
+      weg.onclick = () => {
+        if (!confirm("Diesen Papier-Fehler löschen?")) return;
+        root.GENPAPIER.entfernen(x.ref.id);
+        ITEMS = sammeln();
+        LAUF.ids.splice(LAUF.i, 1);
+        if (LAUF.i >= LAUF.ids.length) VIEW = "ende";
+        zeichnen(); root.scrollTo(0, 0);
+      };
+      links.appendChild(weg);
+    }
     if (x.quelle === "gen" && root.GENUI) {
       const typ = el("button", "fa-link", "Diesen Typ mit neuen Zahlen üben");
       typ.type = "button";
@@ -1204,7 +1365,7 @@
     const L = sammeln();
     const z = zaehlen(L);
     b.appendChild(el("p", null, "Einer nach dem anderen: Aufgabe, deine Antwort, was richtig ist, was fehlt — dann „sitzt“ oder „morgen nochmal“. " +
-      "Aus Prognose-Prüfungen, Azubi-Navigator, echten Prüfungen und Generator."));
+      "Aus Papier (Fotos über Claude), Prognose-Prüfungen, Azubi-Navigator, echten Prüfungen und Generator."));
     const reihe = el("div", "fa-fakten");
     [[z.offen, "offen", z.offen ? "rot" : ""], [z.sitzt, "sitzen", z.sitzt ? "gruen" : ""], ["−" + fmtP(z.verlust), "Punkte offen", ""]].forEach(([n, t, c]) => {
       const f = el("div", "fa-fakt" + (c ? " " + c : "")); f.appendChild(el("b", null, String(n))); f.appendChild(el("span", null, t)); reihe.appendChild(f);
@@ -1270,7 +1431,7 @@
 
   const api = {
     oeffnen, startBlock, sammeln, ordnen, zaehlen, statusVon, setzen,
-    zeilenGen, zeilenAzubi, abgleich, klar, genEingaben, morgenIso, sollZahl, lernpunkte, lernzettel, uebersetze,
+    zeilenGen, zeilenAzubi, zeilenPapier, refFinden, abgleich, klar, genEingaben, morgenIso, sollZahl, lernpunkte, lernzettel, uebersetze,
     get S() { return S; }, setzeStand(neu) { S = Object.assign({ k: {} }, neu || {}); sichern(); }
   };
   root.GENANALYSE = api;

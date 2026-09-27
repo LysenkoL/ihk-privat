@@ -68,7 +68,8 @@ window.GENENDSPURT = (function () {
   function tageBis() { return Math.max(0, Math.round((tag0(TERMIN) - tag0(new Date())) / 864e5)); }
 
   /* ------------------------------------------------------------ Speicher */
-  const PLAN_VERSION = 2;
+  /* 3 (v41): die letzten zwei Tage sind reine Fehlerarbeit (Papier + Fehler durchgehen) */
+  const PLAN_VERSION = 3;
   let S = { gebaut: null, tage: [], erledigt: {}, planOffen: false };
   try { Object.assign(S, JSON.parse(localStorage.getItem(SK)) || {}); } catch (e) { }
   /* Plan aus einer älteren Fassung: einmal neu bauen, Haken bleiben */
@@ -151,7 +152,7 @@ window.GENENDSPURT = (function () {
     return q.length ? q[0] : null;
   }
 
-  const FEHLER = { art: "fehler", titel: "15 Min. Fehler wiederholen" };
+  const FEHLER = { art: "fehler", titel: "15 Min. Fehler durchgehen" };
 
   /* -------------------------------------------------------------- Bauen --- */
   function bauen() {
@@ -229,18 +230,19 @@ window.GENENDSPURT = (function () {
                  "einmal durchblättern, dann mit der Aufgabe anfangen, die am leichtesten " +
                  "aussieht — nicht mit Nummer 1.";
       } else if (rest === 1) {
-        e.art = "ruhe"; e.minuten = 45;
-        e.titel = "Formelblatt, Tasche, 15 Min. Fehler";
-        e.text = "Einmal das Formelblatt laut durchgehen, Merkblatt danebenlegen, die heute fälligen " +
-                 "Fehler wiederholen, Tasche packen, Wecker stellen. Danach Schluss — der Abend vorher " +
-                 "bringt keine Punkte mehr, aber schlechter Schlaf kostet welche.";
-        e.zusatz = FEHLER;
+        e.art = "fehler"; e.minuten = 60;
+        e.titel = "Restliche Fehler, Merkblatt, Tasche";
+        e.text = "Nur noch, was offen ist oder auf „Nochmal morgen“ steht. Dann das Merkblatt lesen " +
+                 "(was mir gefehlt hat), Formelblatt einmal durchgehen, Tasche packen, Wecker stellen. " +
+                 "Danach Schluss — schlechter Schlaf kostet mehr Punkte als eine Stunde Lernen bringt.";
+        e.zusatz = { art: "merkblatt", titel: "Merkblatt" };
       } else if (rest === 2) {
-        e.art = "fehler"; e.minuten = 45;
-        e.titel = "Alle Fehler der Woche wiederholen";
-        e.text = "Nichts Neues mehr. „Fehler wiederholen“ abarbeiten, bis für heute nichts mehr fällig ist — " +
-                 "das sind genau die Punkte, die du in dieser Woche liegen gelassen hast. Danach Rechenaufgaben quer.";
-        e.zusatz = { art: "rechnen", titel: "Rechenaufgaben quer" };
+        e.art = "fehler"; e.minuten = 120;
+        e.titel = "Nur Fehler: Papier einlesen und durchgehen";
+        e.text = "Nichts Neues mehr. Fotos deiner Blätter an Claude, die Antwort unter „Fehler durchgehen → " +
+                 "Fehler von Papier hinzufügen“ einlesen. Dann jeden Fehler einzeln: deine Antwort ↔ richtig, " +
+                 "was fehlt — „Sitzt“ oder „Nochmal morgen“. Danach ein Rechen-Sprint.";
+        e.zusatz = { art: "sprint", titel: "Rechen-Sprint" };
       } else if (rest === 3) {
         e.art = "rechnen"; e.minuten = 45;
         e.titel = "Rechenaufgaben quer durch alle Prüfungen";
@@ -301,7 +303,17 @@ window.GENENDSPURT = (function () {
       return;
     }
     if (t.art === "fehler") {
-      if (window.GENWIEDER) window.GENWIEDER.starten();
+      /* Fehler durchgehen: jede Quelle, auch Papier — sonst Fehler wiederholen */
+      if (window.GENANALYSE) window.GENANALYSE.oeffnen();
+      else if (window.GENWIEDER) window.GENWIEDER.starten();
+      return;
+    }
+    if (t.art === "sprint") {
+      if (window.GENSPRINT) window.GENSPRINT.starten(5);
+      return;
+    }
+    if (t.art === "merkblatt") {
+      if (window.GENMERKBLATT) window.GENMERKBLATT.zeigen();
       return;
     }
     if (t.art === "sim") {

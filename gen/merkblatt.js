@@ -76,6 +76,22 @@ window.GENMERKBLATT = (function () {
       .sort((a, b) => b.n - a.n);
     let offen = 0;
     try { offen = F.liste().filter(x => !x.erledigt).length; } catch (e) { }
+    /* Papier-Fehler (gen/papier.js) zählen mit — Claude hat den Grund schon genannt */
+    try {
+      const P = window.GENPAPIER;
+      if (P) {
+        const alle = P.alle();
+        alle.forEach(e => {
+          v.gesamt = (v.gesamt || 0) + 1;
+          if (e.max != null && e.erreicht != null) v.verloren = Math.round(((v.verloren || 0) + Math.max(0, e.max - e.erreicht)) * 10) / 10;
+          if (!e.grund) return;
+          const z = zeilen.find(x => x.key === e.grund);
+          if (z) z.n++;
+          else { const g = (F.GRUENDE || []).find(x => x.key === e.grund); if (g) zeilen.push({ key: g.key, lang: g.lang, rat: g.rat, n: 1 }); }
+        });
+        zeilen.sort((a, b) => b.n - a.n);
+      }
+    } catch (e) { }
     return { zeilen, gesamt: v.gesamt || 0, verloren: v.verloren || 0, offen };
   }
 
@@ -201,7 +217,7 @@ window.GENMERKBLATT = (function () {
     kopf.appendChild(el("h1", null, "Mein Merkblatt"));
     kopf.appendChild(el("div", "dr-klein",
       fa.gesamt
-        ? "Aus " + fa.gesamt + " Fehlern der letzten 30 Tage — dabei sind " +
+        ? "Aus " + (fa.gesamt === 1 ? "einem Fehler" : fa.gesamt + " Fehlern") + " der letzten 30 Tage — dabei sind " +
           fa.verloren + " BE liegen geblieben. Fast nichts davon war fehlendes Wissen."
         : "Noch keine Fehler im Journal. Die Regeln unten gelten trotzdem — sie kosten " +
           "in jeder Prüfung zweistellige Punktzahlen."));
@@ -214,7 +230,7 @@ window.GENMERKBLATT = (function () {
       const hin = el("div", "fo-block mb-kopf");
       hin.appendChild(el("h3", null, "Was mir gefehlt hat"));
       const z = el("div", "fo-zeile");
-      z.appendChild(el("div", "fo-h", "Aus deinen Fehlern mit gespeicherter Antwort (Prognose, IHK, Azubi, Generator), " +
+      z.appendChild(el("div", "fo-h", "Aus deinen Fehlern (Papier, Prognose, IHK, Azubi, Generator), " +
         "nach Themen — wahrscheinlichstes zuerst. Russisch steht dabei, wenn das Glossar den Begriff kennt."));
       hin.appendChild(z);
       sp.appendChild(hin);
