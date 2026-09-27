@@ -207,6 +207,7 @@
     if (k === "ihk2:answers" || k === "ihk2:scores" || k === "ihk2:timer") return "Prüfungen (Antworten, Punkte)";
     if (k === "ihk2:attempts" || k === "ihk2:archiv") return "Durchgänge und Archiv";
     if (k === "ihk2:wieder") return "Fehler wiederholen";
+    if (k === "ihk2:analyse") return "Fehler durchgehen";
     if (k === "ihk2:gen:satz" || k === "ihk2:satz:ein") return "Kurzfragen";
     if (k.indexOf("ihk2:gen:") === 0) return "Generator und Fehlerjournal";
     if (k === "ihk2:cards") return "Karteikarten";

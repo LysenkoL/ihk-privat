@@ -130,7 +130,9 @@ window.GENFINDER = (function () {
       }, "rechnen rechenaufgaben kalkulation"],
       ["Fehler wiederholen", "alle Punktverluste · heute fällige zuerst", "wieder",
         () => window.GENWIEDER && window.GENWIEDER.starten(), "fehler wiederholen wiederholung nochmal falsch"],
-      ["Fehlerjournal", "Fehler einordnen", "journal", () => {
+      ["Fehler durchgehen", "einer nach dem anderen · deine Antwort ↔ richtig · was fehlt", "journal",
+        () => window.GENANALYSE && window.GENANALYSE.oeffnen(), "fehler durchgehen analyse antwort richtig vergleich fehlt sitzt"],
+      ["Fehlerjournal", "Überblick und Fehlergründe", "journal", () => {
         G() && G().oeffneBlock("blatt", "fehlerBox");
       }, "fehler journal fehlerjournal"],
       ["Spickzettel öffnen", "Verzeichnis der 20 Kapitel", "spick", () => {

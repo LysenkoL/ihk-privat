@@ -57,6 +57,20 @@ window.GENFEHLER = (function () {
   }
 
   /* ------------------------------------------------------- Eintragen ---- */
+  /* Während „Fehler durchgehen“ (gen/fehleranalyse.js) eine alte Aufgabe
+     nachprüft, wird nichts eingetragen — sonst rutscht der Eintrag mit neuer
+     Uhrzeit nach oben.                                                     */
+  let STILL = 0;
+  function still(fn) { STILL++; try { return fn(); } finally { STILL--; } }
+
+  /** Eingaben für später aufheben — aber nicht beliebig groß */
+  function eingabenKopie(ein) {
+    try {
+      const t = JSON.stringify(ein || {});
+      return t.length <= 6000 ? JSON.parse(t) : null;
+    } catch (e) { return null; }
+  }
+
   function merken(e) {
     if (!e || !e.schluessel) return;
     const i = LISTE.findIndex(x => x.schluessel === e.schluessel);
@@ -112,6 +126,9 @@ window.GENFEHLER = (function () {
       zeit: Date.now(),
       quelle: "gen",
       vorlageId: aufgabe.vorlageId,
+      saat: aufgabe.saat,
+      /* alle Eingaben — damit „Fehler durchgehen“ jedes Feld zeigen kann */
+      eingaben: eingabenKopie(erg.eingaben),
       titel: aufgabe.titel,
       thema: aufgabe.themaLabel,
       feld: feldText,
@@ -158,6 +175,22 @@ window.GENFEHLER = (function () {
     });
   }
 
+  /** abhaken (true) oder wieder öffnen (false) — von „Fehler durchgehen“ */
+  function abhaken(schluessel, wert) {
+    const x = LISTE.find(y => y.schluessel === schluessel);
+    if (!x || !!x.erledigt === !!wert) return false;
+    x.erledigt = !!wert;
+    schreib(LISTE);
+    return true;
+  }
+  function grundSetzen(schluessel, grund) {
+    const x = LISTE.find(y => y.schluessel === schluessel);
+    if (!x) return false;
+    x.grund = grund || null;
+    schreib(LISTE);
+    return true;
+  }
+
   /* ------------------------------------------------------- Auswertung --- */
   function offen() { return LISTE.filter(x => !x.erledigt); }
 
@@ -176,6 +209,17 @@ window.GENFEHLER = (function () {
   }
 
   /* ----------------------------------------------------------- Anzeige -- */
+  /*
+     Die Liste war unlesbar: je Fehler Kürzel, sechs Knöpfe, Hinweis und Rat
+     übereinander. Jetzt steht hier nur noch der Überblick — eine Zeile je
+     Fehler. Ein Tipp darauf öffnet „Fehler durchgehen“ (gen/fehleranalyse.js):
+     ganze Aufgabe, deine Antwort ↔ richtig je Feld, Musterlösung, Einordnen.
+  */
+  const durchgehen = id => {
+    if (window.GENANALYSE) window.GENANALYSE.oeffnen(id ? { id } : null);
+  };
+  const idVon = x => x.quelle === "exam" ? "ihk:" + String(x.schluessel).slice(2) : "gen:" + x.schluessel;
+
   function box() {
     const ziel = $("genStartBox");
     if (!ziel) return;
@@ -191,23 +235,32 @@ window.GENFEHLER = (function () {
     k.hidden = false;
 
     const v = verteilung(21);
+    const nOffen = offen().length;
     const kopf = el("div", "fj-kopf");
     const links = el("div");
     links.appendChild(el("h3", null, "Fehlerjournal"));
     links.appendChild(el("p", null,
-      v.gesamt + " Fehler in den letzten 21 Tagen · " + window.GEN.fmt.kurz(v.verloren) +
-      " BE liegen gelassen. Ordne jeden Fehler mit einem Klick ein — danach siehst du, " +
-      "wie viel davon gar kein Wissensproblem ist."));
+      nOffen + " offen · " + window.GEN.fmt.kurz(v.verloren) + " BE liegen gelassen (21 Tage). " +
+      "Tippe einen Fehler an: Aufgabe, deine Antwort und die richtige Lösung nebeneinander."));
     kopf.appendChild(links);
+    const knoepfe = el("div", "fj-knoepfe");
+    if (window.GENANALYSE && nOffen) {
+      const los = el("button", "btn primary klein", "Fehler durchgehen →");
+      los.type = "button";
+      los.onclick = () => durchgehen(null);
+      knoepfe.appendChild(los);
+    }
     const leeren = el("button", "btn ghost klein", "Journal leeren");
+    leeren.type = "button";
     leeren.onclick = () => {
       if (!confirm("Alle " + LISTE.length + " Einträge löschen?")) return;
       LISTE = []; schreib(LISTE); box();
     };
-    kopf.appendChild(leeren);
+    knoepfe.appendChild(leeren);
+    kopf.appendChild(knoepfe);
     k.appendChild(kopf);
 
-    /* Balken je Grund */
+    /* Balken je Grund — eingeordnet wird jetzt im Durchgang („Warum daneben?“) */
     if (v.eingeordnet) {
       const bal = el("div", "fj-balken");
       const max = Math.max(...GRUENDE.map(g => v.zaehler[g.key] || 0), 1);
@@ -234,71 +287,43 @@ window.GENFEHLER = (function () {
         fazit.innerHTML = anteil >= 50
           ? "<b>" + anteil + " % deiner eingeordneten Fehler sind kein Wissensproblem.</b> " +
             "Das sind die Punkte, die am schnellsten zurückkommen: " +
-            GRUENDE.filter(g => g.key !== "gewusst" && v.zaehler[g.key])
-              .sort((a, b) => v.zaehler[b.key] - v.zaehler[a.key])[0].rat
+            esc(GRUENDE.filter(g => g.key !== "gewusst" && v.zaehler[g.key])
+              .sort((a, b) => v.zaehler[b.key] - v.zaehler[a.key])[0].rat)
           : "<b>" + Math.round(wissen / v.eingeordnet * 100) + " % sind echte Wissenslücken.</b> " +
             "Hier hilft nur Wiederholen — nimm dir die Themen aus der Liste unten vor.";
         k.appendChild(fazit);
       }
     }
 
-    /* Liste */
-    const liste = el("div", "fj-liste");
-    offen().slice(0, 14).forEach(x => liste.appendChild(zeile(x)));
+    /* Liste: eine Zeile je Fehler */
+    const MAXZ = 8;
+    const liste = el("ul", "fj-liste");
+    offen().slice(0, MAXZ).forEach(x => liste.appendChild(zeile(x)));
     k.appendChild(liste);
 
-    const rest = offen().length - 14;
-    if (rest > 0) k.appendChild(el("div", "fj-mehr", "… und " + rest + " weitere. Die ältesten " +
-      "verschwinden automatisch, sobald du sie abhakst."));
+    const rest = nOffen - MAXZ;
+    if (rest > 0) k.appendChild(el("div", "fj-mehr", "… und " + rest + " weitere — alle unter „Fehler durchgehen“."));
   }
 
   function zeile(x) {
-    const z = el("div", "fj-eintrag");
-    const kopf = el("div", "fj-ekopf");
+    const li = el("li");
+    const b = el("button", "fj-eintrag");
+    b.type = "button";
     const d = new Date(x.zeit);
-    kopf.appendChild(el("span", "fj-datum",
-      String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0")));
-    kopf.appendChild(el("span", "fj-titel", x.titel || ""));
-    kopf.appendChild(el("span", "fj-be",
-      window.GEN.fmt.kurz(x.erreicht || 0) + " / " + window.GEN.fmt.kurz(x.be || 0) + " BE"));
-    z.appendChild(kopf);
-
-    if (x.feld) z.appendChild(el("div", "fj-feld", x.feld));
-    if (x.meine || x.richtig) {
-      const v = el("div", "fj-vgl");
-      if (x.meine) v.innerHTML += '<span class="fj-du">du:</span> ' + esc(x.meine) + "  ";
-      if (x.richtig) v.innerHTML += '<span class="fj-soll">richtig:</span> ' + esc(x.richtig);
-      z.appendChild(v);
-    }
-    if (x.hinweis) z.appendChild(el("div", "fj-hinweis", x.hinweis));
-
-    const chips = el("div", "fj-chips");
-    GRUENDE.forEach(g => {
-      const b = el("button", "fj-chip" + (x.grund === g.key ? " an" : ""), g.kurz);
-      b.type = "button"; b.title = g.lang;
-      b.onclick = () => {
-        x.grund = (x.grund === g.key) ? null : g.key;
-        schreib(LISTE); box();
-      };
-      chips.appendChild(b);
-    });
-    z.appendChild(chips);
-
-    const wz = el("div", "fj-wz");
-    if (x.quelle === "gen" && x.vorlageId && window.GENUI) {
-      const u = el("button", "btn ghost klein", "↗ diesen Typ üben");
-      u.onclick = () => window.GENUI.erzeugeBlatt({ ids: [x.vorlageId], anzahl: 3, titel: x.titel + " — gezielt" });
-      wz.appendChild(u);
-    }
-    const ok = el("button", "btn ghost klein", "abhaken");
-    ok.onclick = () => { x.erledigt = true; schreib(LISTE); box(); };
-    wz.appendChild(ok);
-    if (x.grund) {
-      const rat = el("span", "fj-rat", gr(x.grund).rat);
-      wz.appendChild(rat);
-    }
-    z.appendChild(wz);
-    return z;
+    const t = el("span", "fj-et");
+    const oben = el("span", "fj-ekopf");
+    oben.appendChild(el("span", "fj-datum",
+      String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0") + "."));
+    oben.appendChild(el("span", "fj-titel", x.titel || ""));
+    t.appendChild(oben);
+    if (x.feld) t.appendChild(el("span", "fj-feld", x.feld));
+    b.appendChild(t);
+    const verlust = Math.max(0, (x.be || 0) - (x.erreicht || 0));
+    b.appendChild(el("span", "fj-be", "−" + window.GEN.fmt.kurz(verlust) + " BE"));
+    b.appendChild(el("span", "fj-pfeil", "›"));
+    b.onclick = () => durchgehen(idVon(x));
+    li.appendChild(b);
+    return li;
   }
 
   /* ------------------------------------------------------------ Einhängen */
@@ -310,7 +335,7 @@ window.GENFEHLER = (function () {
         const erg = alt.apply(this, arguments);
         try {
           erg.eingaben = eingaben || {};
-          ausGenerator(aufgabe, erg);
+          if (!STILL) ausGenerator(aufgabe, erg);
         } catch (e) { console.error("Fehlerjournal:", e); }
         return erg;
       };
@@ -322,7 +347,8 @@ window.GENFEHLER = (function () {
           Der Klick läuft zuerst durch den eigenen Handler von index.html,
           erst danach kommt er hier an — dann steht die Punktzahl schon.  */
     document.addEventListener("click", ev => {
-      const b = ev.target && ev.target.closest && ev.target.closest(".punkte-wahl button");
+      /* die kleine Skala im Rand UND die Zeile „Punkte geben“ unter der Antwort */
+      const b = ev.target && ev.target.closest && ev.target.closest(".punkte-wahl button, .pp-knopf");
       if (!b) return;
       setTimeout(() => {
         try {
@@ -354,7 +380,7 @@ window.GENFEHLER = (function () {
   else einhaengen();
 
   return {
-    GRUENDE, merken, ausGenerator, ausPruefung, verteilung, box,
+    GRUENDE, merken, ausGenerator, ausPruefung, verteilung, box, still, abhaken, grundSetzen,
     liste: () => LISTE.slice(),
     setzen: a => { LISTE = a || []; schreib(LISTE); }
   };

@@ -87,6 +87,9 @@ window.GENSTART = (function () {
       name: "Tempo — Sekunden je BE", info: "Wie schnell du pro Punkt bist",
       worte: "tempo zeit sekunden geschwindigkeit uhr" },
 
+    { key: "analyse", id: "analyseBox", gruppe: "ueben", ikon: "journal",
+      name: "Fehler durchgehen", info: "Einer nach dem anderen: deine Antwort ↔ richtig, was fehlt",
+      worte: "fehler durchgehen fehlerjournal journal analyse antwort richtig vergleich falsch fehlt sitzt nochmal morgen" },
     { key: "wieder", id: "wiederBox", gruppe: "ueben", ikon: "wieder",
       name: "Fehler wiederholen", info: "Alles, wo du Punkte verloren hast — heute fällig zuerst",
       worte: "fehler wiederholen wiederholung falsch verloren punkte nochmal schlange täglich spaced" },
@@ -170,6 +173,8 @@ window.GENSTART = (function () {
       z.letzteSim = b.find(x => x.pruefung) || null;   /* Liste ist neueste zuerst */
     } catch (e) { }
     try { z.fehlerOffen = window.GENFEHLER.liste().filter(x => !x.erledigt).length; } catch (e) { }
+    /* „Fehler durchgehen“ zählt alle Quellen (Prognose, IHK, Azubi, Generator) */
+    try { if (window.GENANALYSE) z.analyseOffen = window.GENANALYSE.zaehlen(window.GENANALYSE.sammeln()).offen; } catch (e) { }
     try { z.satzKarten = window.GENSATZ ? (window.SATZ_POOL || []).length : 0; } catch (e) { }
     try {
       const d = window.GENGESAMT.daten();
@@ -254,7 +259,14 @@ window.GENSTART = (function () {
       };
     }
     /* 3. Offene Fehler im Journal — die billigsten Punkte */
-    if (z.fehlerOffen >= 5) {
+    if (z.analyseOffen != null && z.analyseOffen >= 5) {
+      return {
+        titel: z.analyseOffen + " Fehler zum Durchgehen",
+        warum: "Je Fehler zwei Minuten: deine Antwort neben der richtigen — so kommen die Punkte am schnellsten zurück.",
+        knopf: "Fehler durchgehen", tun: journal
+      };
+    }
+    if (z.analyseOffen == null && z.fehlerOffen >= 5) {
       return {
         titel: z.fehlerOffen + " Fehler warten im Journal",
         warum: "Zehn Minuten einordnen zeigt dir, wie viele Punkte gar kein Wissensproblem sind.",
@@ -294,6 +306,7 @@ window.GENSTART = (function () {
     window.GENSIM.starten();
   }
   function journal() {
+    if (window.GENANALYSE) { window.GENANALYSE.oeffnen(); return; }
     oeffneBlock("blatt", "fehlerBox");
     if (!$("fehlerBox") || $("fehlerBox").hidden) window.toast && window.toast("Das Journal füllt sich, sobald du ein Arbeitsblatt prüfst.");
   }
@@ -649,7 +662,8 @@ window.GENSTART = (function () {
     kachel("Arbeitsblatt", z.vorlagen + " Aufgabentypen", assistent, "blatt");
     kachel("Simulation", z.letzteSim ? "zuletzt " + datum(z.letzteSim.erstellt) : "90 Minuten · 100 BE", simulation, "sim");
     kachel("Kurzfragen", z.satzKarten ? z.satzKarten + " Fragen · 5 Min." : "5 Minuten", satzbau, "satz");
-    kachel("Fehlerjournal", z.fehlerOffen ? z.fehlerOffen + " offen" : "nichts offen", journal, "journal", z.fehlerOffen >= 5);
+    if (z.analyseOffen != null) kachel("Fehler durchgehen", z.analyseOffen ? z.analyseOffen + " offen · Antwort ↔ richtig" : "nichts offen", journal, "journal", z.analyseOffen >= 5);
+    else kachel("Fehlerjournal", z.fehlerOffen ? z.fehlerOffen + " offen" : "nichts offen", journal, "journal", z.fehlerOffen >= 5);
     kachel("Formeln & Operatoren", "zum Ausdrucken", formeln, "formel");
     k.appendChild(g);
   }

@@ -544,6 +544,12 @@
     los.type = "button"; los.onclick = () => due ? starten() : listeZeigen();
     st.appendChild(los);
     if (due) { const li = el("button", "btn", "Liste"); li.type = "button"; li.onclick = listeZeigen; st.appendChild(li); }
+    if (root.GENANALYSE) {
+      const an = el("button", "btn ghost", "Antwort ↔ richtig ansehen");
+      an.type = "button"; an.title = "Fehler durchgehen: jeder Fehler einzeln mit deiner Antwort und der Lösung";
+      an.onclick = () => root.GENANALYSE.oeffnen();
+      st.appendChild(an);
+    }
     b.appendChild(st);
     const d = document.querySelector('details.st-block[data-key="wieder"] .st-zahl');
     if (d) d.textContent = due ? due + " fällig" : (L.length ? L.length + " in der Liste" : "");

@@ -1897,7 +1897,19 @@
       loesung.appendChild(h);
     }
     if (t.vorbild) loesung.appendChild(el("p", "az-vorlage", "Vorlage: " + t.vorbild));
-    return { m, t, aufgabe: a, titel: textAus(t.titel), frage, loesung };
+    /* Ausgangssituation des Bogens — für „Fehler durchgehen“ (zugeklappt) */
+    let situation = null;
+    if ((m.einleitung || []).length) {
+      situation = document.createDocumentFragment();
+      m.einleitung.forEach(e => {
+        const b = el("div", "az-text");
+        if (m.einleitung.length > 1 && e.titel) b.appendChild(el("h4", null, textAus(e.titel)));
+        htmlIn(b, e.html);
+        situation.appendChild(b);
+        (e.anlagen || []).forEach(an => situation.appendChild(anlage(an)));
+      });
+    }
+    return { m, t, aufgabe: a, titel: textAus(t.titel), frage, loesung, situation };
   }
 
   const api = {
