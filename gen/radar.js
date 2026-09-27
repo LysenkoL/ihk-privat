@@ -387,6 +387,19 @@
     PROG().forEach(m => pg.appendChild(pruefungsKarte(m)));
     box.appendChild(pg);
 
+    /* Rechen-Sprint (gen/sprint.js) */
+    if (root.GENSPRINT) {
+      kapitel(box, "Rechen-Sprint", "Rechnungen sind die sichersten Punkte. Fünf Aufgaben — IP-Adressen, Kosten, Speicher & Übertragung, " +
+        "Nutzwert & Leasing, Strom — jedes Mal mit neuen Zahlen, aus jedem Bereich die, in der du am schwächsten warst. Uhr mit Prüfungstempo.", "rdSprint");
+      const st = el("div", "rd-pk-knoepfe");
+      const b5 = el("button", "btn primary", "Rechen-Sprint · 5 Aufgaben");
+      b5.type = "button"; b5.onclick = () => root.GENSPRINT.starten(5);
+      const b3 = el("button", "btn", "Mini · 3 Aufgaben");
+      b3.type = "button"; b3.onclick = () => root.GENSPRINT.starten(3);
+      st.append(b5, b3);
+      box.appendChild(st);
+    }
+
     /* Prioritäten */
     const prio = index().fertig || root.GENAZUBI ? prioritaeten(L) : [];
     if (prio.length) {

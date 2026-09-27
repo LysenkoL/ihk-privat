@@ -181,6 +181,28 @@ input.dr-punkteingabe{ width:22mm; text-align:right; font-family:var(--data); fo
   .fo-spalten{column-count:2}
   #druckBogen .dr-formeln{font-size:9.5pt}
 }
+/* Merkblatt: „Was mir gefehlt hat“ (gen/merkblatt.js) */
+.mb-begriffe{font-weight:normal}
+.mb-b b{color:#111}
+#druckBogen .mb-ru{color:#1d4f8a; font-style:italic}
+@media screen{
+  #druckBogen.dr-lesbar{width:auto; max-width:210mm}
+}
+@media screen and (max-width:560px){
+  #druckBogen.dr-lesbar{margin:10px 6px; padding:16px 14px}
+  #druckBogen.dr-lesbar .dr-deckkopf h1{font-size:22px}
+  #druckBogen.dr-lesbar .dr-klein{font-size:13px}
+}
+.fo-f.mb-frage{font-weight:600}
+/* Auf dem Handy: eine Spalte, lesbare Schrift — gedruckt bleibt es A4 zweispaltig */
+@media screen and (max-width:560px){
+  .fo-spalten{column-count:1}
+  .fo-block h3{font-size:15px}
+  .fo-f{font-size:15px; line-height:1.4}
+  .fo-h{font-size:14.5px; line-height:1.5; padding-left:8px}
+  .fo-zeile{margin-bottom:8px}
+  .fo-block{margin-bottom:16px}
+}
 
 /* ---------- Rechenweg auf dem Prüfungsbogen ---------- */
 .dr-feld.dr-weg{border-left:2px solid #000; padding-left:7mm; margin-top:4mm}

@@ -112,7 +112,7 @@
       const r = ((erg && erg.felder) || []).find(x => x.nr === f.nr) || { status: "leer", punkte: 0, gefunden: [], fehlt: [], text: "" };
       const v = ein[f.nr];
       const s = v == null ? "" : (typeof v === "string" ? v.trim() : v);
-      const z = zeile({ label: f.label || "", be: f.be, punkte: r.punkte, status: r.status || "leer", hinweis: r.text || "" });
+      const z = zeile({ typ: f.typ, label: f.label || "", be: f.be, punkte: r.punkte, status: r.status || "leer", hinweis: r.text || "" });
 
       if (f.typ === "zahl") {
         z.du = s ? s + (f.einheit && !/[a-zA-Z€%$]\s*$/.test(s) ? " " + f.einheit : "") : "";
@@ -252,14 +252,14 @@
                      du: mitE(v, x.f), richtig: soll(x.f), ok: richtigOk(x.f, v), leer: !v });
         }
       }
-      out.push(zeile({ label: "Tabelle", status: sammelStatus(sub), sub }));
+      out.push(zeile({ typ: "raster", label: "Tabelle", status: sammelStatus(sub), sub }));
     } else if (E.typ === "zuordnung") {
       const opt = n => { if (!n) return ""; const x = (E.optionen || [])[Number(n) - 1]; return n + (x ? " – " + klar(x) : ""); };
       const sub = (E.zeilen || []).map(zl => {
         const v = w("z" + zl.id);
         return { label: klar(zl.h), du: opt(v), richtig: opt(zl.soll), ok: !!v && String(v) === String(zl.soll), leer: !v };
       });
-      out.push(zeile({ label: klar(E.ftitel) || "Zuordnung", status: sammelStatus(sub), sub }));
+      out.push(zeile({ typ: "zuordnung", label: klar(E.ftitel) || "Zuordnung", status: sammelStatus(sub), sub }));
     } else if (E.typ === "wahl") {
       const sub = (E.zeilen || []).map(zl => {
         const v = a["w" + zl.id];
@@ -267,13 +267,13 @@
         return { label: klar(zl.h), du: hat ? klar((zl.optionen || [])[Number(v)]) : "", richtig: klar((zl.optionen || [])[zl.soll]),
                  ok: hat && Number(v) === Number(zl.soll), leer: !hat };
       });
-      out.push(zeile({ label: klar(E.ftitel) || "Auswahl", status: sammelStatus(sub), sub }));
+      out.push(zeile({ typ: "wahl", label: klar(E.ftitel) || "Auswahl", status: sammelStatus(sub), sub }));
     } else if (E.typ === "mehrfach") {
       const gew = Array.isArray(a.m) ? a.m.map(Number) : [];
       const S0 = (E.soll || []).map(Number);
       const txt = i => klar((E.optionen || [])[i - 1]) || String(i);
       const z = zeile({
-        label: "Ankreuzen", du: gew.map(txt).join(" · "), richtig: S0.map(txt).join(" · "),
+        typ: "mehrfach", label: "Ankreuzen", du: gew.map(txt).join(" · "), richtig: S0.map(txt).join(" · "),
         passt: gew.filter(i => S0.indexOf(i) >= 0).map(txt),
         fehlt: S0.filter(i => gew.indexOf(i) < 0).map(txt),
         weg: gew.filter(i => S0.indexOf(i) < 0).map(txt)
@@ -287,15 +287,15 @@
         fe.forEach((f, j) => {
           const v = w("f" + f.id);
           const ok = richtigOk(f, v);
-          out.push(zeile({ label: label + (fe.length > 1 ? " (" + (j + 1) + ")" : ""), status: !v ? "leer" : (ok ? "richtig" : "falsch"),
+          out.push(zeile({ typ: f.art === "zahl" ? "zahl" : "feld", label: label + (fe.length > 1 ? " (" + (j + 1) + ")" : ""), status: !v ? "leer" : (ok ? "richtig" : "falsch"),
                            du: mitE(v, f), richtig: soll(f) }));
         });
         if (zl.frei) {
           const v = w("t" + zl.frei);
-          out.push(zeile({ label, status: v ? "offen" : "leer", du: v, frei: true }));
+          out.push(zeile({ typ: "frei", label, status: v ? "offen" : "leer", du: v, frei: true }));
         }
       });
-      if (w("rw")) out.push(zeile({ label: "Rechenweg", status: "offen", du: w("rw"), mono: true, frei: true }));
+      if (w("rw")) out.push(zeile({ typ: "rechenweg", label: "Rechenweg", status: "offen", du: w("rw"), mono: true, frei: true }));
     }
     return out;
   }
@@ -327,7 +327,7 @@
       } catch (e) { }
     }
     return zeile({
-      label: "Abgleich mit der Musterlösung", status: "info", passt, fehlt: fehlt.slice(0, 8), hinweis,
+      typ: "abgleich", label: "Abgleich mit der Musterlösung", status: "info", passt, fehlt: fehlt.slice(0, 8), hinweis,
       info: "Begriffe aus der Musterlösung — ein Wortvergleich, keine Bewertung."
     });
   }
@@ -525,6 +525,144 @@
   }
 
   /* ======================================================================
+     Lernzettel: was mir gefehlt hat — für das Merkblatt (gen/merkblatt.js)
+     ----------------------------------------------------------------------
+     Aus jeder Fehlerkarte zwei Dinge, die sich lohnen, noch einmal zu lesen:
+       Begriffe  die in der Antwort fehlten (mit Russisch, wo das Glossar
+                 sie kennt)
+       Fakten    falsch gewählte Antworten: Zuordnung, Richtig/Falsch,
+                 Auswahl, Ankreuzen — „Frage → richtig“
+     Zahlen stehen nicht darauf: „richtig: 31.360 €“ sagt ohne die Aufgabe
+     nichts. Gruppiert nach den Themen des Radars, wahrscheinlichste zuerst.
+     ====================================================================== */
+  const NUR_ZAHL = /^[\d\s.,:/%+\-–—()→€]*$/;
+
+  /** Russisch aus dem Glossar — nur, wenn der Begriff ganz getroffen ist */
+  function uebersetze(de) {
+    const GL = root.GENGLOSSAR;
+    let G = null;
+    try { G = GL && GL.daten ? GL.daten() : null; } catch (e) { G = null; }
+    if (!G) return "";
+    const t = String(de || "").trim();
+    if (!t) return "";
+    const id = G.formVon && G.formVon[t.toLowerCase()];
+    if (id && G.von[id]) return G.von[id].ru || "";
+    let f = [];
+    try { f = GL.finde(G, t); } catch (e) { f = []; }
+    const m = f.find(x => x.start === 0 && x.ende >= t.length - 3);
+    return m && G.von[m.id] ? G.von[m.id].ru || "" : "";
+  }
+
+  /** Der Anfang der Musterlösung als ein, zwei Sätze — für Textaufgaben */
+  function kernsatz(text, max) {
+    max = max || 220;
+    let t = String(text || "").replace(/\s+/g, " ").trim()
+      .replace(/^(z\.\s?B\.|zum Beispiel|Beispiele?|Mögliche (Antwort|Lösung)(en)?|Lösungsvorschlag|Lösungshinweis|Musterlösung|Lösung|Antwort)\s*[:.\-–]?\s*/i, "")
+      .replace(/^[-–•*]\s*/, "");
+    if (t.length <= max) return t;
+    const cut = t.slice(0, max);
+    const ende = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("; "));
+    return ende > 60 ? cut.slice(0, ende + 1) : cut.replace(/\s+\S*$/, "") + " …";
+  }
+  const ersterSatz = (t, max) => {
+    const x = String(t || "").replace(/\s+/g, " ").trim();
+    const m = /^(.{20,}?[.?!])\s/.exec(x + " ");
+    /* „… folgende Angabe:“ sagt nichts — dann lieber der Anfang der ganzen Frage */
+    const s = m && m[1].length >= 40 ? m[1] : x;
+    return s.length > (max || 140) ? s.slice(0, (max || 140) - 1).replace(/\s+\S*$/, "") + " …" : s;
+  };
+
+  /** Fehlerkarte ohne Seite aufbauen: Zeilen, Aufgabentext, Thema */
+  function zeilenFuer(x) {
+    if (x.quelle === "gen") {
+      const d = detailGen(x);
+      if (d.fehler) return null;
+      return { zeilen: d.zeilen, text: [d.a.titel, d.a.situation, d.a.prompt].join(" "), thema: x.ref.thema || "" };
+    }
+    if (x.quelle === "ihk") {
+      const it = x.ref, d = detailIhk(x);
+      return { zeilen: d.zeilen, text: [it.groupIntro, it.prompt].filter(Boolean).join(" "), thema: "",
+               kern: kernsatz(d.loesung), kernFrage: ersterSatz(it.prompt) };
+    }
+    const A = root.GENAZUBI, m = A && A.modul ? A.modul(x.ref.mid) : null;
+    if (!m) return null;
+    const t = A.teileVon(m).find(y => y.id === x.ref.tid);
+    if (!t) return null;
+    const a = A.zustand(m.id).a[t.id] || {};
+    const zeilen = zeilenAzubi(t, a, A);
+    const frei = zeilen.filter(y => y.frei && y.du).map(y => y.du).join("\n");
+    const md = h => (A.htmlZuMd ? A.htmlZuMd(h) : klar(h));
+    if (frei && t.loesung) zeilen.push(abgleich(md(t.text), frei, md(t.loesung)));
+    return { zeilen, text: klar(t.titel) + " " + klar(t.text), thema: "",
+             kern: kernsatz(md(t.loesung).replace(/\*\*|\|/g, " ")), kernFrage: klar(t.titel) };
+  }
+
+  /** { text, thema, begriffe:[{de, ru}], fakten:[{frage, richtig}] } */
+  function lernpunkte(x) {
+    const d = zeilenFuer(x);
+    if (!d) return null;
+    const begriffe = [], fakten = [];
+    const neuB = (de, sicher) => {
+      de = String(de || "").trim();
+      if (!de || de.length < 3 || NUR_ZAHL.test(de) || begriffe.some(b => normS(b.de) === normS(de))) return;
+      const ru = uebersetze(de);
+      /* Wortvergleich-Begriffe sind unsauber („Herstellers“) — nur, was das
+         Glossar kennt oder technisch aussieht (USB-C, IPv6, PoE, RAID 1) */
+      if (!sicher && !ru && !/[A-ZÄÖÜ].*[A-ZÄÖÜ]|\d|-/.test(de)) return;
+      begriffe.push({ de, ru });
+    };
+    const neuF = (frage, richtig, art) => {
+      frage = String(frage || "").trim(); richtig = String(richtig || "").trim();
+      if (!frage || !richtig || NUR_ZAHL.test(richtig) || fakten.some(f => f.frage === frage)) return;
+      fakten.push({ frage: frage.length > 160 ? frage.slice(0, 157) + "…" : frage, richtig, art: art || "fakt" });
+    };
+    d.zeilen.forEach(z => {
+      if (z.status === "richtig") return;
+      if ((z.typ === "text" || z.typ === "liste") && z.status !== "leer") z.fehlt.forEach(b => neuB(b, true));
+      else if ((z.typ === "text" || z.typ === "liste") && z.status === "leer") (z.fehlt.length ? z.fehlt : String(z.richtig).split(" · ")).slice(0, 4).forEach(b => neuB(b, true));
+      else if (z.typ === "abgleich") z.fehlt.forEach(b => neuB(b, false));
+      else if (z.typ === "auswahl" || z.typ === "feld") neuF(z.label, z.richtig);
+      else if (z.typ === "mehrfachwahl" || z.typ === "mehrfach") neuF(z.label, z.richtig);
+      else if (z.sub && z.typ !== "raster") z.sub.filter(y => !y.ok).forEach(y => {
+        if (z.typ === "aussagen") neuF("„" + y.label + "“", y.richtig === "richtig" ? "stimmt" : "stimmt nicht");
+        else neuF(y.label, y.richtig);
+      });
+    });
+    /* Textaufgabe (IHK, Azubi, Prognose): der Kern der Musterlösung in einem Satz */
+    if (d.kern && d.zeilen.some(z => z.frei && z.typ !== "rechenweg" && z.status !== "richtig")) neuF(d.kernFrage, d.kern, "kern");
+    return { text: d.text, thema: d.thema, begriffe, fakten };
+  }
+
+  /** Alle Fehler → Themen mit Begriffen und Fakten, wahrscheinlichstes Thema zuerst */
+  function lernzettel(items, opt) {
+    opt = opt || {};
+    items = items || sammeln();
+    let themen = [];
+    try { themen = root.GENRADAR && root.GENRADAR.prognose ? root.GENRADAR.prognose().filter(t => t.such) : []; } catch (e) { themen = []; }
+    const rx = themen.map(t => { try { return { t, re: new RegExp(t.such, "i") }; } catch (e) { return null; } }).filter(Boolean);
+    const gruppen = {};
+    items.forEach(x => {
+      let d = null;
+      try { d = lernpunkte(x); } catch (e) { d = null; }
+      if (!d || (!d.begriffe.length && !d.fakten.length)) return;
+      const hit = rx.find(y => y.re.test(d.text));
+      const key = hit ? hit.t.k : "x:" + (d.thema || "Sonstiges");
+      const g = gruppen[key] || (gruppen[key] = { key, name: hit ? hit.t.t : (d.thema || "Sonstiges"), rang: hit ? rx.indexOf(hit) : 999, begriffe: [], fakten: [], n: 0 });
+      g.n++;
+      d.begriffe.forEach(b => { if (!g.begriffe.some(y => normS(y.de) === normS(b.de))) g.begriffe.push(b); });
+      d.fakten.forEach(f => { if (!g.fakten.some(y => y.frage === f.frage)) g.fakten.push(f); });
+    });
+    const maxB = opt.maxBegriffe || 14, maxF = opt.maxFakten || 6;
+    return Object.keys(gruppen).map(k => gruppen[k])
+      .map(g => Object.assign(g, {
+        /* mit Übersetzung zuerst — die sind die sichersten */
+        begriffe: g.begriffe.slice().sort((a, b) => (b.ru ? 1 : 0) - (a.ru ? 1 : 0)).slice(0, maxB),
+        fakten: g.fakten.slice(0, maxF)
+      }))
+      .sort((a, b) => a.rang - b.rang || b.n - a.n);
+  }
+
+  /* ======================================================================
      Oberfläche
      ====================================================================== */
   let VIEW = "liste";               /* liste | karte | ende */
@@ -660,6 +798,11 @@
     st.appendChild(los);
     kopf.appendChild(st);
     if (z.offen) kopf.appendChild(el("p", "fa-klein", "≈ 2–3 Minuten je Fehler. Du kannst jederzeit aufhören — was du entschieden hast, bleibt gespeichert."));
+    if (root.GENMERKBLATT && ITEMS.length) {
+      const mb = el("button", "fa-link", "Merkblatt: was mir gefehlt hat (Begriffe DE → RU, A4)");
+      mb.type = "button"; mb.onclick = () => root.GENMERKBLATT.zeigen();
+      kopf.appendChild(mb);
+    }
     box.appendChild(kopf);
 
     if (!ITEMS.length) {
@@ -1127,7 +1270,7 @@
 
   const api = {
     oeffnen, startBlock, sammeln, ordnen, zaehlen, statusVon, setzen,
-    zeilenGen, zeilenAzubi, abgleich, klar, genEingaben, morgenIso, sollZahl,
+    zeilenGen, zeilenAzubi, abgleich, klar, genEingaben, morgenIso, sollZahl, lernpunkte, lernzettel, uebersetze,
     get S() { return S; }, setzeStand(neu) { S = Object.assign({ k: {} }, neu || {}); sichern(); }
   };
   root.GENANALYSE = api;

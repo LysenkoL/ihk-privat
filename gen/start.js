@@ -662,9 +662,11 @@ window.GENSTART = (function () {
     kachel("Arbeitsblatt", z.vorlagen + " Aufgabentypen", assistent, "blatt");
     kachel("Simulation", z.letzteSim ? "zuletzt " + datum(z.letzteSim.erstellt) : "90 Minuten · 100 BE", simulation, "sim");
     kachel("Kurzfragen", z.satzKarten ? z.satzKarten + " Fragen · 5 Min." : "5 Minuten", satzbau, "satz");
-    if (z.analyseOffen != null) kachel("Fehler durchgehen", z.analyseOffen ? z.analyseOffen + " offen · Antwort ↔ richtig" : "nichts offen", journal, "journal", z.analyseOffen >= 5);
+    if (z.analyseOffen != null) kachel("Fehler durchgehen", z.analyseOffen ? z.analyseOffen + " offen" : "nichts offen", journal, "journal", z.analyseOffen >= 5);
     else kachel("Fehlerjournal", z.fehlerOffen ? z.fehlerOffen + " offen" : "nichts offen", journal, "journal", z.fehlerOffen >= 5);
     kachel("Formeln & Operatoren", "zum Ausdrucken", formeln, "formel");
+    if (window.GENSPRINT) kachel("Rechen-Sprint", "5 Aufgaben · ≈ 30 Min.", () => window.GENSPRINT.starten(5), "rechnen");
+    if (window.GENMERKBLATT) kachel("Merkblatt", "was mir gefehlt hat", () => window.GENMERKBLATT.zeigen(), "journal");
     k.appendChild(g);
   }
 

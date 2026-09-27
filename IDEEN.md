@@ -266,6 +266,10 @@
   - генератор теперь сохраняет **все поля** ответа (`eingaben`, до 6 000 знаков), для старых записей ответ берётся из последних 40 листов; перепроверка при просмотре не двигает запись в журнале (`GENFEHLER.still`);
   - баг: оценка настоящих экзаменов через строку «Punkte geben» под ответом не попадала в журнал (ловилась только шкала на поле) — исправлено;
   - тайл на главной «Fehler durchgehen» (все источники), совет «N Fehler zum Durchgehen», поиск, кнопка «Zurück» телефона между карточкой и списком; `ihk2:analyse` в синхронизации; обновление кэша Service Worker до `ihk-ap1-v39-app`.
+- **Merkblatt из ошибок и Rechen-Sprint** (`gen/fehleranalyse.js`, `gen/merkblatt.js`, `gen/druck.js`, `gen/druckbogen.js`, `gen/druck.css`, `gen/sprint.js`, `gen/start.js`, `gen/finder.js`, `gen/radar.js`, `tests/sprint.test.js`, `tests/fehleranalyse.test.js`, 27.09):
+  - Merkblatt начинается с «Was mir gefehlt hat»: по темам радара — термины, которых не хватило (из генератора — точные, из сверки со словами решения — только те, что знает глоссарий или технические), с русским из глоссария; перепутанные факты; суть решения текстовых задач (IHK, Azubi, Prognose) в 1–2 предложениях;
+  - Merkblatt на телефоне больше не уменьшенный A4, а текст по ширине экрана (`dr-lesbar`), печать не изменилась;
+  - Rechen-Sprint: 5 задач (IP, Kosten, Speicher/Übertragung, Nutzwert/Leasing, Strom) с новыми числами, из каждой области самый слабый шаблон, часы 0,9 мин/BE; Mini — 3 задачи; плитки «Rechen-Sprint» и «Merkblatt» на главной; обновление кэша Service Worker до `ihk-ap1-v40-app`.
 
 
 ## Чего не хватает

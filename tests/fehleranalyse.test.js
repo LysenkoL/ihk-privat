@@ -231,6 +231,39 @@ assert.deepStrictEqual(o.map(x => x.id), ["4", "6", "5", "3", "2", "1"]);
 const s = FA.sammeln();
 assert(s.some(x => x.id === "gen:" + eintrag.schluessel), "Generator-Eintrag gesammelt");
 
+/* ----------------------------------------- Lernzettel fürs Merkblatt ---- */
+require(path.join(root, "gen", "radar-daten.js"));
+require(path.join(root, "gen", "radar.js"));
+require(path.join(root, "gen", "glossar-daten.js"));
+require(path.join(root, "gen", "glossar.js"));
+assert(FA.uebersetze("Netzteil"), "Glossar kennt Netzteil: " + FA.uebersetze("Netzteil"));
+assert.strictEqual(FA.uebersetze("planbare Kosten xyz"), "", "kein halber Treffer");
+/* Liste: ein Argument genannt, zwei verlangt → die übrigen sind Begriffe */
+const lv = G.alleVorlagen().find(v => G.erzeuge(v.id, 5).felder.some(f => f.typ === "liste" && f.noetig >= 2 && f.erwartet.length > f.noetig));
+const la = G.erzeuge(lv.id, 5);
+const lf = la.felder.find(f => f.typ === "liste" && f.noetig >= 2 && f.erwartet.length > f.noetig);
+const lein = { [lf.nr]: lf.erwartet[0][0] };
+const lerg = G.pruefeAufgabe(la, lein); lerg.eingaben = lein;
+F.ausGenerator(la, lerg);
+/* Richtig/Falsch: alle umgedreht → Fakten */
+const av = G.alleVorlagen().find(v => G.erzeuge(v.id, 9).felder.some(f => f.typ === "aussagen"));
+const aa = G.erzeuge(av.id, 9);
+const af = aa.felder.find(f => f.typ === "aussagen");
+const aein = { [af.nr]: {} }; af.aussagen.forEach((x, i) => { aein[af.nr][i] = x.wahr ? "f" : "w"; });
+const aerg = G.pruefeAufgabe(aa, aein); aerg.eingaben = aein;
+F.ausGenerator(aa, aerg);
+const alle = FA.sammeln();
+const lp = FA.lernpunkte(alle.find(x => x.id === "gen:g|" + la.vorlageId + "|" + la.saat));
+assert(lp.begriffe.length >= 1 && lp.begriffe.every(b => b.de && lf.erwartet.some(e => e[0] === b.de)), "Begriffe aus der Liste: " + JSON.stringify(lp.begriffe));
+assert(!lp.begriffe.some(b => b.de === lf.erwartet[0][0]), "Genanntes fehlt nicht");
+const ap = FA.lernpunkte(alle.find(x => x.id === "gen:g|" + aa.vorlageId + "|" + aa.saat));
+assert.strictEqual(ap.fakten.length, af.aussagen.length, "jede falsche Aussage ist ein Fakt");
+assert(ap.fakten.every(f => /^„/.test(f.frage) && (f.richtig === "stimmt" || f.richtig === "stimmt nicht")));
+const lz = FA.lernzettel(alle);
+assert(lz.length >= 1 && lz.every(g => g.name && (g.begriffe.length || g.fakten.length)), "Lernzettel nach Themen");
+assert(lz.every((g, i) => i === 0 || lz[i - 1].rang <= g.rang), "wahrscheinlichstes Thema zuerst");
+assert(!lz.some(g => g.begriffe.some(b => /^[\d\s.,]+$/.test(b.de))), "keine nackten Zahlen");
+
 /* ------------------------------------------------------- Einbindung ---- */
 const sw = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 ["gen/fehleranalyse.js", "gen/fehleranalyse.css"].forEach(f => {

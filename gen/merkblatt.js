@@ -114,7 +114,39 @@ window.GENMERKBLATT = (function () {
       .map(k => ({ f: k.thema + ": " + (k.stichwort || ""), h: k.muster }));
   }
 
+  /** Was mir gefehlt hat — aus „Fehler durchgehen“ (gen/fehleranalyse.js) */
+  function lernzettel(max) {
+    try { return window.GENANALYSE ? window.GENANALYSE.lernzettel(null).slice(0, max || 8) : []; }
+    catch (e) { console.error("Merkblatt/Lernzettel:", e); return []; }
+  }
+
   /* --------------------------------------------------------------- Bauen */
+  function lernBlock(g) {
+    const box = el("div", "fo-block mb-lern");
+    box.appendChild(el("h3", null, g.name));
+    if (g.begriffe.length) {
+      const z = el("div", "fo-zeile");
+      z.appendChild(el("div", "fo-f", "Diese Begriffe haben gefehlt:"));
+      const h = el("div", "fo-h mb-begriffe");
+      g.begriffe.forEach((b, i) => {
+        const s = el("span", "mb-b");
+        s.appendChild(el("b", null, b.de));
+        if (b.ru) s.appendChild(el("span", "mb-ru", " — " + b.ru));
+        h.appendChild(s);
+        if (i < g.begriffe.length - 1) h.appendChild(document.createTextNode(" · "));
+      });
+      z.appendChild(h);
+      box.appendChild(z);
+    }
+    g.fakten.forEach(f => {
+      const z = el("div", "fo-zeile");
+      z.appendChild(el("div", "fo-f mb-frage", f.frage));
+      z.appendChild(el("div", "fo-h", (f.art === "kern" ? "→ So geht es: " : "→ richtig: ") + f.richtig));
+      box.appendChild(z);
+    });
+    return box;
+  }
+
   function block(titel, zeilen) {
     const box = el("div", "fo-block");
     box.appendChild(el("h3", null, titel));
@@ -127,11 +159,18 @@ window.GENMERKBLATT = (function () {
     return box;
   }
 
+  /* Das Azubi-Paket kommt aus dem Gerätespeicher — erst laden, dann bauen */
   function zeigen() {
     if (!window.GENDRUCK) return;
+    const A = window.GENAZUBI;
+    if (A && A.laden) A.laden().then(bauen, bauen); else bauen();
+  }
+
+  function bauen() {
     window.GENDRUCK.zeige({ titel: "Merkblatt", erstellt: "" }, [], { loesung: false });
 
     const fa = fehlerarten(30);
+    const lz = lernzettel(8);
     const th = themen(6);
     const sa = saetze(6);
     const n = tageBis();
@@ -140,8 +179,8 @@ window.GENMERKBLATT = (function () {
     const leiste = $("druckLeiste");
     leiste.innerHTML = "";
     const info = el("div", "dr-info");
-    info.innerHTML = "<b>Merkblatt</b> — deine eigenen Fehler auf einer Seite. " +
-      "Nicht zum Lernen, zum Erinnern: die letzten drei Tage jeden Morgen einmal durchlesen.";
+    info.innerHTML = "<b>Merkblatt</b> — deine eigenen Fehler: was gefehlt hat, was du verwechselt hast, " +
+      "welche Fehler dir oft passieren. Abends und am Prüfungsmorgen einmal durchlesen.";
     leiste.appendChild(info);
     leiste.appendChild(el("span", "weit"));
     const dr = el("button", "btn primary", "Drucken / als PDF speichern");
@@ -169,6 +208,18 @@ window.GENMERKBLATT = (function () {
     s.appendChild(kopf);
 
     const sp = el("div", "fo-spalten");
+
+    /* Zuerst das Konkrete: Begriffe und Fakten aus den eigenen Fehlern */
+    if (lz.length) {
+      const hin = el("div", "fo-block mb-kopf");
+      hin.appendChild(el("h3", null, "Was mir gefehlt hat"));
+      const z = el("div", "fo-zeile");
+      z.appendChild(el("div", "fo-h", "Aus deinen Fehlern mit gespeicherter Antwort (Prognose, IHK, Azubi, Generator), " +
+        "nach Themen — wahrscheinlichstes zuerst. Russisch steht dabei, wenn das Glossar den Begriff kennt."));
+      hin.appendChild(z);
+      sp.appendChild(hin);
+      lz.forEach(g => sp.appendChild(lernBlock(g)));
+    }
 
     if (fa.zeilen.length) {
       sp.appendChild(block("Was mir am häufigsten passiert",
@@ -213,6 +264,9 @@ window.GENMERKBLATT = (function () {
     s.appendChild(fuss);
 
     b.appendChild(s);
+    /* am Handy lesbar umbrechen statt A4 verkleinert (gen/druckbogen.js) */
+    b.classList.add("dr-lesbar");
+    b.style.zoom = "";
     window.scrollTo(0, 0);
   }
 
@@ -252,5 +306,5 @@ window.GENMERKBLATT = (function () {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einhaengen);
   else einhaengen();
 
-  return { zeigen, fehlerarten, themen, saetze, REGELN, ABLAUF };
+  return { zeigen, fehlerarten, themen, saetze, lernzettel, REGELN, ABLAUF };
 })();

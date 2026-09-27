@@ -55,6 +55,8 @@ window.GENDRUCK = (function () {
     const wrap = behaelter();
     wrap.hidden = false;
     document.body.classList.add("druckmodus");
+    /* nur das Merkblatt setzt „dr-lesbar“ wieder (gen/merkblatt.js) */
+    const bg = $("druckBogen"); if (bg) bg.classList.remove("dr-lesbar");
 
     const leiste = $("druckLeiste");
     leiste.innerHTML = "";

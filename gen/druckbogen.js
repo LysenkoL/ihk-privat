@@ -223,6 +223,8 @@ window.GENDRUCKBOGEN = (function () {
   function vorschauAnpassen() {
     const b = document.getElementById("druckBogen");
     if (!b || !b.parentElement) return;
+    /* Blätter zum Lesen am Handy (Merkblatt) fließen um, statt klein zu werden */
+    if (b.classList.contains("dr-lesbar")) { b.style.zoom = ""; return; }
     const platz = b.parentElement.clientWidth - 16;
     if (platz <= 0) return;
     const f = Math.min(1, platz / A4_PX);
